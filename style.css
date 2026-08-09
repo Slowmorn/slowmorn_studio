@@ -806,6 +806,8 @@ body.errorspace {
   --font-body:    'Red Hat Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --paper:  #000005;   /* near-black space */
   --paper-2: #0a0d16;
+  --accent:   #00de81;   /* neon emerald */
+  --accent-2: #ff2ea6;   /* neon magenta */
   letter-spacing: 0;
   background: #000005;
 }
@@ -814,14 +816,37 @@ body.errorspace {
 body.errorspace { font-size: 16px; letter-spacing: 0; }
 body.errorspace .app-name { letter-spacing: -0.01em; }
 
-/* replace the light ambient glow with a cold cosmic wash;
-   the actual stars are injected as #starfield below */
+/* replace the light ambient glow with a neon cyberpunk wash —
+   emerald up top, magenta down low; the stars are injected as #starfield */
 body.errorspace::before {
   background:
-    radial-gradient(130% 100% at 82% -20%, rgba(90,120,200,0.16), transparent 55%),
-    radial-gradient(90% 80% at -12% 112%, rgba(70,60,140,0.14), transparent 60%);
+    radial-gradient(130% 100% at 82% -20%, rgba(0,222,129,0.13), transparent 55%),
+    radial-gradient(90% 80% at -12% 112%, rgba(255,46,166,0.13), transparent 60%);
 }
 body.errorspace::after { opacity: 0.25; }
+
+/* neon glow on accent-colored emphasis + interactive links */
+body.errorspace ::selection { background: rgba(0,222,129,0.30); color: #04140c; }
+body.errorspace .app-body .lead em,
+body.errorspace nav .mark .dot,
+body.errorspace .contact-inner .big em {
+  text-shadow: 0 0 10px rgba(0,222,129,0.55), 0 0 22px rgba(0,222,129,0.28);
+}
+body.errorspace .app-name {
+  text-shadow: 0 0 22px rgba(0,222,129,0.16);
+}
+body.errorspace .legal .prose a:hover,
+body.errorspace .support-card .value a:hover,
+body.errorspace .foot-contact a:hover,
+body.errorspace .back-link:hover {
+  color: var(--accent);
+  text-shadow: 0 0 10px rgba(0,222,129,0.5);
+}
+/* neon privacy highlight box */
+body.errorspace .legal .highlight {
+  background: rgba(0,222,129,0.06);
+  border-color: rgba(0,222,129,0.28);
+}
 
 /* ---------- starfield ---------- */
 #starfield {
