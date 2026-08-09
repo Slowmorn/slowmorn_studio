@@ -702,3 +702,148 @@ footer .foot-contact a {
   transition: color .25s var(--ease), border-color .25s var(--ease);
 }
 footer .foot-contact a:hover { color: var(--accent); border-color: var(--accent); }
+
+/* ============================================================
+   Home (index) — serif type + neutral-gray palette
+   (scoped to .home so other pages are unaffected)
+   ============================================================ */
+body.home {
+  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-body:    'Newsreader', Georgia, 'Times New Roman', serif;
+  letter-spacing: 0;
+
+  /* lighter, gently cool gray — a little blue back in the accent */
+  --paper:     #f8f8f9;   /* near-white, faintly cool */
+  --paper-2:   #fdfdfe;
+  --ink:       #22242b;   /* soft cool charcoal */
+  --ink-soft:  #565a63;
+  --ink-faint: #8d909a;
+  --line:      #dededf;
+  --line-soft: #e8e8ea;
+  --accent:    #6f7888;   /* light gray-slate — faint blue, brighter */
+  --accent-2:  #8b93a2;
+  background: var(--paper);
+}
+/* serif carries its own rhythm — ease the tight tracking a touch */
+body.home h1,
+body.home .manifesto,
+body.home .big { letter-spacing: -0.01em; }
+body.home .eyebrow,
+body.home .sec-label,
+body.home .status,
+body.home .mk { letter-spacing: 0.12em; }
+/* soften the leftover hardcoded blues to match the muted accent */
+body.home ::selection { background: rgba(111,120,136,0.20); color: var(--ink); }
+body.home::before {
+  background:
+    radial-gradient(120% 90% at 86% -20%, rgba(120,128,144,0.13), transparent 55%),
+    radial-gradient(90% 70% at -10% 110%, rgba(112,120,136,0.06), transparent 60%);
+}
+body.home .status.live {
+  color: var(--accent);
+  border-color: rgba(111,120,136,0.42);
+  background: rgba(111,120,136,0.09);
+}
+body.home .status.live .pip {
+  box-shadow: 0 0 0 0 rgba(111,120,136,0.5);
+  animation: pulse-slate 2.4s infinite;
+}
+@keyframes pulse-slate {
+  0%   { box-shadow: 0 0 0 0 rgba(111,120,136,0.45); }
+  70%  { box-shadow: 0 0 0 7px rgba(111,120,136,0); }
+  100% { box-shadow: 0 0 0 0 rgba(111,120,136,0); }
+}
+
+/* ============================================================
+   Benedi — soft light-green palette
+   (scoped to .benedi so other pages are unaffected)
+   ============================================================ */
+body.benedi {
+  --paper:     #e6f0e6;   /* soft green-gray */
+  --paper-2:   #eef5ee;   /* elevated panel */
+  --ink:       #1c2a20;   /* green-charcoal */
+  --ink-soft:  #4f6554;
+  --ink-faint: #85a08c;
+  --line:      #d0e0d3;
+  --line-soft: #dbe8de;
+  --accent:    #4f9366;   /* leaf green */
+  --accent-2:  #6fb385;
+  background: var(--paper);
+}
+body.benedi ::selection { background: rgba(79,147,102,0.22); color: var(--ink); }
+body.benedi::before {
+  background:
+    radial-gradient(120% 90% at 86% -20%, rgba(120,180,130,0.16), transparent 55%),
+    radial-gradient(90% 70% at -10% 110%, rgba(90,150,100,0.09), transparent 60%);
+}
+/* green "Available now" badge */
+body.benedi .status.live {
+  color: var(--accent);
+  border-color: rgba(79,147,102,0.4);
+  background: rgba(79,147,102,0.08);
+}
+body.benedi .status.live .pip {
+  box-shadow: 0 0 0 0 rgba(79,147,102,0.5);
+  animation: pulse-green 2.4s infinite;
+}
+@keyframes pulse-green {
+  0%   { box-shadow: 0 0 0 0 rgba(79,147,102,0.45); }
+  70%  { box-shadow: 0 0 0 7px rgba(79,147,102,0); }
+  100% { box-shadow: 0 0 0 0 rgba(79,147,102,0); }
+}
+/* green privacy highlight box */
+body.benedi .legal .highlight {
+  background: rgba(79,147,102,0.08);
+  border-color: rgba(79,147,102,0.22);
+}
+
+/* ============================================================
+   ErrorSpace — mono type + deep-space background
+   (scoped to .errorspace so other pages are unaffected)
+   ============================================================ */
+body.errorspace {
+  --font-display: 'Red Hat Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --font-body:    'Red Hat Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --paper:  #000005;   /* near-black space */
+  --paper-2: #0a0d16;
+  letter-spacing: 0;
+  background: #000005;
+}
+
+/* mono reads wide — trim size/spacing a touch so it stays composed */
+body.errorspace { font-size: 16px; letter-spacing: 0; }
+body.errorspace .app-name { letter-spacing: -0.01em; }
+
+/* replace the light ambient glow with a cold cosmic wash;
+   the actual stars are injected as #starfield below */
+body.errorspace::before {
+  background:
+    radial-gradient(130% 100% at 82% -20%, rgba(90,120,200,0.16), transparent 55%),
+    radial-gradient(90% 80% at -12% 112%, rgba(70,60,140,0.14), transparent 60%);
+}
+body.errorspace::after { opacity: 0.25; }
+
+/* ---------- starfield ---------- */
+#starfield {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+#starfield .star {
+  position: absolute;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(255,255,255,0.6);
+}
+#starfield .star.twinkle {
+  animation: es-twinkle var(--dur, 3s) ease-in-out var(--delay, 0s) infinite;
+}
+@keyframes es-twinkle {
+  0%, 100% { opacity: 0.15; }
+  50%      { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #starfield .star.twinkle { animation: none; }
+}
