@@ -19,6 +19,14 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:image" content="https://slowmorn.com/budget/og.png">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZB0D0NTBJ8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZB0D0NTBJ8');
+</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <style>
@@ -1897,6 +1905,10 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 <script>
 (function(){
   const STORE_KEY = "prep-budget-v2";
+  // GA4 events. Silent when analytics is blocked or still loading.
+  function track(name, params){
+    try{ if(typeof gtag === "function") gtag("event", name, params || {}); }catch(e){}
+  }
   // ExcelJS is ~950KB and only two buttons need it, so fetch it on first use
   const EXCELJS_URL = "https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js";
   let excelPromise = null;
@@ -2664,6 +2676,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
     if(!isDefault) plan.title = state.title;
     replaceActive(plan);
     render(); save();
+    track("template_load", { template: btn.dataset.tpl, source: "menu" });
     toast(`'${btn.dataset.label}' 템플릿을 불러왔어요`, snap);
   }));
 
@@ -2793,6 +2806,11 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
     const it = optItem();
     const o = (it.options || []).find(x => x.id === row.dataset.oid);
     if(!o) return;
+    if(e.target.closest("a.opt-tool")){ // 참고·제휴 링크를 열었을 때
+      let host = ""; try{ host = new URL(o.link).hostname.replace(/^www\./, ""); }catch(err){}
+      track("affiliate_click", { item_name: it.name || "", option_name: o.name, link_domain: host });
+      return;
+    }
     if(e.target.closest(".opt-main")){
       if(it.choiceId === o.id){
         it.choiceId = null; // keep the budget as it is
@@ -3384,6 +3402,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   }));
 
   async function runExport(scope){
+    track("excel_export", { scope: scope, tabs: store.plans.length });
     try{ await loadExcel(); }catch(e){ toast("엑셀 도구를 불러오지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요."); return; }
     exporting = true;
     exportBtn.setAttribute("aria-disabled", "true");
@@ -3612,6 +3631,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
     store.activeId = plan.id;
     syncActive();
     save();
+    track("template_load", { template: key, source: "link" });
     // Drop the parameter so a reload doesn't add the template again
     try{ history.replaceState(null, "", location.pathname + location.hash); }catch(e){}
   })();
