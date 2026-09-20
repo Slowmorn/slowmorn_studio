@@ -1892,10 +1892,26 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 ]
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<!-- ExcelJS는 내보내기·불러오기를 누를 때만 받아요 (loadExcel) -->
 <script>
 (function(){
   const STORE_KEY = "prep-budget-v2";
+  // ExcelJS is ~950KB and only two buttons need it, so fetch it on first use
+  const EXCELJS_URL = "https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js";
+  let excelPromise = null;
+  function loadExcel(){
+    if(window.ExcelJS) return Promise.resolve(window.ExcelJS);
+    if(!excelPromise){
+      excelPromise = new Promise((resolve, reject) => {
+        const el = document.createElement("script");
+        el.src = EXCELJS_URL;
+        el.onload = () => window.ExcelJS ? resolve(window.ExcelJS) : reject(new Error("no ExcelJS"));
+        el.onerror = () => reject(new Error("load failed"));
+        document.head.appendChild(el);
+      }).catch(err => { excelPromise = null; throw err; });
+    }
+    return excelPromise;
+  }
   const LEGACY_KEY = "prep-budget-v1"; // single-plan format, migrated on first load
 
   // Templates come from the JSON block #templateData (edited with template-editor.html).
@@ -3367,7 +3383,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   }));
 
   async function runExport(scope){
-    if(typeof ExcelJS === "undefined"){ toast("엑셀 도구를 불러오지 못했어요. 새로고침 후 다시 시도해 주세요."); return; }
+    try{ await loadExcel(); }catch(e){ toast("엑셀 도구를 불러오지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요."); return; }
     exporting = true;
     exportBtn.setAttribute("aria-disabled", "true");
     try{
@@ -3551,7 +3567,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
     const file = importInput.files[0];
     importInput.value = "";
     if(!file) return;
-    if(typeof ExcelJS === "undefined"){ toast("엑셀 도구를 불러오지 못했어요. 새로고침 후 다시 시도해 주세요."); return; }
+    try{ await loadExcel(); }catch(e){ toast("엑셀 도구를 불러오지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요."); return; }
 
     let found;
     try{
