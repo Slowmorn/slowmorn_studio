@@ -1,0 +1,1764 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>템플릿 편집기</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F4F6; --sheet:#FFFFFF; --ink:#1B2230; --muted:#667085; --line:#DDE2E8;
+  --accent:#1A766B; --accent-fill:#26A392; --accent-soft:#DDF3EF; --on-accent:#FFFFFF; --warn:#B4233C;
+  --sans:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12161D; --sheet:#1A2029; --ink:#E7EAEE; --muted:#9AA3B2; --line:#2C3440;
+    --accent:#6FB7B1; --accent-fill:#6FB7B1; --accent-soft:#1F3534; --on-accent:#12161D; --warn:#F07A8E;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12161D; --sheet:#1A2029; --ink:#E7EAEE; --muted:#9AA3B2; --line:#2C3440;
+  --accent:#6FB7B1; --accent-fill:#6FB7B1; --accent-soft:#1F3534; --on-accent:#12161D; --warn:#F07A8E;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.5;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+.top{
+  position:sticky;top:0;z-index:10;background:color-mix(in srgb, var(--paper) 92%, transparent);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.top-inner{max-width:1180px;margin:0 auto;padding:14px 20px;display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px}
+.top h1{margin:0;font-size:19px;font-weight:700;letter-spacing:-0.02em}
+.top p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.top .spacer{flex:1}
+.saved{color:var(--muted);font-size:12.5px;white-space:nowrap}
+.btn{
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;
+  border:1px solid var(--line);background:var(--sheet);border-radius:8px;padding:8px 13px;font-size:13.5px;font-weight:500;
+}
+.btn:hover{background:color-mix(in srgb, var(--ink) 5%, var(--sheet))}
+.btn:active{background:color-mix(in srgb, var(--ink) 11%, var(--sheet))}
+.btn.primary{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--on-accent);font-weight:600}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn svg{width:14px;height:14px}
+
+.layout{max-width:1180px;margin:0 auto;padding:20px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:20px;align-items:start}
+.side{position:sticky;top:86px}
+.side h2,.section-title{font-size:12.5px;color:var(--muted);font-weight:600;margin:0 0 8px;letter-spacing:.02em}
+.tpl-list{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:6px}
+.tpl-item{
+  width:100%;display:flex;align-items:center;gap:8px;text-align:left;border:1px solid var(--line);background:var(--sheet);
+  border-radius:10px;padding:10px 12px;
+}
+.tpl-item:hover{background:color-mix(in srgb, var(--ink) 4%, var(--sheet))}
+.tpl-item.on{border-color:var(--accent-fill);background:var(--accent-soft);box-shadow:inset 0 0 0 1px var(--accent-fill)}
+.tpl-item .nm{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tpl-item .ct{color:var(--muted);font-size:12px;white-space:nowrap}
+.badge{font-size:11px;padding:1px 6px;border-radius:999px;background:var(--paper);color:var(--muted)}
+.side .btn{width:100%;justify-content:center}
+.hint{color:var(--muted);font-size:12.5px;margin:14px 2px 0;line-height:1.6}
+.hint b{color:var(--ink);font-weight:600}
+
+.card{background:var(--sheet);border-radius:12px;border:1px solid var(--line)}
+.meta{padding:18px 20px;margin-bottom:18px}
+.meta-head{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.meta-head h2{margin:0;font-size:17px;font-weight:700;flex:1}
+.fields{display:grid;grid-template-columns:repeat(2, minmax(0,1fr));gap:10px 14px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field.wide{grid-column:1 / -1}
+.field span{font-size:12.5px;color:var(--muted);font-weight:500}
+.field .row-in{display:flex;gap:6px}
+input.in,select.in,textarea.in{
+  width:100%;min-width:0;border:1px solid var(--line);background:var(--sheet);border-radius:8px;padding:8px 11px;
+}
+input.in:focus,select.in:focus,textarea.in:focus{outline:none;border-color:var(--accent)}
+.intro-in{font:inherit;line-height:1.5;resize:vertical;min-height:72px}
+
+.cat{position:relative;margin-bottom:14px;border-left:4px solid var(--accent-fill);border-radius:0 12px 12px 0} /* items are measured against their card */
+.cat-top{display:flex;align-items:center;gap:6px;padding:12px 14px 8px 16px}
+.cat-top .cat-name{flex:1;font-weight:700;font-size:16px;border:1px solid transparent;border-radius:8px;padding:6px 8px;background:transparent;min-width:0}
+.cat-top .cat-name:hover{border-color:var(--line)}
+.cat-top .cat-name:focus{outline:none;border-color:var(--accent);background:var(--paper)}
+.cat-top .count{color:var(--muted);font-size:12.5px;white-space:nowrap;margin-right:4px}
+.ic{
+  width:30px;height:30px;border:0;border-radius:6px;background:none;color:var(--muted);display:grid;place-items:center;flex:none;
+}
+.ic:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
+.ic:active{background:color-mix(in srgb, var(--ink) 11%, transparent)}
+.ic:disabled{opacity:.3;cursor:default;background:none}
+.ic.danger:hover{color:var(--warn)}
+.ic svg{width:15px;height:15px}
+.cat.folded .items,.cat.folded .add-row{display:none}
+.cat.folded .fold svg{transform:rotate(180deg)}
+
+.items{padding:0 14px 4px 16px}
+.ihead,.item{display:grid;grid-template-columns:18px minmax(0,1fr) 70px 110px 120px 96px;gap:8px;align-items:center}
+.guest .ihead,.guest .item{grid-template-columns:18px minmax(0,1fr) 120px 96px}
+/* drag handle for items */
+.item-grip{
+  width:18px;height:28px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);
+  display:grid;place-items:center;cursor:grab;opacity:.6;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+}
+.item-grip svg{width:8px;height:14px}
+.item:hover .item-grip,.item-grip:focus-visible{opacity:1}
+.item-grip:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
+@media (hover:none){.item-grip{opacity:1}}
+.item.dragging{
+  z-index:30;background:var(--sheet);border-radius:8px;border-bottom:0;padding:5px 8px 5px 0;
+  box-shadow:0 12px 28px rgba(15,20,30,.2);outline:2px solid var(--accent-fill);outline-offset:-1px;pointer-events:none;
+}
+.item-slot{border:2px dashed color-mix(in srgb, var(--accent-fill) 70%, transparent);border-radius:8px;background:color-mix(in srgb, var(--accent-soft) 60%, transparent);margin:2px 0}
+body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-webkit-user-select:none}
+.guest .col-qty,.guest .col-opt{display:none}
+.ihead{font-size:12px;color:var(--muted);padding:4px 0;border-bottom:1px solid var(--line)}
+.ihead .r{text-align:right;padding-right:10px}
+.item{padding:5px 0;border-bottom:1px solid var(--line)}
+.item input{width:100%;min-width:0;border:1px solid transparent;border-radius:6px;padding:6px 9px;background:transparent}
+.item input:hover{border-color:var(--line)}
+.item input:focus{outline:none;border-color:var(--accent);background:var(--paper)}
+.item input.num{text-align:right;font-variant-numeric:tabular-nums}
+.item .acts{display:flex;justify-content:flex-end}
+.opt-btn{
+  width:100%;height:30px;border:1px dashed var(--line);border-radius:6px;background:none;color:var(--muted);font-size:12.5px;
+}
+.opt-btn.has{border-style:solid;border-color:color-mix(in srgb, var(--accent-fill) 45%, var(--line));background:var(--accent-soft);color:var(--ink)}
+.opt-btn.open{box-shadow:inset 0 0 0 1px var(--accent-fill)}
+.opts{grid-column:1 / -1;margin:4px 0 6px;padding:10px 12px;border-radius:8px;background:var(--paper)}
+.opts-title{font-size:12px;color:var(--muted);margin-bottom:6px}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1.1fr) minmax(0,1fr) 30px;gap:6px;align-items:center;margin-bottom:4px}
+.opt .num{text-align:right;font-variant-numeric:tabular-nums}
+.opt-head{display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1.1fr) minmax(0,1fr) 30px;gap:6px;font-size:11.5px;color:var(--muted);margin:0 0 3px;padding:0 2px}
+.opt-head .r{text-align:right;padding-right:10px}
+.opt input{background:var(--sheet);border-color:var(--line)}
+.add-link{border:0;background:none;color:var(--accent);font-weight:500;padding:6px 2px;font-size:13.5px}
+.add-link:hover{text-decoration:underline}
+.add-row{padding:4px 16px 12px}
+.add-cat{
+  width:100%;padding:14px;border:1.5px dashed var(--line);border-radius:12px;background:transparent;color:var(--muted);font-weight:500;
+}
+.add-cat:hover{border-color:var(--accent);color:var(--accent)}
+.empty{color:var(--muted);text-align:center;padding:40px 20px;border:1.5px dashed var(--line);border-radius:12px}
+
+.toast{
+  position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(10px);
+  background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:14px;display:flex;gap:14px;align-items:center;
+  opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:20;max-width:90vw;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.show.has-action{pointer-events:auto}
+.toast button{border:0;background:none;color:var(--accent-soft);font-weight:600;text-decoration:underline;padding:0}
+
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr}
+  .side{position:static}
+  .fields{grid-template-columns:1fr}
+  .ihead{display:none}
+  .item{grid-template-columns:18px minmax(0,1fr) 64px 96px;grid-template-areas:"g n q b" ". o o a"}
+  .guest .item{grid-template-columns:18px minmax(0,1fr) 110px 96px;grid-template-areas:"g n b a"}
+  .opt{grid-template-columns:minmax(0,1fr) 96px 30px;grid-template-areas:"on op od" "ol ol ol" "nt nt nt"}
+  .opt-head{display:none}
+  .opt [data-f=opt-name]{grid-area:on}.opt [data-f=opt-price]{grid-area:op}.opt [data-f=opt-link]{grid-area:ol}.opt [data-f=opt-note]{grid-area:nt}.opt .ic{grid-area:od}
+  .item .item-grip{grid-area:g}.item .col-name{grid-area:n}.item .col-qty{grid-area:q}.item .col-budget{grid-area:b}.item .col-opt{grid-area:o}.item .acts{grid-area:a}
+}
+@media (prefers-reduced-motion:reduce){.toast{transition:none}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-inner">
+    <div>
+      <h1>기본 템플릿 편집기</h1>
+      <p>여기서 고친 뒤 <b>JSON 내려받기</b>를 누르면, 그 파일로 예산표 사이트의 템플릿을 바꿀 수 있어요.</p>
+    </div>
+    <span class="spacer"></span>
+    <span class="saved" id="saved">이 브라우저에 자동 저장돼요</span>
+    <button class="btn" id="importBtn" type="button" title=".json 파일이나 budget-checklist.html에서 템플릿을 불러와요">불러오기</button>
+    <input type="file" id="importFile" accept=".json,.html,application/json,text/html" hidden>
+    <button class="btn" id="resetBtn" type="button">처음 상태로</button>
+    <button class="btn" id="copyBtn" type="button">JSON 복사</button>
+    <button class="btn primary" id="downloadBtn" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.8 6.8L8 10l3.2-3.2M2.5 10.5v2a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>JSON 내려받기</button>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="side">
+    <h2>템플릿 (메뉴 순서)</h2>
+    <ol class="tpl-list" id="tplList"></ol>
+    <button class="btn" id="addTpl" type="button">+ 새 템플릿</button>
+    <p class="hint">
+      <b>Enter</b> — 항목 이름에서 누르면 아래에 새 항목이 생겨요.<br>
+      <b>여러 줄 붙여넣기</b> — 항목 이름 칸에 줄바꿈된 목록을 붙여넣으면 줄마다 항목이 생겨요.<br>
+      <b>선택지</b> — 브랜드·업체 추천. 가격 없이 이름과 비고만 넣어요.<br>
+      '빈 목록'은 사이트에 항상 맨 위에 있어서 여기엔 없어요.
+    </p>
+  </aside>
+  <main id="editor"></main>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+
+<!-- 사이트에 지금 들어 있는 템플릿 (처음 상태) -->
+<script type="application/json" id="original">
+[
+  {
+    "id": "wedding",
+    "label": "결혼 준비",
+    "desc": "결혼식·청첩장·예물·부모님 등 8개 카테고리",
+    "title": "우리 결혼 준비",
+    "intro": "ver. 2026\n예식장부터 혼수까지, 결혼 준비 체크리스트예요. 견적을 받은 업체는 항목의 선택지에 가격과 함께 적어 두고 비교해 보세요.",
+    "kind": "budget",
+    "categories": [
+      {
+        "name": "결혼식",
+        "items": [
+          {
+            "name": "예식장"
+          },
+          {
+            "name": "버스 대절"
+          },
+          {
+            "name": "플래너"
+          },
+          {
+            "name": "스튜디오 촬영"
+          },
+          {
+            "name": "드레스"
+          },
+          {
+            "name": "헤어·메이크업"
+          },
+          {
+            "name": "본식 스냅"
+          },
+          {
+            "name": "본식 DVD"
+          },
+          {
+            "name": "신랑 예복"
+          },
+          {
+            "name": "부케"
+          }
+        ]
+      },
+      {
+        "name": "서포트",
+        "items": [
+          {
+            "name": "주례"
+          },
+          {
+            "name": "사회"
+          },
+          {
+            "name": "축가"
+          },
+          {
+            "name": "방명록·축의금 관리"
+          },
+          {
+            "name": "가방순이"
+          }
+        ]
+      },
+      {
+        "name": "청첩장",
+        "items": [
+          {
+            "name": "종이 청첩장"
+          },
+          {
+            "name": "모바일 청첩장"
+          }
+        ]
+      },
+      {
+        "name": "예물",
+        "items": [
+          {
+            "name": "결혼반지"
+          }
+        ]
+      },
+      {
+        "name": "부모님",
+        "items": [
+          {
+            "name": "상견례"
+          },
+          {
+            "name": "혼주 한복"
+          },
+          {
+            "name": "혼주 메이크업"
+          }
+        ]
+      },
+      {
+        "name": "신혼여행",
+        "items": [
+          {
+            "name": "항공권"
+          },
+          {
+            "name": "숙소"
+          },
+          {
+            "name": "여행 경비"
+          }
+        ]
+      },
+      {
+        "name": "가전",
+        "items": [
+          {
+            "name": "냉장고",
+            "options": [
+              {
+                "name": "삼성 키친핏 615L"
+              }
+            ]
+          },
+          {
+            "name": "세탁기·건조기",
+            "options": [
+              {
+                "name": "LG 워시타워",
+                "note": "로봇청소기·오븐과 묶음 구매"
+              }
+            ]
+          },
+          {
+            "name": "에어컨"
+          },
+          {
+            "name": "TV",
+            "options": [
+              {
+                "name": "삼성 더 세리프 55인치"
+              }
+            ]
+          },
+          {
+            "name": "전자레인지"
+          },
+          {
+            "name": "무선청소기",
+            "options": [
+              {
+                "name": "다이슨"
+              }
+            ]
+          },
+          {
+            "name": "로봇청소기",
+            "options": [
+              {
+                "name": "LG"
+              }
+            ]
+          },
+          {
+            "name": "오븐",
+            "options": [
+              {
+                "name": "LG"
+              }
+            ]
+          },
+          {
+            "name": "밥솥",
+            "options": [
+              {
+                "name": "쿠쿠"
+              }
+            ]
+          },
+          {
+            "name": "음식물 처리기",
+            "options": [
+              {
+                "name": "린클"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "가구·인테리어",
+        "items": [
+          {
+            "name": "침대"
+          },
+          {
+            "name": "식탁·식탁 의자"
+          },
+          {
+            "name": "책상·의자"
+          },
+          {
+            "name": "책장"
+          },
+          {
+            "name": "수납 선반"
+          },
+          {
+            "name": "침실 수납장·사이드 테이블"
+          },
+          {
+            "name": "전신 거울"
+          },
+          {
+            "name": "침실 조명"
+          },
+          {
+            "name": "책상 조명"
+          },
+          {
+            "name": "식탁 램프"
+          },
+          {
+            "name": "빨래 바구니",
+            "qty": 2
+          },
+          {
+            "name": "커트러리 세트"
+          },
+          {
+            "name": "트롤리"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "baby",
+    "label": "출산·육아 준비",
+    "desc": "아기옷·가구·위생·수유 등 6개 카테고리",
+    "title": "출산·육아 준비",
+    "intro": "ver. 2026\n쌍둥이 아빠가 직접 준비하면서 만든 체크리스트 겸 예산표예요. 여러 맘카페와 블로그 후기를 기반으로 평이 좋은 제품을 항목마다 선택지로 정리해 뒀어요. 구매의 편의성을 위해 쿠팡과 네이버스토어를 위주로 링크를 걸어뒀습니다. 조리원에서 주는 것, 물려받을 것은 지우고 우리 집 상황에 맞게 고쳐 쓰세요.",
+    "kind": "budget",
+    "categories": [
+      {
+        "name": "산모",
+        "items": [
+          {
+            "name": "산후조리원"
+          },
+          {
+            "name": "산모 패드",
+            "options": [
+              {
+                "name": "디펜드 맘스 안심패드",
+                "link": "https://link.coupang.com/a/hbVbHz91O0"
+              },
+              {
+                "name": "아베나 덴마크 프리미엄 산모패드",
+                "link": "https://link.coupang.com/a/hbVhGRVtnw"
+              },
+              {
+                "name": "마더케이 미라클 산모패드",
+                "link": "https://link.coupang.com/a/hbVkoVWjUi"
+              }
+            ]
+          },
+          {
+            "name": "수유 브라",
+            "options": [
+              {
+                "name": "에이투에프 수유브라",
+                "link": "https://brand.naver.com/atof/category/1c2b237a23d14a75a364a6bfb0164eb3"
+              },
+              {
+                "name": "하성민기업 수유브라",
+                "link": "https://brand.naver.com/hasungmin/search?q=%ED%95%98%EC%84%B1%EB%AF%BC%EA%B8%B0%EC%97%85%20%EC%88%98%EC%9C%A0%EB%B8%8C%EB%9D%BC"
+              },
+              {
+                "name": "Mothersbaby 수유브라",
+                "link": "https://mothersbaby.co.kr/category/%EC%88%98%EC%9C%A0%EB%B8%8C%EB%9D%BC/547/"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "아기옷",
+        "items": [
+          {
+            "name": "배냇저고리",
+            "options": [
+              {
+                "name": "베베댕 무형광 배냇저고리",
+                "link": "https://m.bebedeng.co.kr/goods/goods_view.php?goodsNo=1000000032"
+              },
+              {
+                "name": "큐비앤맘 배냇저고리",
+                "link": "http://cubynmom.com/category/%EB%B0%B0%EB%83%87%EC%A0%80%EA%B3%A0%EB%A6%AC/925/?srsltid=AU7gw4Wo74W300h56k82Or9JpwVypARJDb8YJZ5PexMQgCrz6Yz_9omm"
+              },
+              {
+                "name": "베이비베어 배냇저고리",
+                "link": "https://link.coupang.com/a/hbWEzs1PA4"
+              }
+            ]
+          },
+          {
+            "name": "바디수트",
+            "qty": 3,
+            "options": [
+              {
+                "name": "유니클로 쿨 코튼 메쉬 이너 바디수트",
+                "link": "https://www.uniqlo.com/kr/ko/baby/newborn/bodysuits"
+              },
+              {
+                "name": "H&M 신생아 바디수트",
+                "link": "https://www2.hm.com/ko_kr/baby/products/clothing/bodysuits.html?srsltid=AU7gw4U95kaHSezbcAG3joGCdueFlx-ulWkCorsIT50dR_tC9Lx9Sier"
+              },
+              {
+                "name": "오우아스튜디오 바디수트",
+                "link": "https://link.coupang.com/a/hbWZFdiRRB"
+              }
+            ]
+          },
+          {
+            "name": "겉싸개",
+            "options": [
+              {
+                "name": "조리원 증정"
+              }
+            ]
+          },
+          {
+            "name": "속싸개",
+            "options": [
+              {
+                "name": "말랑하니 속싸개",
+                "link": "https://link.coupang.com/a/hbY46mEwmW"
+              },
+              {
+                "name": "러브투드림 속싸개",
+                "link": "https://swaddleupkorea.com/"
+              },
+              {
+                "name": "스칸디맘 속싸개",
+                "link": "https://link.coupang.com/a/hbYQlYWJhc"
+              }
+            ]
+          },
+          {
+            "name": "스와들업",
+            "options": [
+              {
+                "name": "오우와스튜디오 스와들업",
+                "link": "https://link.coupang.com/a/hbXmvWpsnQ"
+              },
+              {
+                "name": "베베곰 스와들업",
+                "link": "https://link.coupang.com/a/hbXqW70Ima"
+              },
+              {
+                "name": "엘라바 스와들업",
+                "link": "https://link.coupang.com/a/hbXxOJfs3E"
+              }
+            ]
+          },
+          {
+            "name": "모자",
+            "options": [
+              {
+                "name": "오가닉붐 신생아 모자",
+                "link": "https://link.coupang.com/a/hbXFMYDwCP"
+              }
+            ]
+          },
+          {
+            "name": "양말",
+            "qty": 3,
+            "options": [
+              {
+                "name": "유니클로 신생아 양말",
+                "link": "https://www.uniqlo.com/kr/ko/baby/newborn/socks"
+              },
+              {
+                "name": "H&M 신생아 양말",
+                "link": "https://www2.hm.com/ko_kr/baby/newborn/clothing/socks-tights.html?srsltid=AU7gw4VvTCu1WLgk3DuiQ6FT0dKEjSS-WETnOLZNJbJ1bMkYJH-ZHKSE"
+              },
+              {
+                "name": "하이베이비키즈 신생아 양말",
+                "link": "https://link.coupang.com/a/hbYdTjsQjk"
+              }
+            ]
+          },
+          {
+            "name": "내복",
+            "qty": 3,
+            "options": [
+              {
+                "name": "코코하니 내복",
+                "link": "https://cocohani.co.kr/"
+              },
+              {
+                "name": "큐비앤맘 내복",
+                "link": "https://cubynmom.com/category/%EB%82%B4%EC%9D%98/911/"
+              },
+              {
+                "name": "말랑하니 내복",
+                "link": "https://link.coupang.com/a/hbZBYP6liK"
+              }
+            ]
+          },
+          {
+            "name": "손수건",
+            "options": [
+              {
+                "name": "밤부베베 손수건",
+                "link": "https://brand.naver.com/bamboobebe/category/009025bfc22a449e82aea3410cb2a7bb?cp=1"
+              },
+              {
+                "name": "베베룬 손수건",
+                "link": "https://brand.naver.com/bebelune/category/26d569842d1b4b27b75a98f5ec7b3426?cp=1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "가구",
+        "items": [
+          {
+            "name": "아기 침대 (신생아용)",
+            "options": [
+              {
+                "name": "다이치 리우 아기침대",
+                "link": "https://www.babyseatmall.net/?act=shop.goods_list&GC=GD3H01"
+              },
+              {
+                "name": "리안 드림콧 접이식 아기침대",
+                "link": "https://link.coupang.com/a/hb0KCMW1tY"
+              },
+              {
+                "name": "부가부 스타더스트",
+                "link": "https://www.bugaboo.com/kr-ko/%EC%A0%91%EC%9D%B4%EC%8B%9D-%EC%95%84%EA%B8%B0%EC%B9%A8%EB%8C%80/%EB%B6%80%EA%B0%80%EB%B6%80-%EC%8A%A4%ED%83%80%EB%8D%94%EC%8A%A4%ED%8A%B8-%ED%86%A0%ED%94%84-%EC%BD%94%ED%8A%BC%EC%8B%9C%ED%8A%B8-%ED%8F%AC%ED%95%A8-PV007412.html"
+              }
+            ]
+          },
+          {
+            "name": "아기침대",
+            "options": [
+              {
+                "name": "숲소리 범퍼침대",
+                "link": "https://www.soopsori.co.kr/goods/goods_list.php?cateCd=005"
+              },
+              {
+                "name": "안데르센 저상형 데이베드 침대",
+                "link": "https://brand.naver.com/andersenmall/category/15edb709fec746a295e856e7ac5f169f?cp=1"
+              },
+              {
+                "name": "일룸 쿠시노 저상형 침대",
+                "link": "https://www.iloom.com/series/series.do?sn=86&srsltid=AU7gw4VvLMlfiW9UKhCAwvRuoLh20NSEhdgt-mIkig26yCq3YSXNnZlK"
+              }
+            ]
+          },
+          {
+            "name": "바운서",
+            "options": [
+              {
+                "name": "베이비뵨 바운서",
+                "link": "https://www.babybjorn.kr/products/baby-bouncers/",
+                "note": "압도적 추천"
+              }
+            ]
+          },
+          {
+            "name": "하이체어",
+            "qty": 2,
+            "options": [
+              {
+                "name": "스토케 트립트랩",
+                "link": "https://www.stokke.com/KOR/ko-kr/category/%ED%95%98%EC%9D%B4%EC%B2%B4%EC%96%B4/%ED%8A%B8%EB%A6%BD%ED%8A%B8%EB%9E%A9"
+              },
+              {
+                "name": "사이벡스 레모 하이체어",
+                "link": "https://www.cybex-shop.co.kr/goods/goods_view.php?goodsNo=1000000416"
+              },
+              {
+                "name": "아가드 하이체어",
+                "link": "https://link.coupang.com/a/hb4meaujqC"
+              }
+            ]
+          },
+          {
+            "name": "방수 패드",
+            "qty": 2,
+            "options": [
+              {
+                "name": "베이비앙 방수패드",
+                "link": "https://m.babyan.co.kr/category/%EB%B0%A9%EC%88%98%EC%9A%94/346/"
+              },
+              {
+                "name": "포몽드 방수패드",
+                "link": "https://formongde.com/category/%EB%B0%A9%EC%88%98%ED%8C%A8%EB%93%9C/837/"
+              },
+              {
+                "name": "말랑하니 방수패드",
+                "link": "https://link.coupang.com/a/hb45jGHeGy"
+              }
+            ]
+          },
+          {
+            "name": "쿨매트",
+            "options": [
+              {
+                "name": "비비엔다 쿨매트",
+                "price": 56250,
+                "link": "https://vivienda.co.kr/category/%EC%BF%A8%ED%8C%A8%EB%93%9C%EC%BF%A8%EB%A7%A4%ED%8A%B8/166/"
+              },
+              {
+                "name": "아이레빗 냉감패드",
+                "link": "https://link.coupang.com/a/hb5pRNnG4i"
+              },
+              {
+                "name": "포몽드 쿨매트",
+                "link": "https://formongde.com/category/%EB%B0%A9%EC%88%98%ED%8C%A8%EB%93%9C/837/"
+              }
+            ]
+          },
+          {
+            "name": "기저귀 갈이대",
+            "options": [
+              {
+                "name": "소베맘 기저귀갈이대",
+                "link": "https://link.coupang.com/a/hb5CWW3Ipo",
+                "note": "국민템"
+              },
+              {
+                "name": "도노도노 기저귀갈이대",
+                "link": "https://link.coupang.com/a/hb5FFozTSS"
+              },
+              {
+                "name": "두리 기저귀갈이대",
+                "link": "https://durimall.co.kr/category/%EA%B8%B0%EC%A0%80%EA%B7%80-%EA%B0%88%EC%9D%B4%EB%8C%80/173/?srsltid=AU7gw4VrFyEYve8ICtbNcE_zcfyZD0YXcfd4E_NbVfPeH_eZbD8UokIN"
+              }
+            ]
+          },
+          {
+            "name": "거실 매트",
+            "options": [
+              {
+                "name": "꼬망세 매트",
+                "link": "https://link.coupang.com/a/hb5YLlbPQO"
+              },
+              {
+                "name": "비몰 매트",
+                "link": "https://link.coupang.com/a/hb57UWoI3w"
+              },
+              {
+                "name": "크림하우스 매트",
+                "link": "https://link.coupang.com/a/hb6iAbjD1U"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "수유",
+        "items": [
+          {
+            "name": "젖병",
+            "options": [
+              {
+                "name": "더블하트 모유실감 젖병",
+                "link": "https://link.coupang.com/a/hbZ65mx8eW"
+              },
+              {
+                "name": "란시노 유리젖병",
+                "link": "https://link.coupang.com/a/hb0b7dXL1o"
+              },
+              {
+                "name": "닥터브라운 젖병",
+                "link": "https://link.coupang.com/a/hb0d9Gj4rQ",
+                "note": "배앓이 방지"
+              }
+            ]
+          },
+          {
+            "name": "젖병 세척기",
+            "options": [
+              {
+                "name": "식기세척기로 사용"
+              },
+              {
+                "name": "베이비브레짜 젖병 세척기",
+                "link": "https://link.coupang.com/a/hb7CcFkwOy"
+              }
+            ]
+          },
+          {
+            "name": "젖병 소독기",
+            "options": [
+              {
+                "name": "유팡 젖병소독기",
+                "link": "https://link.coupang.com/a/hb6slGx4Wy"
+              },
+              {
+                "name": "케이 젖병소독기",
+                "link": "https://link.coupang.com/a/hb6BEUHSwK"
+              },
+              {
+                "name": "폴레드 픽셀 젖병소독기",
+                "link": "https://link.coupang.com/a/hb8CtlEuY0"
+              }
+            ]
+          },
+          {
+            "name": "분유",
+            "options": [
+              {
+                "name": "압타밀 프로푸트라 분유",
+                "link": "https://link.coupang.com/a/hb8GSxc0Y0"
+              },
+              {
+                "name": "앱솔루트 산양 분유",
+                "link": "https://link.coupang.com/a/hb6YvtPaMe"
+              },
+              {
+                "name": "파스퇴르 위드맘 제왕 분유",
+                "link": "https://link.coupang.com/a/hb6SyPqM3g"
+              }
+            ]
+          },
+          {
+            "name": "유축기",
+            "options": [
+              {
+                "name": "대여 가능"
+              },
+              {
+                "name": "메델라 유축기",
+                "link": "https://smartstore.naver.com/momsdream/products/4008814821?n_media=27758&n_query=%EB%A9%94%EB%8D%B8%EB%9D%BC%EC%8A%A4%EC%9C%99&n_rank=1&n_ad_group=grp-a001-01-000000020161176&n_ad=nad-a001-01-000000187176112&n_campaign_type=1&n_ad_group_type=1&n_match=2&NaPm=ct%3Dmu9htx1n%7Cci%3DERadff8604%2Db4c4%2D11f1%2Dbbe2%2D5e28beaf1165%7Ctr%3Dsa%7Chk%3D7961e2cbded5f74da4997f035667991245e47b90%7Cnacn%3DJ1naBIBzQNr6"
+              },
+              {
+                "name": "스펙트라 유축기",
+                "link": "https://link.coupang.com/a/hb7aYum3Pw"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "목욕·위생",
+        "items": [
+          {
+            "name": "아기 욕조 (신생아용)",
+            "qty": 2,
+            "options": [
+              {
+                "name": "슈너글 아기욕조",
+                "link": "https://link.coupang.com/a/hcbo0BT6MC"
+              },
+              {
+                "name": "온다베이비 아기욕조",
+                "link": "https://link.coupang.com/a/hcbrgNwUkC"
+              },
+              {
+                "name": "스토케 플레시바스 번들 아기욕조",
+                "link": "https://link.coupang.com/a/hcbw8L21Ho"
+              }
+            ]
+          },
+          {
+            "name": "아기 수전",
+            "options": [
+              {
+                "name": "해피달링 720도 아기수전",
+                "link": "https://link.coupang.com/a/hcbzywiV7A",
+                "note": "720도"
+              },
+              {
+                "name": "퓨어닷 스마트 아기수전",
+                "link": "https://brand.naver.com/petitelinstore/products/12584488197?nl-query=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%95%84%EA%B8%B0%EC%88%98%EC%A0%84&nl-au=1563403e34a2413d8d25f0e89bc90eb5&NaPm=ci%3D1563403e34a2413d8d25f0e89bc90eb5%7Cct%3Dmu9iw69e%7Ctr%3Dnslsl%7Csn%3D395905%7Chk%3D2f5e7d1a97c7eed66703161027997b1abb08abf7",
+                "note": "온도표시 기능"
+              },
+              {
+                "name": "대림바스 아기수전",
+                "link": "https://link.coupang.com/a/hcbLcAute8"
+              }
+            ]
+          },
+          {
+            "name": "아기 비데",
+            "options": [
+              {
+                "name": "포프베베 아기비데",
+                "link": "https://link.coupang.com/a/hcbP2d1DHg",
+                "note": "설치형"
+              },
+              {
+                "name": "폴레드 허그베어 아기비데",
+                "link": "https://link.coupang.com/a/hcbSKNHRqm",
+                "note": "설치형"
+              },
+              {
+                "name": "코니스 이지워시",
+                "link": "https://brand.naver.com/conys/products/13441981574",
+                "note": "스탠딩형"
+              }
+            ]
+          },
+          {
+            "name": "기저귀",
+            "options": [
+              {
+                "name": "하기스 네이처메이드 기저귀",
+                "link": "https://link.coupang.com/a/hb9HHzdto4"
+              },
+              {
+                "name": "킨도 베베가드 기저귀",
+                "link": "https://link.coupang.com/a/hb7TPODXHg"
+              },
+              {
+                "name": "팸퍼스 기저귀",
+                "link": "https://link.coupang.com/a/hb9KSkRAfA"
+              }
+            ]
+          },
+          {
+            "name": "물티슈",
+            "options": [
+              {
+                "name": "베베숲 시그니처 물티슈",
+                "link": "https://link.coupang.com/a/hb8aNX2uYu"
+              },
+              {
+                "name": "페넬로페 본보야지 아기물티슈",
+                "link": "https://link.coupang.com/a/hb90PS5S9Y"
+              },
+              {
+                "name": "브라운 물티슈",
+                "link": "https://link.coupang.com/a/hb8jSafROm"
+              }
+            ]
+          },
+          {
+            "name": "구강 티슈",
+            "options": [
+              {
+                "name": "비앤비 구강티슈",
+                "link": "https://link.coupang.com/a/hb94J4CCSO"
+              },
+              {
+                "name": "마더케이 구강티슈",
+                "link": "https://link.coupang.com/a/hb970FrEse"
+              },
+              {
+                "name": "마이비 구강티슈",
+                "link": "https://link.coupang.com/a/hb99Q11E7w"
+              }
+            ]
+          },
+          {
+            "name": "쪽쪽이",
+            "qty": 3,
+            "options": [
+              {
+                "name": "모윰 소프트윙 쪽쪽이",
+                "link": "https://link.coupang.com/a/hccmFYFiRU"
+              },
+              {
+                "name": "더블하트 쪽쪽이",
+                "link": "https://brand.naver.com/doubleheart_official/category/fcc080cb6c6c4d0aa280b86c27bcefd8?cp=1"
+              },
+              {
+                "name": "누크 센서티브 올실리콘 쪽쪽이",
+                "link": "https://link.coupang.com/a/hccqtn5H5g"
+              }
+            ]
+          },
+          {
+            "name": "아기 샴푸·바디워시",
+            "options": [
+              {
+                "name": "맘뜨레 아기 샴푸앤바스 올인원",
+                "link": "https://link.coupang.com/a/hcakDDjKHk"
+              },
+              {
+                "name": "아토팜 탑투토 워시 올인원",
+                "link": "https://link.coupang.com/a/hcaqSOsLPo"
+              },
+              {
+                "name": "프랭클린 바스앤샴푸",
+                "link": "https://link.coupang.com/a/hcat5wiPNQ"
+              }
+            ]
+          },
+          {
+            "name": "아기칫솔",
+            "options": [
+              {
+                "name": "블랑키즐 아기칫솔",
+                "link": "https://link.coupang.com/a/hccJB6m9bU"
+              },
+              {
+                "name": "마더케이",
+                "link": "https://link.coupang.com/a/hccNjCcGHY"
+              }
+            ]
+          },
+          {
+            "name": "아기치약",
+            "options": [
+              {
+                "name": "블랑키즐 유아용 고불소 치약",
+                "link": "https://link.coupang.com/a/hcfNWHMhB6"
+              },
+              {
+                "name": "픽킷 고불소 어린이 치약",
+                "link": "https://link.coupang.com/a/hcfRnrhtzU"
+              },
+              {
+                "name": "닥터노아 고불소 어린이 치약",
+                "link": "https://link.coupang.com/a/hcfWjSC29I"
+              }
+            ]
+          },
+          {
+            "name": "체온계",
+            "options": [
+              {
+                "name": "브라운 귀 적외선 체온계",
+                "link": "https://link.coupang.com/a/hccRp60Nci"
+              }
+            ]
+          },
+          {
+            "name": "온습도계",
+            "options": [
+              {
+                "name": "드레텍 미니 온습도계",
+                "link": "https://link.coupang.com/a/hcc1nC4Fqe"
+              },
+              {
+                "name": "휴비딕 온습도계",
+                "link": "https://link.coupang.com/a/hcc3ArE1ZY"
+              }
+            ]
+          },
+          {
+            "name": "샤워헤드",
+            "options": [
+              {
+                "name": "슬로운 샤워헤드",
+                "link": "https://brand.naver.com/slown/category/5686debaee2b4e30870249e700df8aea?cp=1"
+              },
+              {
+                "name": "퓨어닷 아기샤워기",
+                "link": "https://search.shopping.naver.com/ns/search?query=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%83%A4%EC%9B%8C%ED%97%A4%EB%93%9C"
+              },
+              {
+                "name": "소베맘 온오프 아기 필터 샤워기 헤드",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%86%8C%EB%B2%A0%EB%A7%98%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0"
+              }
+            ]
+          },
+          {
+            "name": "손톱깎이 세트",
+            "options": [
+              {
+                "name": "마더케이 영유아 핀셋 네일케어",
+                "link": "https://link.coupang.com/a/hccvnIDxpQ"
+              },
+              {
+                "name": "베이비클라우드 네일트리머",
+                "link": "https://smartstore.naver.com/babycloud_int/products/7791988920"
+              }
+            ]
+          },
+          {
+            "name": "콧물 흡입기",
+            "options": [
+              {
+                "name": "노시부 콧물흡입기",
+                "link": "https://link.coupang.com/a/hcb4g6pToa"
+              },
+              {
+                "name": "코니케어 콧물흡입기",
+                "link": "https://link.coupang.com/a/hccbjrYRBQ"
+              }
+            ]
+          },
+          {
+            "name": "주방 세제",
+            "options": [
+              {
+                "name": "토루토루 주방세제",
+                "link": "https://smartstore.naver.com/torutoru/products/296483246"
+              },
+              {
+                "name": "프랭클린 주방세제",
+                "link": "https://link.coupang.com/a/hcaD4Q3sFo"
+              },
+              {
+                "name": "마더케이 주방세제",
+                "link": "https://link.coupang.com/a/hcaG9CzVO9"
+              }
+            ]
+          },
+          {
+            "name": "세탁 세제",
+            "options": [
+              {
+                "name": "호호에미 세탁세제",
+                "link": "https://link.coupang.com/a/hcaJ86DYjs"
+              },
+              {
+                "name": "프랭클린 세탁세제",
+                "link": "https://link.coupang.com/a/hcaMtXCCzY"
+              },
+              {
+                "name": "토루토루 세탁세제",
+                "link": "https://smartstore.naver.com/torutoru/products/115687449?nl-query=%ED%86%A0%EB%A3%A8%ED%86%A0%EB%A3%A8%EC%84%B8%ED%83%81%EC%84%B8%EC%A0%9C&nl-ts-pid=jq%2Bnbdqos5rPSBRVhZh-373640&NaPm=ct%3Dmu9ihn4w%7Cci%3D7fa3305b9f07f23feebc7d6aa9d2e04442bf5b48%7Ctr%3Dsls%7Csn%3D175312%7Chk%3D55fd223a45366c44b19b89bddea621f68c1a4e10"
+              }
+            ]
+          },
+          {
+            "name": "식기세척기 세제",
+            "options": [
+              {
+                "name": "토루토루 식기세척기세제",
+                "link": "https://smartstore.naver.com/torutoru/products/8472224697?nl-query=%ED%86%A0%EB%A3%A8%ED%86%A0%EB%A3%A8%20%EC%8B%9D%EA%B8%B0%EC%84%B8%EC%B2%99%EA%B8%B0%20%EC%84%B8%EC%A0%9C&nl-au=3d94f643a2a744a1bc04c76d9fef875a&NaPm=ci%3D3d94f643a2a744a1bc04c76d9fef875a%7Cct%3Dmu9iirdx%7Ctr%3Dnslsl%7Csn%3D175312%7Chk%3D37d390a3f3290f534a0c033bb897b08975b1cb01",
+                "note": "액상"
+              },
+              {
+                "name": "마더케이 디아 젖병세척기세제",
+                "link": "https://link.coupang.com/a/hcaY1pzKj6",
+                "note": "타블렛형"
+              },
+              {
+                "name": "뽀숑하우스 올인원 파우더",
+                "link": "https://link.coupang.com/a/hca4E3Hc7g"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "외출",
+        "items": [
+          {
+            "name": "카시트 (0세~4세)",
+            "options": [
+              {
+                "name": "브라이텍스 듀얼픽스 프로",
+                "link": "https://safian.co.kr/product/%EB%B8%8C%EB%9D%BC%EC%9D%B4%ED%85%8D%EC%8A%A4-%EB%93%80%EC%96%BC%ED%94%BD%EC%8A%A4-%ED%94%84%EB%A1%9C-%EC%8A%A4%ED%83%80%EC%9D%BC-%EC%95%84%EC%9D%B4%EC%82%AC%EC%9D%B4%EC%A6%88-%EC%8B%A0%EC%83%9D%EC%95%84-%EC%9C%A0%EC%95%84-%EC%95%84%EA%B8%B0-%ED%9A%8C%EC%A0%84%ED%98%95-%EC%B9%B4%EC%8B%9C%ED%8A%B8-isofix/3210/category/478/display/1/"
+              },
+              {
+                "name": "사이벡스 제로나T",
+                "link": "https://www.cybex-shop.co.kr/goods/goods_view.php?goodsNo=1000000447"
+              },
+              {
+                "name": "조이 아이스핀360",
+                "link": "https://joiebaby.co.kr/category/%EC%B9%B4%EC%8B%9C%ED%8A%B8/421/"
+              },
+              {
+                "name": "다이치 원픽스360",
+                "link": "https://www.babyseatmall.net/?act=shop.goods_list&GC=GD000J"
+              },
+              {
+                "name": "뉴나 토들넥스트",
+                "link": "https://nunababy.com/kr/todl-next-convertible-car-seat?color_ref=16693"
+              }
+            ]
+          },
+          {
+            "name": "유모차 (절충형)",
+            "options": [
+              {
+                "name": "부가부 드래곤플라이 플러스",
+                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-dragonfly-plus-seat/%EB%B6%80%EA%B0%80%EB%B6%80-%EB%93%9C%EB%9E%98%EA%B3%A4%ED%94%8C%EB%9D%BC%EC%9D%B4-%ED%94%8C%EB%9F%AC%EC%8A%A4-%EC%A0%88%EC%B6%A9%ED%98%95-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-PM007941.html"
+              },
+              {
+                "name": "줄즈 허브2",
+                "link": "https://link.coupang.com/a/hcecEQBvUa"
+              },
+              {
+                "name": "에그Q 절충형 유모차",
+                "link": "https://www.eggstroller.co.kr/goods/view?no=138"
+              }
+            ]
+          },
+          {
+            "name": "유모차 (휴대용)",
+            "options": [
+              {
+                "name": "부가부 버터플라이2",
+                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-butterfly-2/%EB%B6%80%EA%B0%80%EB%B6%80-%EB%B2%84%ED%84%B0%ED%94%8C%EB%9D%BC%EC%9D%B4-2-%ED%9C%B4%EB%8C%80%EC%9A%A9-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-%EB%B2%94%ED%8D%BC%EB%B0%94-%ED%8F%AC%ED%95%A8-PM007649.html"
+              },
+              {
+                "name": "사이벡스 리베르",
+                "link": "https://brand.naver.com/cybex/category/27038e8e29994589bb3c053f5a127bc3?cp=1"
+              },
+              {
+                "name": "줄즈 에어2",
+                "link": "https://link.coupang.com/a/hceBQA5Piu"
+              },
+              {
+                "name": "스토케 요요5",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%8A%A4%ED%86%A0%EC%BC%80%20%EC%9A%94%EC%9A%945&prevQuery=%EC%8B%B8%EC%9D%B4%EB%B2%A1%EC%8A%A4"
+              }
+            ]
+          },
+          {
+            "name": "유모차 (디럭스)",
+            "options": [
+              {
+                "name": "부가부 폭스5",
+                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-fox-5-renew/%EB%B6%80%EA%B0%80%EB%B6%80-%ED%8F%AD%EC%8A%A4-5-%EB%A6%AC%EB%89%B4-%EB%94%94%EB%9F%AD%EC%8A%A4-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-PM007564.html"
+              },
+              {
+                "name": "줄즈 데이5",
+                "link": "https://link.coupang.com/a/hceUIgi1SK"
+              },
+              {
+                "name": "스토케 익스플로리",
+                "link": "https://link.coupang.com/a/hceYQpAkkm"
+              },
+              {
+                "name": "어파베이비 비스타v3",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%96%B4%ED%8C%8C%EB%B2%A0%EC%9D%B4%EB%B9%84%20%EB%B9%84%EC%8A%A4%ED%83%80v3&prevQuery=%EC%8A%A4%ED%86%A0%EC%BC%80%20%EC%9D%B5%EC%8A%A4%ED%94%8C%EB%A1%9C%EB%A6%AC%20x"
+              }
+            ]
+          },
+          {
+            "name": "아기띠",
+            "options": [
+              {
+                "name": "베이비뵨 아기띠",
+                "link": "https://link.coupang.com/a/hciJIknNlc"
+              },
+              {
+                "name": "베베스완 방탄조끼 아기띠",
+                "link": "https://link.coupang.com/a/hcfgeErzhs"
+              },
+              {
+                "name": "에르고베이비",
+                "link": "https://link.coupang.com/a/hcfix1eqXs"
+              },
+              {
+                "name": "아띠포페 아기띠",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%95%84%EB%9D%A0%ED%8F%AC%ED%8E%98%20%EC%95%84%EA%B8%B0%EB%9D%A0&prevQuery=%EC%96%B4%ED%8C%8C%EB%B2%A0%EC%9D%B4%EB%B9%84%20%EB%B9%84%EC%8A%A4%ED%83%80v3"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "guestbook",
+    "label": "방명록",
+    "desc": "신랑·신부 참석자와 계좌이체 4개 카테고리",
+    "title": "결혼식 방명록",
+    "intro": "예식 당일 받은 축의금을 신랑·신부, 현장·계좌이체로 나눠 적는 칸이에요. 이름과 금액만 넣으면 칸마다 인원과 합계가 계산돼요.",
+    "kind": "guestbook",
+    "categories": [
+      {
+        "name": "신랑 참석자",
+        "items": [
+          {
+            "name": ""
+          }
+        ]
+      },
+      {
+        "name": "신부 참석자",
+        "items": [
+          {
+            "name": ""
+          }
+        ]
+      },
+      {
+        "name": "신랑 (계좌이체)",
+        "items": [
+          {
+            "name": ""
+          }
+        ]
+      },
+      {
+        "name": "신부 (계좌이체)",
+        "items": [
+          {
+            "name": ""
+          }
+        ]
+      }
+    ]
+  }
+]
+</script>
+
+<script>
+(function(){
+  const KEY = "template-editor-v1";
+  const ORIGINAL = JSON.parse(document.getElementById("original").textContent);
+  const clone = v => JSON.parse(JSON.stringify(v));
+
+  let data = null, sel = 0;
+  try{ const raw = localStorage.getItem(KEY); if(raw){ const s = JSON.parse(raw); if(Array.isArray(s.templates)){ data = s.templates; sel = s.sel || 0; } } }catch(e){}
+  if(!data) data = clone(ORIGINAL);
+
+  const openOpts = new WeakSet(); // items whose 선택지 are expanded
+  const folded = new WeakSet();   // collapsed categories
+
+  // ---- helpers ----
+  const esc = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const plain = n => n ? Number(n).toLocaleString("ko-KR") : "";
+  const digits = s => { const d = String(s).replace(/[^\d]/g, ""); return d ? parseInt(d, 10) : 0; };
+  const tpl = () => data[sel];
+  const move = (arr, i, j) => { if(j < 0 || j >= arr.length) return false; const [x] = arr.splice(i, 1); arr.splice(j, 0, x); return true; };
+  const ICON = {
+    up: '<svg viewBox="0 0 16 16"><path d="M4 10l4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    down: '<svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    del: '<svg viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>',
+    fold: '<svg viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    copy: '<svg viewBox="0 0 16 16"><rect x="5" y="5" width="8.5" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M11 3.5V3a1 1 0 0 0-1-1H3.5a1 1 0 0 0-1 1v6.5a1 1 0 0 0 1 1H4" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>'
+  };
+  const newId = () => "tpl-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+  const itemCount = t => t.categories.reduce((s, c) => s + c.items.length, 0);
+  function autoDesc(t){
+    const names = t.categories.map(c => c.name).filter(Boolean);
+    if(!names.length) return "";
+    return `${names.slice(0, 4).join("·")}${names.length > 4 ? " 등" : ""} ${names.length}개 카테고리`;
+  }
+
+  // ---- save / undo ----
+  let saveTimer;
+  function save(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      try{ localStorage.setItem(KEY, JSON.stringify({ templates: data, sel })); document.getElementById("saved").textContent = "자동 저장됨 · " + new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" }); }catch(e){}
+    }, 300);
+  }
+  const snapshot = () => JSON.stringify({ data, sel });
+  let toastTimer;
+  function toast(msg, snap){
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.classList.toggle("has-action", !!snap);
+    if(snap){
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = "되돌리기";
+      b.onclick = () => { const s = JSON.parse(snap); data = s.data; sel = s.sel; renderAll(); save(); el.classList.remove("show", "has-action"); };
+      el.appendChild(b);
+    }
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show", "has-action"), snap ? 6000 : 2400);
+  }
+
+  // ---- render ----
+  const listEl = document.getElementById("tplList");
+  const edEl = document.getElementById("editor");
+
+  function renderList(){
+    listEl.innerHTML = data.map((t, i) => `<li>
+      <button type="button" class="tpl-item${i === sel ? " on" : ""}" data-sel="${i}">
+        <span class="nm">${esc(t.label || "이름 없음")}</span>
+        ${t.kind === "guestbook" ? '<span class="badge">방명록</span>' : ""}
+        <span class="ct">${t.categories.length}·${itemCount(t)}</span>
+      </button></li>`).join("");
+  }
+
+  function itemHTML(t, ci, ii, it){
+    const opts = it.options || [];
+    const open = openOpts.has(it);
+    return `<div class="item" data-ci="${ci}" data-ii="${ii}">
+      <button type="button" class="item-grip" aria-label="순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 옮기기 — 다른 카테고리로도 옮길 수 있어요"><svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg></button>
+      <input class="col-name" data-f="name" value="${esc(it.name)}" placeholder="${t.kind === "guestbook" ? "이름 (비워 두면 빈 줄)" : "항목 이름"}" aria-label="항목 이름">
+      <input class="col-qty num" data-f="qty" inputmode="numeric" value="${it.qty > 1 ? it.qty : ""}" placeholder="1" aria-label="수량">
+      <input class="col-budget num" data-f="budget" inputmode="numeric" value="${plain(it.budget)}" placeholder="${t.kind === "guestbook" ? "축의금" : "예산"}" aria-label="기본 금액">
+      <button type="button" class="col-opt opt-btn${opts.length ? " has" : ""}${open ? " open" : ""}" data-act="opts">${opts.length ? `선택지 ${opts.length}개` : "+ 선택지"}</button>
+      <span class="acts">
+        <button type="button" class="ic" data-act="item-up" title="위로" aria-label="위로" ${ii === 0 ? "disabled" : ""}>${ICON.up}</button>
+        <button type="button" class="ic" data-act="item-down" title="아래로" aria-label="아래로" ${ii === t.categories[ci].items.length - 1 ? "disabled" : ""}>${ICON.down}</button>
+        <button type="button" class="ic danger" data-act="item-del" title="삭제" aria-label="항목 삭제">${ICON.del}</button>
+      </span>
+      ${open && t.kind !== "guestbook" ? `<div class="opts">
+        <div class="opts-title">선택지 — 추천 브랜드·업체. 가격·링크·비고는 비워 둬도 돼요</div>
+        ${opts.length ? `<div class="opt-head"><span>이름</span><span class="r">가격</span><span>링크</span><span>비고</span><span></span></div>` : ""}
+        ${opts.map((o, oi) => `<div class="opt" data-oi="${oi}">
+          <input class="in" data-f="opt-name" value="${esc(o.name)}" placeholder="이름 (예: 스토케)" aria-label="선택지 이름">
+          <input class="in num" data-f="opt-price" inputmode="numeric" value="${plain(o.price)}" placeholder="가격" aria-label="선택지 가격">
+          <input class="in" data-f="opt-link" inputmode="url" value="${esc(o.link)}" placeholder="링크 (예: coupang.com/...)" aria-label="선택지 링크">
+          <input class="in" data-f="opt-note" value="${esc(o.note)}" placeholder="비고" aria-label="선택지 비고">
+          <button type="button" class="ic danger" data-act="opt-del" title="삭제" aria-label="선택지 삭제">${ICON.del}</button>
+        </div>`).join("")}
+        <button type="button" class="add-link" data-act="opt-add">+ 선택지 추가</button>
+      </div>` : ""}
+    </div>`;
+  }
+
+  function renderEditor(){
+    const t = tpl();
+    if(!t){ edEl.innerHTML = `<div class="empty">템플릿이 없어요. 왼쪽에서 새 템플릿을 추가하세요.</div>`; return; }
+    const guest = t.kind === "guestbook";
+    edEl.innerHTML = `
+      <section class="card meta">
+        <div class="meta-head">
+          <h2>${esc(t.label || "이름 없음")}</h2>
+          <button type="button" class="ic" data-act="tpl-up" title="메뉴에서 위로" aria-label="메뉴에서 위로" ${sel === 0 ? "disabled" : ""}>${ICON.up}</button>
+          <button type="button" class="ic" data-act="tpl-down" title="메뉴에서 아래로" aria-label="메뉴에서 아래로" ${sel === data.length - 1 ? "disabled" : ""}>${ICON.down}</button>
+          <button type="button" class="ic" data-act="tpl-dup" title="복제" aria-label="템플릿 복제">${ICON.copy}</button>
+          <button type="button" class="ic danger" data-act="tpl-del" title="템플릿 삭제" aria-label="템플릿 삭제">${ICON.del}</button>
+        </div>
+        <div class="fields">
+          <label class="field"><span>메뉴 이름</span><input class="in" data-f="label" value="${esc(t.label)}" placeholder="예: 결혼 준비"></label>
+          <label class="field"><span>불러오면 들어가는 예산표 제목</span><input class="in" data-f="title" value="${esc(t.title)}" placeholder="예: 우리 결혼 준비"></label>
+          <div class="field wide"><span>메뉴 설명</span>
+            <div class="row-in"><input class="in" data-f="desc" value="${esc(t.desc)}" placeholder="예: 결혼식장·스드메 등 10개 카테고리">
+            <button type="button" class="btn" data-act="auto-desc" title="카테고리 이름으로 설명을 채워요">자동 채우기</button></div>
+          </div>
+          <div class="field wide"><span>불러오면 제목 밑에 들어가는 설명</span>
+            <textarea class="in intro-in" data-f="intro" rows="3" placeholder="예: ver. 2026&#10;예식장부터 혼수까지, 결혼 준비 체크리스트예요.">${esc(t.intro || "")}</textarea>
+          </div>
+          <label class="field"><span>종류</span>
+            <select class="in" data-f="kind">
+              <option value="budget"${!guest ? " selected" : ""}>예산표 (항목·선택지·수량·예산·지출)</option>
+              <option value="guestbook"${guest ? " selected" : ""}>방명록 (이름·축의금)</option>
+            </select>
+          </label>
+          <div class="field"><span>구성</span><div style="padding:8px 0;color:var(--muted)">카테고리 ${t.categories.length}개 · 항목 ${itemCount(t)}개</div></div>
+        </div>
+      </section>
+      <div class="section-title">카테고리</div>
+      ${t.categories.map((c, ci) => `
+        <section class="card cat${guest ? " guest" : ""}${folded.has(c) ? " folded" : ""}" data-ci="${ci}">
+          <div class="cat-top">
+            <input class="cat-name" data-f="cat-name" value="${esc(c.name)}" placeholder="카테고리 이름" aria-label="카테고리 이름">
+            <span class="count">항목 ${c.items.length}개</span>
+            <button type="button" class="ic" data-act="cat-up" title="위로" aria-label="카테고리 위로" ${ci === 0 ? "disabled" : ""}>${ICON.up}</button>
+            <button type="button" class="ic" data-act="cat-down" title="아래로" aria-label="카테고리 아래로" ${ci === t.categories.length - 1 ? "disabled" : ""}>${ICON.down}</button>
+            <button type="button" class="ic fold" data-act="cat-fold" title="접기/펼치기" aria-label="접기/펼치기">${ICON.fold}</button>
+            <button type="button" class="ic danger" data-act="cat-del" title="카테고리 삭제" aria-label="카테고리 삭제">${ICON.del}</button>
+          </div>
+          <div class="items">
+            <div class="ihead"><span></span><span>${guest ? "이름" : "항목"}</span><span class="r col-qty">수량</span><span class="r">${guest ? "축의금" : "기본 예산"}</span><span class="col-opt">선택지</span><span></span></div>
+            ${c.items.map((it, ii) => itemHTML(t, ci, ii, it)).join("")}
+          </div>
+          <div class="add-row"><button type="button" class="add-link" data-act="item-add">+ 항목 추가</button></div>
+        </section>`).join("")}
+      <button type="button" class="add-cat" data-act="cat-add">+ 카테고리 추가</button>`;
+  }
+
+  function renderAll(){
+    if(sel >= data.length) sel = Math.max(0, data.length - 1);
+    renderList(); renderEditor();
+  }
+
+  function focusSoon(selector){ requestAnimationFrame(() => { const el = edEl.querySelector(selector); if(el) el.focus(); }); }
+
+  // ---- events: template list ----
+  listEl.addEventListener("click", e => {
+    const b = e.target.closest("[data-sel]");
+    if(!b) return;
+    sel = +b.dataset.sel; renderAll(); save();
+    window.scrollTo({ top: 0 });
+  });
+  document.getElementById("addTpl").addEventListener("click", () => {
+    data.push({ id: newId(), label: "새 템플릿", desc: "", title: "새 예산표", intro: "", kind: "budget", categories: [{ name: "첫 번째 카테고리", items: [{ name: "" }] }] });
+    sel = data.length - 1; renderAll(); save();
+    focusSoon('[data-f="label"]');
+  });
+
+  // ---- events: editor inputs (no re-render, keeps focus) ----
+  edEl.addEventListener("input", e => {
+    const f = e.target.dataset.f; if(!f) return;
+    const t = tpl(); const v = e.target.value;
+    const ci = e.target.closest("[data-ci]") ? +e.target.closest("[data-ci]").dataset.ci : -1;
+    const ii = e.target.closest("[data-ii]") ? +e.target.closest("[data-ii]").dataset.ii : -1;
+    const oi = e.target.closest("[data-oi]") ? +e.target.closest("[data-oi]").dataset.oi : -1;
+    const it = ii >= 0 ? t.categories[ci].items[ii] : null;
+    if(f === "label"){ t.label = v; edEl.querySelector(".meta-head h2").textContent = v || "이름 없음"; renderList(); }
+    else if(f === "title") t.title = v;
+    else if(f === "desc") t.desc = v;
+    else if(f === "intro") t.intro = v;
+    else if(f === "cat-name") t.categories[ci].name = v;
+    else if(f === "name") it.name = v;
+    else if(f === "qty"){ const n = Math.min(digits(v), 9999); e.target.value = n > 1 ? String(n) : v.replace(/[^\d]/g, ""); if(n > 1) it.qty = n; else delete it.qty; }
+    else if(f === "budget"){ const n = digits(v); e.target.value = plain(n); if(n) it.budget = n; else delete it.budget; }
+    else if(f === "opt-name") it.options[oi].name = v;
+    else if(f === "opt-note"){ if(v) it.options[oi].note = v; else delete it.options[oi].note; }
+    else if(f === "opt-price"){ const n = digits(v); e.target.value = plain(n); if(n) it.options[oi].price = n; else delete it.options[oi].price; }
+    else if(f === "opt-link"){ if(v.trim()) it.options[oi].link = v.trim(); else delete it.options[oi].link; }
+    save();
+  });
+  edEl.addEventListener("change", e => {
+    if(e.target.dataset.f === "kind"){ tpl().kind = e.target.value; renderAll(); save(); }
+  });
+
+  // Enter in an item name → new item below; pasting several lines → one item per line
+  edEl.addEventListener("keydown", e => {
+    if(e.key !== "Enter" || e.isComposing || e.target.dataset.f !== "name") return;
+    e.preventDefault();
+    const ci = +e.target.closest("[data-ci]").dataset.ci, ii = +e.target.closest("[data-ii]").dataset.ii;
+    tpl().categories[ci].items.splice(ii + 1, 0, { name: "" });
+    renderAll(); save();
+    focusSoon(`[data-ci="${ci}"] [data-ii="${ii + 1}"] [data-f="name"]`);
+  });
+  edEl.addEventListener("paste", e => {
+    if(e.target.dataset.f !== "name") return;
+    const text = (e.clipboardData || window.clipboardData).getData("text");
+    const lines = text.split(/\r?\n/).map(s => s.replace(/^[\s\-•·*]+/, "").trim()).filter(Boolean);
+    if(lines.length < 2) return;
+    e.preventDefault();
+    const ci = +e.target.closest("[data-ci]").dataset.ci, ii = +e.target.closest("[data-ii]").dataset.ii;
+    const items = tpl().categories[ci].items;
+    const snap = snapshot();
+    if(!items[ii].name) items.splice(ii, 1, ...lines.map(name => ({ name })));
+    else items.splice(ii + 1, 0, ...lines.map(name => ({ name })));
+    renderAll(); save();
+    toast(`항목 ${lines.length}개를 붙여넣었어요`, snap);
+  });
+
+  // ---- events: editor buttons ----
+  edEl.addEventListener("click", e => {
+    const b = e.target.closest("[data-act]"); if(!b) return;
+    const act = b.dataset.act, t = tpl();
+    const ci = b.closest("[data-ci]") ? +b.closest("[data-ci]").dataset.ci : -1;
+    const ii = b.closest("[data-ii]") ? +b.closest("[data-ii]").dataset.ii : -1;
+    const oi = b.closest("[data-oi]") ? +b.closest("[data-oi]").dataset.oi : -1;
+    const c = ci >= 0 ? t.categories[ci] : null, it = ii >= 0 ? c.items[ii] : null;
+    let snap;
+    switch(act){
+      case "tpl-up": if(move(data, sel, sel - 1)) sel--; break;
+      case "tpl-down": if(move(data, sel, sel + 1)) sel++; break;
+      case "tpl-dup": {
+        const copy = clone(t); copy.id = newId(); copy.label = `${t.label} 복사본`;
+        data.splice(sel + 1, 0, copy); sel++; break;
+      }
+      case "tpl-del":
+        snap = snapshot(); data.splice(sel, 1);
+        renderAll(); save(); toast(`'${t.label}' 템플릿을 삭제했어요`, snap); return;
+      case "auto-desc": t.desc = autoDesc(t); break;
+      case "cat-add":
+        t.categories.push({ name: "", items: [{ name: "" }] });
+        renderAll(); save(); focusSoon(`[data-ci="${t.categories.length - 1}"] [data-f="cat-name"]`); return;
+      case "cat-up": move(t.categories, ci, ci - 1); break;
+      case "cat-down": move(t.categories, ci, ci + 1); break;
+      case "cat-fold": if(folded.has(c)) folded.delete(c); else folded.add(c); break;
+      case "cat-del":
+        snap = snapshot(); t.categories.splice(ci, 1);
+        renderAll(); save(); toast(`'${c.name || "이름 없는 카테고리"}' 카테고리를 삭제했어요`, snap); return;
+      case "item-add":
+        c.items.push({ name: "" });
+        renderAll(); save(); focusSoon(`[data-ci="${ci}"] [data-ii="${c.items.length - 1}"] [data-f="name"]`); return;
+      case "item-up": move(c.items, ii, ii - 1); break;
+      case "item-down": move(c.items, ii, ii + 1); break;
+      case "item-del":
+        snap = snapshot(); c.items.splice(ii, 1);
+        renderAll(); save(); toast(`'${it.name || "빈 항목"}'을(를) 삭제했어요`, snap); return;
+      case "opts": if(openOpts.has(it)) openOpts.delete(it); else openOpts.add(it); break;
+      case "opt-add":
+        (it.options = it.options || []).push({ name: "" });
+        renderAll(); save(); focusSoon(`[data-ci="${ci}"] [data-ii="${ii}"] .opt:last-of-type [data-f="opt-name"]`); return;
+      case "opt-del":
+        it.options.splice(oi, 1); if(!it.options.length) delete it.options; break;
+      default: return;
+    }
+    renderAll(); save();
+  });
+
+  // ---- drag items (within a category or into another), arrow keys on the grip ----
+  // Same approach as the site: the row floats under the pointer, a dashed slot marks the drop spot,
+  // other rows slide (FLIP). Hit-testing uses layout offsets so animations don't misplace drops.
+  let drag = null;
+  const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function flip(els, change){
+    const before = new Map(els.map(el => [el, el.getBoundingClientRect()]));
+    els.forEach(el => el.getAnimations().forEach(a => a.cancel()));
+    change();
+    if(reduceMotion()) return;
+    els.forEach(el => {
+      const a = before.get(el), b = el.getBoundingClientRect();
+      const dx = a.left - b.left, dy = a.top - b.top;
+      if(Math.abs(dx) >= 1 || Math.abs(dy) >= 1) el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 200, easing: "cubic-bezier(.2,.8,.2,1)" });
+    });
+  }
+  function rowBox(el){
+    const c = el.offsetParent.getBoundingClientRect();
+    const top = c.top + el.offsetTop, left = c.left + el.offsetLeft;
+    return { left, top, right: left + el.offsetWidth, bottom: top + el.offsetHeight, mid: top + el.offsetHeight / 2 };
+  }
+  const inside = (el, x, y) => { const b = el.getBoundingClientRect(); return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom; };
+
+  function moveSlot(x, y){
+    const { row, slot, gx, gy } = drag;
+    row.style.left = `${x - gx}px`; row.style.top = `${y - gy}px`;
+    const list = slot.parentElement;
+    const rows = [...edEl.querySelectorAll(".cat:not(.folded) .item:not(.dragging)")];
+    const target = rows.find(r => { const b = rowBox(r); return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom; });
+    if(target){
+      const mid = rowBox(target).mid, dest = target.parentElement;
+      const touched = rows.filter(r => r.parentElement === list || r.parentElement === dest);
+      if(dest === list){
+        const seq = [...list.children].filter(el => el === slot || (el.matches(".item") && !el.classList.contains("dragging")));
+        const from = seq.indexOf(slot), to = seq.indexOf(target);
+        if(!(to > from ? y > mid : y < mid)) return; // past the middle only, so rows don't flip back and forth
+        flip(touched, () => { if(to > from) target.after(slot); else target.before(slot); });
+      } else {
+        flip(touched, () => { if(y > mid) target.after(slot); else target.before(slot); });
+      }
+      drag.moved = true;
+      return;
+    }
+    // over a category with no items: drop at its end
+    const card = [...edEl.querySelectorAll(".cat:not(.folded)")].find(c => inside(c, x, y));
+    const cardList = card && card.querySelector(".items");
+    if(cardList && cardList !== list && !cardList.querySelector(".item:not(.dragging)")){ cardList.appendChild(slot); drag.moved = true; }
+  }
+
+  function autoScroll(){
+    if(!drag) return;
+    const top = 110, bottom = window.innerHeight - 60;
+    const speed = drag.y < top ? -Math.min(24, (top - drag.y) / 3 + 4) : drag.y > bottom ? Math.min(24, (drag.y - bottom) / 3 + 4) : 0;
+    if(speed){ window.scrollBy(0, speed); moveSlot(drag.x, drag.y); }
+    drag.raf = requestAnimationFrame(autoScroll);
+  }
+
+  function endDrag(cancel){
+    if(!drag) return;
+    const { row, slot, raf, moved } = drag;
+    cancelAnimationFrame(raf);
+    drag = null;
+    document.body.classList.remove("is-sorting");
+    if(cancel || !moved){ renderAll(); return; }
+    // Rebuild each category's items from the page order (rows still carry their original indices)
+    const t = tpl();
+    const old = t.categories.map(c => c.items.slice());
+    slot.replaceWith(row);
+    edEl.querySelectorAll(".cat").forEach(card => {
+      t.categories[+card.dataset.ci].items = [...card.querySelectorAll(".items > .item")].map(el => old[+el.dataset.ci][+el.dataset.ii]);
+    });
+    renderAll(); save();
+  }
+
+  edEl.addEventListener("pointerdown", e => {
+    const grip = e.target.closest(".item-grip");
+    if(!grip || e.button !== 0) return;
+    e.preventDefault();
+    if(document.activeElement) document.activeElement.blur();
+    const row = grip.closest(".item");
+    const r = row.getBoundingClientRect();
+    const slot = document.createElement("div");
+    slot.className = "item-slot";
+    slot.style.height = `${r.height}px`;
+    row.before(slot);
+    Object.assign(row.style, { position: "fixed", left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, margin: "0" });
+    row.classList.add("dragging");
+    document.body.classList.add("is-sorting");
+    try{ grip.setPointerCapture(e.pointerId); }catch(_){}
+    drag = { row, slot, gx: e.clientX - r.left, gy: e.clientY - r.top, x: e.clientX, y: e.clientY, moved: false, raf: 0 };
+    drag.raf = requestAnimationFrame(autoScroll);
+  });
+  window.addEventListener("pointermove", e => { if(!drag) return; drag.x = e.clientX; drag.y = e.clientY; moveSlot(e.clientX, e.clientY); });
+  window.addEventListener("pointerup", () => endDrag(false));
+  window.addEventListener("pointercancel", () => endDrag(true));
+  document.addEventListener("keydown", e => {
+    if(drag && e.key === "Escape"){ endDrag(true); return; }
+    const grip = e.target.closest && e.target.closest(".item-grip");
+    const step = grip && { ArrowUp: -1, ArrowDown: 1 }[e.key];
+    if(!step) return;
+    e.preventDefault();
+    const row = grip.closest(".item"), ci = +row.dataset.ci, ii = +row.dataset.ii;
+    if(!move(tpl().categories[ci].items, ii, ii + step)) return;
+    renderAll(); save();
+    focusSoon(`[data-ci="${ci}"] [data-ii="${ii + step}"] .item-grip`);
+  });
+
+  // ---- export ----
+  function cleanData(){
+    return data.map(t => ({
+      id: t.id || newId(),
+      label: (t.label || "").trim() || "이름 없는 템플릿",
+      desc: (t.desc || "").trim(),
+      intro: (t.intro || "").trim(),
+      title: (t.title || "").trim() || (t.label || "새 예산표"),
+      kind: t.kind === "guestbook" ? "guestbook" : "budget",
+      categories: t.categories.map(c => ({
+        name: (c.name || "").trim(),
+        items: c.items.map(it => {
+          const o = { name: (it.name || "").trim() };
+          if(it.qty > 1) o.qty = it.qty;
+          if(it.budget > 0) o.budget = it.budget;
+          const opts = (it.options || []).filter(x => (x.name || "").trim()).map(x => {
+            const y = { name: x.name.trim() };
+            if(x.price > 0) y.price = x.price;
+            if((x.link || "").trim()) y.link = x.link.trim();
+            if((x.note || "").trim()) y.note = x.note.trim();
+            return y;
+          });
+          if(opts.length && t.kind !== "guestbook") o.options = opts;
+          return o;
+        })
+      }))
+    }));
+  }
+  const exportText = () => JSON.stringify(cleanData(), null, 2);
+
+  document.getElementById("downloadBtn").addEventListener("click", () => {
+    const blob = new Blob([exportText() + "\n"], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = "templates.json";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+    toast("templates.json을 내려받았어요");
+  });
+  document.getElementById("copyBtn").addEventListener("click", async () => {
+    const text = exportText();
+    try{ await navigator.clipboard.writeText(text); toast("JSON을 복사했어요"); }
+    catch(e){
+      const ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+      try{ document.execCommand("copy"); toast("JSON을 복사했어요"); }catch(_){ toast("복사하지 못했어요. 내려받기를 써 주세요."); }
+      ta.remove();
+    }
+  });
+
+  // ---- import (.json, or budget-checklist.html with its #templateData block) ----
+  const importFile = document.getElementById("importFile");
+  document.getElementById("importBtn").addEventListener("click", () => importFile.click());
+  importFile.addEventListener("change", async () => {
+    const file = importFile.files[0]; importFile.value = "";
+    if(!file) return;
+    let text = await file.text();
+    const m = text.match(/<script[^>]*id="templateData"[^>]*>([\s\S]*?)<\/script>/);
+    if(m) text = m[1];
+    let list;
+    try{ list = JSON.parse(text.replace(/<\\\//g, "</")); }catch(e){ toast("읽을 수 없는 파일이에요. templates.json이나 budget-checklist.html을 골라 주세요."); return; }
+    if(!Array.isArray(list) || !list.every(t => t && Array.isArray(t.categories))){ toast("템플릿 형식이 아니에요"); return; }
+    const snap = snapshot();
+    data = list; sel = 0; renderAll(); save();
+    toast(`템플릿 ${list.length}개를 불러왔어요`, snap);
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", () => {
+    const snap = snapshot();
+    data = clone(ORIGINAL); sel = 0; renderAll(); save();
+    toast("사이트에 들어 있던 처음 상태로 되돌렸어요", snap);
+  });
+
+  renderAll();
+})();
+</script>
+</body>
+</html>

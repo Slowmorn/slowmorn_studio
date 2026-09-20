@@ -1,0 +1,3606 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>준비 예산표 · 결혼·출산 준비 예산 계획표 만들고 엑셀·구글 시트로 내보내기</title>
+<meta name="description" content="결혼 준비, 출산·육아 준비, 방명록까지 템플릿으로 바로 시작하는 무료 예산 계획표. 항목별 예산과 실제 지출을 적으면 합계가 자동 계산되고, 엑셀(xlsx)로 내보내 구글 시트에서 이어서 쓸 수 있어요. 설치도 가입도 필요 없어요.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://slowmorn.com/budget/">
+<meta property="og:url" content="https://slowmorn.com/budget/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="준비 예산표 · 결혼·출산 준비 예산 계획표">
+<meta property="og:description" content="템플릿으로 시작해 항목별 예산을 정리하고, 엑셀로 내보내 구글 시트에서 이어서 쓰는 무료 예산 계획표.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="favicon.svg">
+<meta property="og:image" content="https://slowmorn.com/budget/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://slowmorn.com/budget/og.png">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2F4F6;
+  --sheet:#FFFFFF;
+  --ink:#1B2230;
+  --muted:#667085;
+  --line:#DDE2E8;
+  --accent:#1A766B;
+  --accent-soft:#DDF3EF;
+  --accent-fill:#26A392;
+  --on-accent:#FFFFFF;
+  --warn:#B4233C;
+  --bar:#1B2230;
+  --bar-ink:#F2F4F6;
+  --bar-muted:#A9B2C0;
+  --sans:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12161D; --sheet:#1A2029; --ink:#E7EAEE; --muted:#9AA3B2; --line:#2C3440;
+    --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#12161D; --warn:#F07A8E;
+    --bar:#E7EAEE; --bar-ink:#12161D; --bar-muted:#4B5563;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12161D; --sheet:#1A2029; --ink:#E7EAEE; --muted:#9AA3B2; --line:#2C3440;
+  --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#12161D; --warn:#F07A8E;
+  --bar:#E7EAEE; --bar-ink:#12161D; --bar-muted:#4B5563;
+}
+/* --swatch: brighter display color for the picker and tab dots only. */
+/* Per-tab theme colors. Scoped by [data-accent] so each tab chip can show its own color too. */
+[data-accent="green"]{--accent:#1A766B;--accent-soft:#DDF3EF;--accent-fill:#26A392;--on-accent:#FFFFFF;--swatch:#2FB5A0}
+[data-accent="navy"]{--accent:#3264C8;--accent-soft:#E3ECFB;--accent-fill:#4176E0;--on-accent:#FFFFFF;--swatch:#4B7BE0}
+[data-accent="pink"]{--accent:#C9336F;--accent-soft:#FCE6EF;--accent-fill:#E0508A;--on-accent:#FFFFFF;--swatch:#F0649A}
+[data-accent="yellow"]{--accent:#8F6A00;--accent-soft:#FFF4D1;--accent-fill:#FFC933;--on-accent:#1B2230;--swatch:#FFCC33}
+[data-accent="purple"]{--accent:#7A4FD0;--accent-soft:#F0E9FC;--accent-fill:#8E63E6;--on-accent:#FFFFFF;--swatch:#9B72E8}
+[data-accent="orange"]{--accent:#B24A0B;--accent-soft:#FDEBDD;--accent-fill:#E2661C;--on-accent:#FFFFFF;--swatch:#FF8A3D}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#12161D}
+}
+:root[data-theme="dark"] [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#12161D}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  padding-bottom:150px;
+}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+
+body{--wrap:860px}
+body[data-cols="2"]{--wrap:1240px}
+body[data-cols="4"]{--wrap:1640px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:20px 20px 0;scroll-margin-top:12px}
+
+/* 소개 영역 */
+.hero{border-bottom:1px solid var(--line);background:var(--sheet)}
+.hero-inner{max-width:var(--wrap);margin:0 auto;padding:44px 20px 36px}
+.hero-kicker{color:var(--accent);font-size:13.5px;font-weight:600;margin:0 0 10px}
+.hero h1{
+  font-size:clamp(26px,4.4vw,38px);line-height:1.28;letter-spacing:-0.02em;
+  margin:0 0 12px;max-width:22ch;
+}
+.hero-lead{color:var(--muted);margin:0;max-width:62ch;line-height:1.7}
+.hero-points{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.hero-points li{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--paper)}
+.hero-points b{display:block;font-size:14.5px;margin-bottom:4px}
+.hero-points span{color:var(--muted);font-size:13.5px;line-height:1.6}
+.hero-cta{
+  display:inline-block;margin-top:22px;
+  background:var(--accent-fill);color:var(--on-accent);text-decoration:none;
+  font-weight:600;padding:11px 20px;border-radius:8px;
+}
+.hero-cta:hover{filter:brightness(1.06)}
+.hero-cta:active{filter:brightness(0.94)}
+.hero-note{color:var(--muted);font-size:13px;margin:10px 0 0}
+.hero-links{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px}
+.hero-links a{color:var(--accent);font-size:13.5px;text-decoration:none;border-bottom:1px solid transparent}
+.hero-links a:hover{border-bottom-color:currentColor}
+
+/* 아래쪽 안내 */
+.about{max-width:var(--wrap);margin:0 auto;padding:8px 20px 0}
+.about h2{font-size:19px;margin:32px 0 10px}
+.about h3{font-size:15.5px;margin:18px 0 4px}
+.about p{color:var(--muted);margin:0;max-width:66ch;line-height:1.7}
+.about a{color:var(--accent)}
+.about ol{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:1.8;max-width:66ch}
+
+/* Plan tabs */
+.tabs{display:flex;align-items:flex-end;gap:6px;border-bottom:1px solid var(--line);margin-bottom:28px}
+.tab-list{display:flex;gap:2px;min-width:0;overflow-x:auto;scrollbar-width:none}
+.tab-list::-webkit-scrollbar{display:none}
+.tab{position:relative;display:flex;align-items:center;flex:none;border-radius:8px 8px 0 0}
+.tab:hover{background:color-mix(in srgb, var(--ink) 5%, transparent)}
+.tab-dot{width:8px;height:8px;border-radius:50%;background:var(--swatch, var(--accent-fill));flex:none;margin-left:14px;margin-right:-8px;pointer-events:none}
+.tab-btn{
+  border:0;background:none;color:var(--muted);font-size:14px;font-weight:500;
+  padding:10px 16px;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  border-radius:8px 8px 0 0;
+}
+.tab.closable .tab-btn{padding-right:34px}
+.tab.active{background:var(--sheet);box-shadow:inset 0 -2px 0 var(--accent)}
+.tab.active .tab-btn{color:var(--ink)}
+.tab-close{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  width:22px;height:22px;border:0;border-radius:5px;background:none;
+  color:var(--muted);font-size:16px;line-height:1;opacity:0;
+}
+.tab:hover .tab-close,.tab.active .tab-close,.tab-close:focus-visible{opacity:1}
+.tab-close:hover{background:color-mix(in srgb, var(--ink) 10%, transparent);color:var(--ink)}
+.tab-add{
+  flex:none;display:inline-flex;align-items:center;gap:6px;
+  border:0;background:none;color:var(--muted);font-size:14px;
+  padding:8px 10px;margin-bottom:3px;border-radius:6px;
+}
+.tab-add svg{width:14px;height:14px}
+.tab-add:hover{background:color-mix(in srgb, var(--ink) 5%, transparent);color:var(--ink)}
+.tab-add:active{background:color-mix(in srgb, var(--ink) 11%, transparent)}
+@media (hover:none){.tab-close{opacity:1}}
+
+/* Header */
+.plan-title{
+  display:block;width:100%;
+  font-weight:700;letter-spacing:-0.02em;
+  font-size:clamp(28px,5vw,40px);line-height:1.2;
+  border:0;background:transparent;padding:4px 0;margin:0;
+  border-bottom:1px dashed transparent;
+}
+.plan-title:hover{border-bottom-color:var(--line)}
+.plan-title:focus{outline:none;border-bottom-color:var(--accent)}
+/* 설명: 제목과 같은 방식으로 그 자리에서 고쳐 쓰는 칸 */
+.intro{
+  display:block;width:100%;max-width:60ch;margin:8px 0 0;
+  color:var(--muted);font:inherit;line-height:1.55;
+  border:0;background:transparent;padding:4px 0;resize:none;overflow:hidden;
+  border-bottom:1px dashed transparent;
+}
+.intro:hover{border-bottom-color:var(--line)}
+.intro:focus{outline:none;border-bottom-color:var(--accent)}
+.intro::placeholder{color:var(--muted)}
+.intro{margin-bottom:22px}
+.hero-aff{margin:14px 0 0;max-width:60ch}
+
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;margin-bottom:28px}
+.view-opts{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.opt-toggle{display:flex;align-items:center;gap:7px;color:var(--muted);font-size:14px;cursor:pointer}
+.opt-toggle input{width:16px;height:16px;accent-color:var(--accent-fill);margin:0}
+.opt-toggle:hover{color:var(--ink)}
+body.kind-guestbook .opt-toggle{display:none}
+.color-pick{display:flex;align-items:center;gap:8px}
+/* 색상 드롭다운 */
+.color-menu{position:relative}
+.color-btn{
+  list-style:none;cursor:pointer;user-select:none;
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--line);background:var(--sheet);color:var(--ink);
+  padding:5px 8px 5px 10px;border-radius:7px;font-size:13px;gap:6px;
+  transition:background-color .15s, border-color .15s;
+}
+.color-btn::-webkit-details-marker{display:none}
+.color-btn .chev{width:11px;height:11px;color:var(--muted);transition:transform .15s}
+.color-menu[open] .chev{transform:rotate(180deg)}
+.color-btn:hover,.color-menu[open] .color-btn{background:color-mix(in srgb, var(--ink) 5%, var(--sheet));border-color:color-mix(in srgb, var(--ink) 16%, var(--sheet))}
+.color-btn:active{background:color-mix(in srgb, var(--ink) 11%, var(--sheet));border-color:color-mix(in srgb, var(--ink) 24%, var(--sheet))}
+.color-dot,.swatch::before{
+  content:"";width:12px;height:12px;border-radius:50%;flex:none;
+  background:var(--swatch, var(--accent-fill));
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+.color-menu .menu-pop{left:0;right:auto;min-width:132px}
+.menu-pop .swatch{display:flex;align-items:center;gap:9px;padding:7px 10px;font-size:13.5px}
+.menu-pop .swatch[aria-pressed="true"]{font-weight:600;background:var(--paper)}
+.view-toggle{display:flex;align-items:center;gap:8px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;background:var(--sheet);padding:2px}
+.seg button{
+  display:inline-flex;align-items:center;gap:6px;
+  border:0;background:none;color:var(--muted);font-size:13.5px;
+  padding:6px 11px;border-radius:6px;
+}
+.seg button svg{width:16px;height:12px;flex:none}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+
+/* Template dropdown */
+.tool-group{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.tpl-menu{position:relative}
+.tpl-btn,.tool-btn{
+  list-style:none;cursor:pointer;user-select:none;
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid var(--line);background:var(--sheet);color:var(--ink);
+  padding:8px 12px 8px 14px;border-radius:8px;font-size:14px;font-weight:500;
+  transition:background-color .15s, border-color .15s;
+}
+.tpl-btn::-webkit-details-marker{display:none}
+.tpl-btn svg,.tool-btn svg{width:16px;height:16px;flex:none;color:var(--muted)}
+.tpl-btn .chev{width:12px;height:12px;transition:transform .15s}
+.tpl-menu[open] .chev{transform:rotate(180deg)}
+.tpl-btn:hover,.tool-btn:hover,.tpl-menu[open] .tpl-btn{background:color-mix(in srgb, var(--ink) 5%, var(--sheet));border-color:color-mix(in srgb, var(--ink) 16%, var(--sheet))}
+.tpl-btn:active,.tool-btn:active{background:color-mix(in srgb, var(--ink) 11%, var(--sheet));border-color:color-mix(in srgb, var(--ink) 24%, var(--sheet))}
+.tpl-menu .menu-pop{left:0;right:auto;min-width:260px}
+.menu-note{color:var(--muted);font-size:12px;padding:6px 12px 4px}
+
+/* Category grid: 1 / 2 / 4 columns */
+#cats{
+  display:grid;grid-template-columns:repeat(var(--cols,1),minmax(0,1fr));
+  gap:18px;align-items:start;
+}
+body[data-cols="2"] #cats{--cols:2}
+body[data-cols="4"] #cats{--cols:4}
+#cats .empty{grid-column:1 / -1}
+
+/* Category */
+.cat{
+  container-type:inline-size;
+  position:relative;
+  background:var(--sheet);
+  border-left:4px solid var(--accent-fill);
+  border-radius:0 10px 10px 0;
+  padding:18px 20px 12px;
+}
+.cat:has(.cat-menu[open]){z-index:3}
+.toolbar{position:relative;z-index:4}
+/* Line 1: name · fold    Line 2: 예산/지출 · ⋯ menu  (the grip sits outside the card) */
+.cat-head{
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"name fold" "sum menu";
+  align-items:center;column-gap:6px;margin-bottom:6px;
+}
+.cat-head .cat-name{grid-area:name}
+.cat-head .fold-btn{grid-area:fold}
+.cat-head .cat-sum{grid-area:sum}
+.cat-head .cat-menu{grid-area:menu}
+/* Category reordering: grip handle, cards fold to headers while dragging */
+/* Colored tab outside the card, attached to its left color bar. 14px + 4px bar = the 18px grid gap. */
+.cat-grip{
+  position:absolute;top:0;left:-18px;width:14px;height:40px;padding:0;
+  border:0;border-radius:7px 0 0 7px;background:var(--accent-fill);color:var(--on-accent);
+  display:grid;place-items:center;cursor:grab;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+}
+.cat-grip svg{width:8px;height:16px}
+.cat-grip:hover{filter:brightness(1.08)}
+.cat-grip:active{cursor:grabbing;filter:brightness(.94)}
+.cat-grip:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:7px 0 0 7px}
+#cats.sorting .cols,#cats.sorting .rows,#cats.sorting .add-item{display:none}
+#cats.sorting .cat{padding-bottom:12px}
+#cats.sorting .cat-head{margin-bottom:0}
+#cats{position:relative} /* offsets of cards are measured against the grid */
+.item-grip{
+  width:18px;height:28px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);
+  display:grid;place-items:center;cursor:grab;opacity:.55;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+}
+.item-grip svg{width:8px;height:14px}
+.row:hover .item-grip,.item-grip:focus-visible{opacity:1}
+.item-grip:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
+@media (hover:none){.item-grip{opacity:1}}
+.row.dragging-row{
+  z-index:30;background:var(--sheet);border-radius:8px;border-bottom:0;padding-left:0;padding-right:8px;
+  box-shadow:0 12px 28px rgba(15,20,30,.2);outline:2px solid var(--accent-fill);outline-offset:-1px;pointer-events:none;
+}
+.row-slot{
+  border:2px dashed color-mix(in srgb, var(--accent-fill) 70%, transparent);border-radius:8px;
+  background:color-mix(in srgb, var(--accent-soft) 60%, transparent);margin:2px 0;
+}
+.cat.dragging{
+  z-index:30;box-shadow:0 18px 40px rgba(15,20,30,.22);
+  outline:2px solid var(--accent-fill);outline-offset:-1px;
+  transform:scale(1.02);pointer-events:none;
+}
+.cat-slot{
+  border:2px dashed color-mix(in srgb, var(--accent-fill) 70%, transparent);border-radius:0 10px 10px 0;
+  background:color-mix(in srgb, var(--accent-soft) 60%, transparent);
+}
+body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-webkit-user-select:none}
+.cat-name{
+  flex:1 1 160px;min-width:0;
+  font-weight:700;letter-spacing:-0.02em;font-size:21px;
+  border:0;background:transparent;padding:2px 0;
+  border-bottom:1px dashed transparent;
+}
+.cat-name:hover{border-bottom-color:var(--line)}
+.cat-name:focus{outline:none;border-bottom-color:var(--accent)}
+.cat-sum{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.cat-sum b{color:var(--ink);font-weight:600}
+.cat-sum .over{color:var(--warn)}
+
+/* Category menu */
+.cat-menu{position:relative}
+.cat-menu summary{
+  list-style:none;cursor:pointer;
+  width:32px;height:32px;border-radius:6px;
+  display:grid;place-items:center;color:var(--muted);
+}
+.cat-menu summary::-webkit-details-marker{display:none}
+.cat-menu summary:hover,.cat-menu[open] summary{background:var(--paper);color:var(--ink)}
+.cat-menu summary svg{width:18px;height:18px}
+.menu-pop{
+  color:var(--ink);text-align:left;font-weight:400;
+  position:absolute;right:0;top:calc(100% + 4px);z-index:20;
+  min-width:180px;padding:6px;
+  background:var(--sheet);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 8px 24px rgba(15,20,30,.14);
+}
+.menu-pop button{
+  display:block;width:100%;text-align:left;
+  border:0;background:none;padding:9px 12px;border-radius:6px;font-size:14px;
+}
+.menu-pop button:hover{background:var(--paper)}
+.menu-pop .danger{color:var(--warn)}
+.menu-pop small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
+.menu-pop hr{border:0;border-top:1px solid var(--line);margin:4px 2px}
+
+.cols,.row{
+  display:grid;
+  grid-template-columns:18px 28px minmax(0,1.2fr) minmax(0,1fr) 72px 128px 128px 32px;
+  gap:8px;align-items:center;
+}
+.cols{font-size:12.5px;color:var(--muted);padding:6px 0 4px;border-bottom:1px solid var(--line)}
+.cols .r{text-align:right;padding-right:10px}
+.row{padding:6px 0;border-bottom:1px solid var(--line)}
+.row:last-of-type{border-bottom:0}
+.row input[type="text"]{
+  width:100%;min-width:0;
+  border:1px solid transparent;background:transparent;
+  padding:7px 10px;border-radius:6px;
+}
+.row input[type="text"]:hover{border-color:var(--line)}
+.row input[type="text"]:focus{outline:none;border-color:var(--accent);background:var(--paper)}
+.row .money{text-align:right;font-variant-numeric:tabular-nums}
+.row.done .name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted)}
+.row .actual.over{color:var(--warn)}
+
+/* 수량 */
+.qty{display:flex;align-items:center;min-width:0;border:1px solid transparent;border-radius:6px;padding-right:8px;cursor:text}
+.qty:hover{border-color:var(--line)}
+.qty:focus-within{border-color:var(--accent);background:var(--paper)}
+.row .qty input[type="text"]{border:0;background:transparent;padding:7px 3px 7px 6px;text-align:right;font-variant-numeric:tabular-nums}
+.row .qty input[type="text"]:focus{background:transparent}
+.qty span{color:var(--muted);font-size:13px;flex:none}
+
+/* Guestbook tabs: 이름 · 축의금 only */
+.cols.guest,.row.guest{grid-template-columns:18px minmax(0,1fr) 160px 32px}
+.row.guest .name{padding-left:10px}
+.cols.guest span:nth-child(2){padding-left:10px}
+body.kind-guestbook .t-actual,body.kind-guestbook .t-diff{display:none}
+
+/* 실제 지출 칸을 끈 상태: 예산만 적는 모드 */
+body.no-actual .cols:not(.guest),body.no-actual .row:not(.guest){
+  grid-template-columns:18px 28px minmax(0,1.2fr) minmax(0,1fr) 72px 128px 32px;
+}
+body.no-actual .row:not(.guest) .actual,
+body.no-actual .cols:not(.guest) span:nth-child(7){display:none}
+body.no-actual .t-actual,body.no-actual .t-diff{display:none}
+
+/* Fold a category's items */
+.fold-btn{
+  flex:none;width:32px;height:32px;border:0;border-radius:6px;background:none;color:var(--muted);
+  display:grid;place-items:center;
+}
+.fold-btn:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
+.fold-btn:active{background:color-mix(in srgb, var(--ink) 11%, transparent)}
+.fold-btn svg{width:14px;height:14px;transition:transform .15s}
+.cat.collapsed .fold-btn svg{transform:rotate(180deg)}
+.cat.collapsed .cols,.cat.collapsed .rows,.cat.collapsed .add-item{display:none}
+.cat.collapsed .cat-head{margin-bottom:0}
+.cat.collapsed{padding-bottom:14px}
+#cats.sorting .fold-btn{display:none}
+
+/* 선택지 button in each row */
+.pick{
+  display:flex;align-items:center;gap:6px;width:100%;min-width:0;height:34px;padding:0 10px;
+  border:1px dashed var(--line);border-radius:6px;background:none;color:var(--muted);
+  font-size:13.5px;text-align:left;
+}
+.pick:hover{background:color-mix(in srgb, var(--ink) 5%, transparent)}
+.pick:active{background:color-mix(in srgb, var(--ink) 11%, transparent)}
+.pick.has-options{border-style:solid}
+.pick.chosen{border-style:solid;border-color:color-mix(in srgb, var(--accent-fill) 40%, var(--line));background:var(--accent-soft);color:var(--ink)}
+.pick-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pick-count{flex:none;font-size:11.5px;line-height:18px;padding:0 6px;border-radius:999px;background:var(--paper);color:var(--muted);font-variant-numeric:tabular-nums}
+.pick.chosen .pick-count{background:var(--sheet)}
+
+/* 선택지 dialog */
+.opt-dialog{
+  border:0;padding:0;border-radius:14px;background:var(--sheet);color:var(--ink);
+  width:min(560px, calc(100vw - 32px));max-height:min(84vh, 760px);
+  box-shadow:0 24px 64px rgba(15,20,30,.28);
+}
+.opt-dialog::backdrop{background:rgba(15,20,30,.45)}
+.opt-inner{display:flex;flex-direction:column;max-height:inherit}
+.opt-head{display:flex;align-items:flex-start;gap:12px;padding:20px 20px 12px}
+.opt-head h2{margin:0;font-size:18px;font-weight:700;letter-spacing:-0.02em}
+.opt-head p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+.opt-x{
+  margin-left:auto;flex:none;width:32px;height:32px;border:0;border-radius:6px;background:none;
+  color:var(--muted);font-size:20px;line-height:1;
+}
+.opt-x:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
+.opt-list{overflow-y:auto;padding:4px 20px 8px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.opt-empty{color:var(--muted);font-size:14px;text-align:center;padding:22px 12px;border:1.5px dashed var(--line);border-radius:10px}
+.opt{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:10px;padding:4px}
+.opt.selected{border-color:var(--accent-fill);background:var(--accent-soft)}
+.opt-main{
+  flex:1;min-width:0;display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:2px 12px;align-items:center;
+  border:0;background:none;text-align:left;padding:9px 10px;border-radius:7px;
+}
+.opt-main:hover{background:color-mix(in srgb, var(--ink) 5%, transparent)}
+.opt-main:active{background:color-mix(in srgb, var(--ink) 11%, transparent)}
+.opt-radio{width:18px;height:18px;border-radius:50%;border:1.5px solid color-mix(in srgb, var(--ink) 30%, var(--sheet));display:grid;place-items:center}
+.opt.selected .opt-radio{border-color:var(--accent-fill)}
+.opt.selected .opt-radio::after{content:"";width:9px;height:9px;border-radius:50%;background:var(--accent-fill)}
+.opt-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opt-price{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.opt-price.none{color:var(--muted);font-weight:400}
+.opt-note{grid-column:2 / -1;color:var(--ink);opacity:.75;font-size:12.5px;white-space:pre-wrap;overflow-wrap:anywhere}
+.opt-host{grid-column:2 / -1;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.opt-tool{
+  flex:none;width:32px;height:32px;border:0;border-radius:6px;background:none;color:var(--muted);
+  display:grid;place-items:center;text-decoration:none;
+}
+.opt-tool svg{width:16px;height:16px}
+.opt-tool:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
+.opt-tool.danger:hover{color:var(--warn)}
+.opt-form{border-top:1px solid var(--line);padding:14px 20px 18px;display:grid;gap:8px}
+.opt-form-title{font-size:13.5px;font-weight:600}
+.opt-form input{
+  width:100%;min-width:0;border:1px solid var(--line);border-radius:8px;background:var(--sheet);
+  padding:9px 12px;
+}
+.opt-form input:focus{outline:none;border-color:var(--accent)}
+.opt-form .money{text-align:right;font-variant-numeric:tabular-nums}
+.opt-form-row{display:grid;grid-template-columns:minmax(0,1fr) 150px;gap:8px}
+.opt-form-foot{display:flex;align-items:center;gap:8px}
+.opt-form-foot small{color:var(--muted);font-size:12.5px;margin-right:auto}
+.btn-ghost,.btn-primary{border-radius:8px;padding:9px 16px;font-size:14px;font-weight:600}
+.btn-ghost{border:1px solid var(--line);background:var(--sheet)}
+.btn-ghost:hover{background:color-mix(in srgb, var(--ink) 5%, var(--sheet))}
+.btn-primary{border:0;background:var(--accent-fill);color:var(--on-accent)}
+.btn-primary:hover{filter:brightness(1.06)}
+.btn-primary:active{filter:brightness(.94)}
+@media (max-width:640px){
+  .opt-dialog{width:100vw;max-width:100vw;margin:auto 0 0;border-radius:16px 16px 0 0;max-height:88vh}
+  .opt-form-row{grid-template-columns:1fr}
+  .opt-name{white-space:normal;word-break:keep-all;overflow-wrap:anywhere}
+}
+.check{display:flex;justify-content:center}
+.check input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+.del-item{
+  border:0;background:none;color:var(--muted);font-size:18px;line-height:1;
+  width:32px;height:32px;border-radius:6px;
+}
+.del-item:hover{color:var(--warn);background:var(--paper)}
+.add-item{
+  margin-top:6px;border:0;background:none;color:var(--accent);
+  font-weight:500;padding:8px 4px;
+}
+.add-item:hover{text-decoration:underline}
+
+.add-cat{
+  width:100%;padding:16px;margin-top:18px;border:1.5px dashed var(--line);border-radius:10px;
+  background:transparent;color:var(--muted);font-weight:500;
+}
+.add-cat:hover{border-color:var(--accent);color:var(--accent)}
+
+.empty{
+  text-align:center;color:var(--muted);padding:40px 20px;
+  border:1.5px dashed var(--line);border-radius:10px;margin-bottom:18px;
+}
+
+.foot-note{color:var(--muted);font-size:13.5px;margin:22px 0 0}
+/* 쿠팡 파트너스 고지 (링크가 보이는 곳마다 표시) */
+.aff-note{color:var(--muted);font-size:12px;line-height:1.6;margin:8px 0 0}
+.opt-inner .aff-note{margin:2px 0 0;padding:0 20px 2px}
+.foot-actions{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:13.5px}
+.foot-actions button{border:0;background:none;color:var(--muted);text-decoration:underline;padding:0;font-size:inherit}
+.foot-actions button:hover{color:var(--warn)}
+
+/* Totals bar: the one loud element */
+.totals{
+  position:fixed;left:0;right:0;bottom:0;z-index:5;
+  background:var(--bar);color:var(--bar-ink);
+}
+.totals-inner{
+  max-width:var(--wrap);margin:0 auto;padding:16px 20px calc(16px + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:28px;flex-wrap:wrap;
+}
+.t-main .t-label,.t-small .t-label{font-size:12.5px;color:var(--bar-muted)}
+.t-main .t-num{
+  font-weight:700;letter-spacing:-0.02em;
+  font-size:clamp(26px,4.4vw,34px);line-height:1.1;
+  font-variant-numeric:tabular-nums;letter-spacing:-0.01em;
+}
+.t-main .t-man{font-size:13px;color:var(--bar-muted)}
+.t-small .t-num{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.t-small .t-num.over{color:#FF8FA3}
+.t-spacer{flex:1}
+.export{
+  border:0;border-radius:8px;padding:12px 18px;font-weight:600;
+  background:var(--accent-fill);color:var(--on-accent);white-space:nowrap;
+}
+.export{list-style:none;cursor:pointer;display:inline-block;text-align:center;user-select:none}
+.export::-webkit-details-marker{display:none}
+.export:hover{filter:brightness(1.08)}
+.export[aria-disabled="true"]{opacity:.6;cursor:wait}
+.export-menu{position:relative}
+.export-menu .menu-pop{top:auto;bottom:calc(100% + 8px);right:0;min-width:260px}
+
+.toast{
+  position:fixed;left:50%;bottom:120px;transform:translateX(-50%) translateY(10px);
+  background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:14px;
+  opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:10;max-width:90vw;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast{display:flex;align-items:center;gap:14px}
+.toast.show.has-action{pointer-events:auto}
+.toast button{
+  border:0;background:none;color:var(--accent-soft);font-weight:600;text-decoration:underline;padding:0;
+}
+
+/* Narrow category card (2/4 columns, or phone): item goes onto three lines */
+@container (max-width:620px){
+  .cols:not(.guest){grid-template-columns:18px 28px 1fr 1fr 64px}
+  .cols:not(.guest) span:nth-child(3),.cols:not(.guest) span:nth-child(4),.cols:not(.guest) span:nth-child(5){display:none}
+  .cols.guest,.row.guest{grid-template-columns:18px minmax(0,1fr) 120px 32px}
+  .row:not(.guest){
+    grid-template-columns:18px 28px 1fr 1fr 64px;
+    grid-template-areas:"g c n n d" ". . o o q" ". . b a .";
+    row-gap:2px;
+  }
+  .row:not(.guest) .item-grip{grid-area:g}
+  .row:not(.guest) .check{grid-area:c}
+  .row:not(.guest) .name{grid-area:n}
+  .row:not(.guest) .del-item{grid-area:d}
+  .row:not(.guest) .budget{grid-area:b}
+  .row:not(.guest) .actual{grid-area:a}
+  .row:not(.guest) .pick{grid-area:o;height:30px}
+  .row:not(.guest) .qty{grid-area:q}
+  .row:not(.guest) .del-item{justify-self:end}
+  body.no-actual .cols:not(.guest),body.no-actual .row:not(.guest){grid-template-columns:18px 28px 1fr 1fr 64px}
+  body.no-actual .row:not(.guest){grid-template-areas:"g c n n d" ". . o o q" ". . b b .";}
+  .row{padding:4px 0}
+  .row input[type="text"]{padding:5px 8px}
+}
+
+@media (max-width:1100px){
+  body[data-cols="4"]{--wrap:1240px}
+  body[data-cols="4"] #cats{--cols:2}
+  .seg button[data-cols="4"]{display:none}
+  body[data-cols="4"] .seg button[data-cols="2"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+}
+@media (max-width:700px){
+  body[data-cols] #cats{--cols:1}
+  .view-toggle{display:none}
+}
+@media (max-width:640px){
+  .wrap{padding-top:12px}
+  .tab-add span{display:none}
+  .tab-btn{max-width:150px}
+  .cat{padding:14px 14px 10px}
+  .totals-inner{gap:14px 20px}
+  .t-spacer{display:none}
+  .export-menu,.export{display:block;width:100%}
+  .export-menu .menu-pop{left:0;right:0;min-width:0}
+  body{padding-bottom:210px}
+  .toast{bottom:190px}
+}
+@media (prefers-reduced-motion:reduce){.toast,.tpl-btn,.tool-btn,.tpl-btn .chev{transition:none}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="hero-inner">
+    <p class="hero-kicker">준비 예산표 및 체크리스트</p>
+    <h1>결혼·출산 준비 예산표를 쉽게 만들고 구글 시트로 옮기세요</h1>
+    <p class="hero-lead">
+      결혼 준비, 출산·육아 준비, 축의금 방명록 템플릿으로 바로 시작할 수 있어요.
+      항목마다 예산과 실제 지출을 적으면 카테고리 소계와 전체 합계가 자동으로 계산되고,
+      엑셀(xlsx) 파일로 내보내 구글 시트에서 그대로 이어서 쓸 수 있어요.
+    </p>
+    <ul class="hero-points">
+      <li><b>템플릿으로 시작</b><span>결혼 준비 8개 카테고리, 출산·육아 50개 항목이 미리 들어 있어요.</span></li>
+      <li><b>선택지 비교</b><span>항목마다 제품·업체 후보를 가격과 함께 모아 두고 하나를 고르면 예산이 바뀌어요.</span></li>
+      <li><b>엑셀 내보내기·불러오기</b><span>탭마다 시트로 저장되고, 내보낸 파일을 다시 불러와 이어서 작업할 수 있어요.</span></li>
+    </ul>
+    <a class="hero-cta" href="#planner">예산표 만들기</a>
+    <p class="hero-note">무료 · 가입 없음 · 브라우저에 자동 저장</p>
+    <nav class="hero-links" aria-label="템플릿 안내">
+      <a href="wedding/">결혼 준비 예산표</a>
+      <a href="baby/">출산 준비물 리스트</a>
+      <a href="guestbook/">축의금 방명록 양식</a>
+    </nav>
+    <p class="hero-aff aff-note">이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따라 일정액의 수수료를 제공받습니다.</p>
+  </div>
+</header>
+
+<div class="wrap" id="planner">
+  <nav class="tabs" aria-label="예산표 목록">
+    <div id="tabList" class="tab-list" role="tablist"></div>
+    <button id="addPlan" class="tab-add" type="button" aria-label="새 예산표 만들기"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>새 예산표</span></button>
+  </nav>
+
+  <input id="planTitle" class="plan-title" type="text" aria-label="예산표 이름" value="">
+  <textarea id="planIntro" class="intro" rows="1" aria-label="예산표 설명" placeholder="카테고리와 항목을 적고 예산과 실제 쓴 돈을 입력하면 합계가 바로 계산돼요. 이 설명은 눌러서 고칠 수 있어요."></textarea>
+
+  <div class="toolbar">
+    <div class="tool-group">
+    <details class="menu tpl-menu">
+      <summary class="tpl-btn"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5 5.5h6M5 8h6M5 10.5h3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>템플릿 불러오기<svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+      <div class="menu-pop">
+        <div class="menu-note">지금 예산표의 내용이 템플릿으로 바뀌어요</div>
+        <button type="button" id="tplBlank" data-tpl="blank" data-label="빈 목록">빈 목록<small>카테고리 1개와 빈 항목으로 새로 시작</small></button>
+        <!-- the other templates are added from #templateData -->
+      </div>
+    </details>
+    <button id="importBtn" class="tool-btn" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.8 6.8L8 10l3.2-3.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 10.5v2a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>엑셀 불러오기</button>
+    <input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+    </div>
+    <div class="view-opts">
+    <label class="opt-toggle"><input type="checkbox" id="actualToggle" checked><span>실제 지출 칸</span></label>
+    <div class="color-pick">
+      <details class="menu color-menu">
+        <summary class="color-btn" aria-label="테마 색상 고르기" title="테마 색상"><span class="color-dot" aria-hidden="true"></span><span id="colorName">녹색</span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+        <div class="menu-pop" role="group" aria-label="테마 색상"><button type="button" class="swatch" data-accent="green" aria-pressed="false">녹색</button><button type="button" class="swatch" data-accent="navy" aria-pressed="false">네이비</button><button type="button" class="swatch" data-accent="pink" aria-pressed="false">핑크</button><button type="button" class="swatch" data-accent="yellow" aria-pressed="false">노랑</button><button type="button" class="swatch" data-accent="purple" aria-pressed="false">보라</button><button type="button" class="swatch" data-accent="orange" aria-pressed="false">주황</button></div>
+      </details>
+    </div>
+    <div class="view-toggle">
+      <div class="seg" role="group" aria-label="카테고리를 몇 열로 볼지">
+        <button type="button" data-cols="1" aria-pressed="true"><svg viewBox="0 0 16 12" aria-hidden="true"><rect x="0.5" y="0.5" width="15" height="11" rx="1.5" fill="none" stroke="currentColor"/></svg>1열</button>
+        <button type="button" data-cols="2" aria-pressed="false"><svg viewBox="0 0 16 12" aria-hidden="true"><rect x="0.5" y="0.5" width="6.5" height="11" rx="1.5" fill="none" stroke="currentColor"/><rect x="9" y="0.5" width="6.5" height="11" rx="1.5" fill="none" stroke="currentColor"/></svg>2열</button>
+        <button type="button" data-cols="4" aria-pressed="false"><svg viewBox="0 0 16 12" aria-hidden="true"><rect x="0.5" y="0.5" width="2.6" height="11" rx="1" fill="none" stroke="currentColor"/><rect x="4.6" y="0.5" width="2.6" height="11" rx="1" fill="none" stroke="currentColor"/><rect x="8.7" y="0.5" width="2.6" height="11" rx="1" fill="none" stroke="currentColor"/><rect x="12.9" y="0.5" width="2.6" height="11" rx="1" fill="none" stroke="currentColor"/></svg>4열</button>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <main id="cats" aria-live="polite"></main>
+  <button id="addCat" class="add-cat">카테고리 추가</button>
+
+  <p class="foot-note">입력한 내용은 이 브라우저에 자동으로 저장돼요. 다른 기기에서 보거나 오래 보관하려면 엑셀로 내보내 두세요.</p>
+  <div class="foot-actions"><button id="clearAllItems" type="button">카테고리만 남기고 항목 비우기</button><button id="resetAll" type="button">이 예산표 모두 지우기</button></div>
+</div>
+
+<section class="about" aria-label="사용 안내">
+  <h2>예산표 만드는 순서</h2>
+  <ol>
+    <li>위쪽 <b>템플릿 불러오기</b>에서 결혼 준비, 출산·육아 준비, 방명록 중 하나를 고르거나 빈 목록으로 시작해요.</li>
+    <li>카테고리와 항목 이름을 고치고, 필요 없는 항목은 지워요.</li>
+    <li>항목의 <b>선택지</b>에 후보 제품·업체를 가격과 함께 적고 하나를 고르면 예산이 자동으로 채워져요.</li>
+    <li>실제로 쓴 금액을 <b>실제 지출</b> 칸에 적으면 남은 예산이 바로 계산돼요. 이 칸은 필요 없으면 꺼 둘 수 있어요.</li>
+    <li><b>엑셀로 내보내기</b>로 받은 파일을 구글 시트에 올리면 가족과 함께 볼 수 있어요.</li>
+  </ol>
+
+  <h2>템플릿별 안내</h2>
+  <p>
+    <a href="wedding/">결혼 준비 예산표</a> · <a href="baby/">출산 준비물 리스트</a> · <a href="guestbook/">축의금 방명록 양식</a>
+  </p>
+
+  <h2>자주 묻는 질문</h2>
+  <h3>가입이나 설치가 필요한가요?</h3>
+  <p>아니요. 브라우저에서 바로 쓰고, 입력한 내용은 쓰는 기기의 브라우저에만 저장돼요. 서버로 보내지 않아요.</p>
+  <h3>구글 시트에서도 쓸 수 있나요?</h3>
+  <p>엑셀(xlsx)로 내보낸 뒤 구글 드라이브에 올려 구글 시트로 열면 돼요. 합계와 소계는 수식으로 들어가 있어서 시트에서 숫자를 고쳐도 다시 계산돼요.</p>
+  <h3>여러 예산표를 같이 관리할 수 있나요?</h3>
+  <p>탭을 여러 개 만들 수 있고, 탭마다 색을 정할 수 있어요. 내보낼 때 탭 하나만 내보내거나 모든 탭을 시트별로 한 파일에 담을 수 있어요.</p>
+  <h3>결혼식 축의금도 정리할 수 있나요?</h3>
+  <p>방명록 템플릿을 고르면 이름과 축의금만 적는 화면으로 바뀌고, 인원과 합계가 따로 계산돼요.</p>
+</section>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebApplication",
+      "name": "준비 예산표",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "inLanguage": "ko",
+      "description": "결혼 준비, 출산·육아 준비, 축의금 방명록 예산을 정리하고 엑셀로 내보내 구글 시트에서 이어서 쓰는 무료 예산 계획표.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        { "@type": "Question", "name": "가입이나 설치가 필요한가요?", "acceptedAnswer": { "@type": "Answer", "text": "아니요. 브라우저에서 바로 쓰고, 입력한 내용은 쓰는 기기의 브라우저에만 저장됩니다." } },
+        { "@type": "Question", "name": "구글 시트에서도 쓸 수 있나요?", "acceptedAnswer": { "@type": "Answer", "text": "엑셀(xlsx)로 내보낸 뒤 구글 드라이브에 올려 구글 시트로 열면 됩니다. 합계와 소계는 수식으로 들어가 있어 시트에서도 다시 계산됩니다." } },
+        { "@type": "Question", "name": "여러 예산표를 같이 관리할 수 있나요?", "acceptedAnswer": { "@type": "Answer", "text": "탭을 여러 개 만들 수 있고, 탭 하나만 내보내거나 모든 탭을 시트별로 한 파일에 담아 내보낼 수 있습니다." } },
+        { "@type": "Question", "name": "결혼식 축의금도 정리할 수 있나요?", "acceptedAnswer": { "@type": "Answer", "text": "방명록 템플릿을 고르면 이름과 축의금만 적는 화면으로 바뀌고 인원과 합계가 계산됩니다." } }
+      ]
+    }
+  ]
+}
+</script>
+
+<div class="totals" role="region" aria-label="합계">
+  <div class="totals-inner">
+    <div class="t-main">
+      <div class="t-label" id="tBudgetLabel">예산 합계</div>
+      <div class="t-num" id="tBudget">0원</div>
+      <div class="t-man" id="tBudgetMan">&nbsp;</div>
+    </div>
+    <div class="t-small t-actual">
+      <div class="t-label">실제 지출</div>
+      <div class="t-num" id="tActual">0원</div>
+    </div>
+    <div class="t-small t-diff">
+      <div class="t-label" id="tDiffLabel">남은 예산</div>
+      <div class="t-num" id="tDiff">0원</div>
+    </div>
+    <div class="t-small">
+      <div class="t-label" id="tDoneLabel">완료</div>
+      <div class="t-num" id="tDone">0 / 0</div>
+    </div>
+    <div class="t-spacer"></div>
+    <details id="exportMenu" class="menu export-menu">
+      <summary id="exportBtn" class="export">엑셀로 내보내기</summary>
+      <div class="menu-pop">
+        <div class="menu-note">어떤 예산표를 내보낼까요?</div>
+        <button type="button" data-export="current">지금 탭만<small id="exportCurrentNote"></small></button>
+        <button type="button" data-export="all">모든 탭<small id="exportAllNote"></small></button>
+      </div>
+    </details>
+  </div>
+</div>
+
+<dialog id="optDialog" class="opt-dialog" aria-labelledby="optTitle">
+  <div class="opt-inner">
+    <div class="opt-head">
+      <div>
+        <h2 id="optTitle">선택지</h2>
+        <p id="optSub"></p>
+      </div>
+      <button type="button" class="opt-x" data-close aria-label="닫기">×</button>
+    </div>
+    <div id="optList" class="opt-list"></div>
+    <p class="aff-note">기본 템플릿의 일부 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따라 일정액의 수수료를 제공받습니다.</p>
+    <form id="optForm" class="opt-form" autocomplete="off">
+      <div class="opt-form-title" id="optFormTitle">선택지 추가</div>
+      <input name="name" type="text" placeholder="이름 (제품, 업체 등)" aria-label="선택지 이름" required>
+      <div class="opt-form-row">
+        <input name="link" type="text" inputmode="url" placeholder="참고 링크 (선택)" aria-label="참고 링크">
+        <input name="price" type="text" inputmode="numeric" class="money" placeholder="가격" aria-label="가격">
+      </div>
+      <input name="note" type="text" placeholder="비고 (선택) · 예: 대여 포함, 3월 할인" aria-label="비고">
+      <div class="opt-form-foot">
+        <small>고르면 이 항목의 예산이 가격 × 수량으로 바뀌어요</small>
+        <button type="button" class="btn-ghost" id="optCancel" hidden>취소</button>
+        <button type="submit" class="btn-primary" id="optSubmit">추가</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status"></div>
+
+<!-- 기본 템플릿 데이터: template-editor.html에서 고친 뒤 내려받은 JSON으로 이 블록 안을 통째로 바꾸면 돼요. -->
+<script type="application/json" id="templateData">
+[
+  {
+    "id": "wedding",
+    "label": "결혼 준비",
+    "desc": "결혼식·청첩장·예물·부모님 등 8개 카테고리",
+    "title": "우리 결혼 준비",
+    "intro": "ver. 2026\n예식장부터 혼수까지, 결혼 준비 체크리스트예요. 견적을 받은 업체는 항목의 선택지에 가격과 함께 적어 두고 비교해 보세요.",
+    "kind": "budget",
+    "categories": [
+      {
+        "name": "결혼식",
+        "items": [
+          {
+            "name": "예식장"
+          },
+          {
+            "name": "버스 대절"
+          },
+          {
+            "name": "플래너"
+          },
+          {
+            "name": "스튜디오 촬영"
+          },
+          {
+            "name": "드레스"
+          },
+          {
+            "name": "헤어·메이크업"
+          },
+          {
+            "name": "본식 스냅"
+          },
+          {
+            "name": "본식 DVD"
+          },
+          {
+            "name": "신랑 예복"
+          },
+          {
+            "name": "부케"
+          }
+        ]
+      },
+      {
+        "name": "서포트",
+        "items": [
+          {
+            "name": "주례"
+          },
+          {
+            "name": "사회"
+          },
+          {
+            "name": "축가"
+          },
+          {
+            "name": "방명록·축의금 관리"
+          },
+          {
+            "name": "가방순이"
+          }
+        ]
+      },
+      {
+        "name": "청첩장",
+        "items": [
+          {
+            "name": "종이 청첩장"
+          },
+          {
+            "name": "모바일 청첩장"
+          }
+        ]
+      },
+      {
+        "name": "예물",
+        "items": [
+          {
+            "name": "결혼반지"
+          }
+        ]
+      },
+      {
+        "name": "부모님",
+        "items": [
+          {
+            "name": "상견례"
+          },
+          {
+            "name": "혼주 한복"
+          },
+          {
+            "name": "혼주 메이크업"
+          }
+        ]
+      },
+      {
+        "name": "신혼여행",
+        "items": [
+          {
+            "name": "항공권"
+          },
+          {
+            "name": "숙소"
+          },
+          {
+            "name": "여행 경비"
+          }
+        ]
+      },
+      {
+        "name": "가전",
+        "items": [
+          {
+            "name": "냉장고",
+            "options": [
+              {
+                "name": "삼성 키친핏 615L"
+              }
+            ]
+          },
+          {
+            "name": "세탁기·건조기",
+            "options": [
+              {
+                "name": "LG 워시타워",
+                "note": "로봇청소기·오븐과 묶음 구매"
+              }
+            ]
+          },
+          {
+            "name": "에어컨"
+          },
+          {
+            "name": "TV",
+            "options": [
+              {
+                "name": "삼성 더 세리프 55인치"
+              }
+            ]
+          },
+          {
+            "name": "전자레인지"
+          },
+          {
+            "name": "무선청소기",
+            "options": [
+              {
+                "name": "다이슨"
+              }
+            ]
+          },
+          {
+            "name": "로봇청소기",
+            "options": [
+              {
+                "name": "LG"
+              }
+            ]
+          },
+          {
+            "name": "오븐",
+            "options": [
+              {
+                "name": "LG"
+              }
+            ]
+          },
+          {
+            "name": "밥솥",
+            "options": [
+              {
+                "name": "쿠쿠"
+              }
+            ]
+          },
+          {
+            "name": "음식물 처리기",
+            "options": [
+              {
+                "name": "린클"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "가구·인테리어",
+        "items": [
+          {
+            "name": "침대"
+          },
+          {
+            "name": "식탁·식탁 의자"
+          },
+          {
+            "name": "책상·의자"
+          },
+          {
+            "name": "책장"
+          },
+          {
+            "name": "수납 선반"
+          },
+          {
+            "name": "침실 수납장·사이드 테이블"
+          },
+          {
+            "name": "전신 거울"
+          },
+          {
+            "name": "침실 조명"
+          },
+          {
+            "name": "책상 조명"
+          },
+          {
+            "name": "식탁 램프"
+          },
+          {
+            "name": "빨래 바구니",
+            "qty": 2
+          },
+          {
+            "name": "커트러리 세트"
+          },
+          {
+            "name": "트롤리"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "baby",
+    "label": "출산·육아 준비",
+    "desc": "아기옷·가구·위생·수유 등 6개 카테고리",
+    "title": "출산·육아 준비",
+    "intro": "ver. 2026\n쌍둥이 아빠가 직접 준비하면서 만든 체크리스트 겸 예산표예요. 여러 맘카페와 블로그 후기를 기반으로 평이 좋은 제품을 항목마다 선택지로 정리해 뒀어요. 구매의 편의성을 위해 쿠팡과 네이버스토어를 위주로 링크를 걸어뒀습니다. 조리원에서 주는 것, 물려받을 것은 지우고 우리 집 상황에 맞게 고쳐 쓰세요.",
+    "kind": "budget",
+    "categories": [
+      {
+        "name": "산모",
+        "items": [
+          {
+            "name": "산후조리원"
+          },
+          {
+            "name": "산모 패드",
+            "options": [
+              {
+                "name": "디펜드 맘스 안심패드",
+                "link": "https://link.coupang.com/a/hbVbHz91O0"
+              },
+              {
+                "name": "아베나 덴마크 프리미엄 산모패드",
+                "link": "https://link.coupang.com/a/hbVhGRVtnw"
+              },
+              {
+                "name": "마더케이 미라클 산모패드",
+                "link": "https://link.coupang.com/a/hbVkoVWjUi"
+              }
+            ]
+          },
+          {
+            "name": "수유 브라",
+            "options": [
+              {
+                "name": "에이투에프 수유브라",
+                "link": "https://brand.naver.com/atof/category/1c2b237a23d14a75a364a6bfb0164eb3"
+              },
+              {
+                "name": "하성민기업 수유브라",
+                "link": "https://brand.naver.com/hasungmin/search?q=%ED%95%98%EC%84%B1%EB%AF%BC%EA%B8%B0%EC%97%85%20%EC%88%98%EC%9C%A0%EB%B8%8C%EB%9D%BC"
+              },
+              {
+                "name": "Mothersbaby 수유브라",
+                "link": "https://mothersbaby.co.kr/category/%EC%88%98%EC%9C%A0%EB%B8%8C%EB%9D%BC/547/"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "아기옷",
+        "items": [
+          {
+            "name": "배냇저고리",
+            "options": [
+              {
+                "name": "베베댕 무형광 배냇저고리",
+                "link": "https://m.bebedeng.co.kr/goods/goods_view.php?goodsNo=1000000032"
+              },
+              {
+                "name": "큐비앤맘 배냇저고리",
+                "link": "http://cubynmom.com/category/%EB%B0%B0%EB%83%87%EC%A0%80%EA%B3%A0%EB%A6%AC/925/?srsltid=AU7gw4Wo74W300h56k82Or9JpwVypARJDb8YJZ5PexMQgCrz6Yz_9omm"
+              },
+              {
+                "name": "베이비베어 배냇저고리",
+                "link": "https://link.coupang.com/a/hbWEzs1PA4"
+              }
+            ]
+          },
+          {
+            "name": "바디수트",
+            "qty": 3,
+            "options": [
+              {
+                "name": "유니클로 쿨 코튼 메쉬 이너 바디수트",
+                "link": "https://www.uniqlo.com/kr/ko/baby/newborn/bodysuits"
+              },
+              {
+                "name": "H&M 신생아 바디수트",
+                "link": "https://www2.hm.com/ko_kr/baby/products/clothing/bodysuits.html?srsltid=AU7gw4U95kaHSezbcAG3joGCdueFlx-ulWkCorsIT50dR_tC9Lx9Sier"
+              },
+              {
+                "name": "오우아스튜디오 바디수트",
+                "link": "https://link.coupang.com/a/hbWZFdiRRB"
+              }
+            ]
+          },
+          {
+            "name": "겉싸개",
+            "options": [
+              {
+                "name": "조리원 증정"
+              }
+            ]
+          },
+          {
+            "name": "속싸개",
+            "options": [
+              {
+                "name": "말랑하니 속싸개",
+                "link": "https://link.coupang.com/a/hbY46mEwmW"
+              },
+              {
+                "name": "러브투드림 속싸개",
+                "link": "https://swaddleupkorea.com/"
+              },
+              {
+                "name": "스칸디맘 속싸개",
+                "link": "https://link.coupang.com/a/hbYQlYWJhc"
+              }
+            ]
+          },
+          {
+            "name": "스와들업",
+            "options": [
+              {
+                "name": "오우와스튜디오 스와들업",
+                "link": "https://link.coupang.com/a/hbXmvWpsnQ"
+              },
+              {
+                "name": "베베곰 스와들업",
+                "link": "https://link.coupang.com/a/hbXqW70Ima"
+              },
+              {
+                "name": "엘라바 스와들업",
+                "link": "https://link.coupang.com/a/hbXxOJfs3E"
+              }
+            ]
+          },
+          {
+            "name": "모자",
+            "options": [
+              {
+                "name": "오가닉붐 신생아 모자",
+                "link": "https://link.coupang.com/a/hbXFMYDwCP"
+              }
+            ]
+          },
+          {
+            "name": "양말",
+            "qty": 3,
+            "options": [
+              {
+                "name": "유니클로 신생아 양말",
+                "link": "https://www.uniqlo.com/kr/ko/baby/newborn/socks"
+              },
+              {
+                "name": "H&M 신생아 양말",
+                "link": "https://www2.hm.com/ko_kr/baby/newborn/clothing/socks-tights.html?srsltid=AU7gw4VvTCu1WLgk3DuiQ6FT0dKEjSS-WETnOLZNJbJ1bMkYJH-ZHKSE"
+              },
+              {
+                "name": "하이베이비키즈 신생아 양말",
+                "link": "https://link.coupang.com/a/hbYdTjsQjk"
+              }
+            ]
+          },
+          {
+            "name": "내복",
+            "qty": 3,
+            "options": [
+              {
+                "name": "코코하니 내복",
+                "link": "https://cocohani.co.kr/"
+              },
+              {
+                "name": "큐비앤맘 내복",
+                "link": "https://cubynmom.com/category/%EB%82%B4%EC%9D%98/911/"
+              },
+              {
+                "name": "말랑하니 내복",
+                "link": "https://link.coupang.com/a/hbZBYP6liK"
+              }
+            ]
+          },
+          {
+            "name": "손수건",
+            "options": [
+              {
+                "name": "밤부베베 손수건",
+                "link": "https://brand.naver.com/bamboobebe/category/009025bfc22a449e82aea3410cb2a7bb?cp=1"
+              },
+              {
+                "name": "베베룬 손수건",
+                "link": "https://brand.naver.com/bebelune/category/26d569842d1b4b27b75a98f5ec7b3426?cp=1"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "가구",
+        "items": [
+          {
+            "name": "아기 침대 (신생아용)",
+            "options": [
+              {
+                "name": "다이치 리우 아기침대",
+                "link": "https://www.babyseatmall.net/?act=shop.goods_list&GC=GD3H01"
+              },
+              {
+                "name": "리안 드림콧 접이식 아기침대",
+                "link": "https://link.coupang.com/a/hb0KCMW1tY"
+              },
+              {
+                "name": "부가부 스타더스트",
+                "link": "https://www.bugaboo.com/kr-ko/%EC%A0%91%EC%9D%B4%EC%8B%9D-%EC%95%84%EA%B8%B0%EC%B9%A8%EB%8C%80/%EB%B6%80%EA%B0%80%EB%B6%80-%EC%8A%A4%ED%83%80%EB%8D%94%EC%8A%A4%ED%8A%B8-%ED%86%A0%ED%94%84-%EC%BD%94%ED%8A%BC%EC%8B%9C%ED%8A%B8-%ED%8F%AC%ED%95%A8-PV007412.html"
+              }
+            ]
+          },
+          {
+            "name": "아기침대",
+            "options": [
+              {
+                "name": "숲소리 범퍼침대",
+                "link": "https://www.soopsori.co.kr/goods/goods_list.php?cateCd=005"
+              },
+              {
+                "name": "안데르센 저상형 데이베드 침대",
+                "link": "https://brand.naver.com/andersenmall/category/15edb709fec746a295e856e7ac5f169f?cp=1"
+              },
+              {
+                "name": "일룸 쿠시노 저상형 침대",
+                "link": "https://www.iloom.com/series/series.do?sn=86&srsltid=AU7gw4VvLMlfiW9UKhCAwvRuoLh20NSEhdgt-mIkig26yCq3YSXNnZlK"
+              }
+            ]
+          },
+          {
+            "name": "바운서",
+            "options": [
+              {
+                "name": "베이비뵨 바운서",
+                "link": "https://www.babybjorn.kr/products/baby-bouncers/",
+                "note": "압도적 추천"
+              }
+            ]
+          },
+          {
+            "name": "하이체어",
+            "qty": 2,
+            "options": [
+              {
+                "name": "스토케 트립트랩",
+                "link": "https://www.stokke.com/KOR/ko-kr/category/%ED%95%98%EC%9D%B4%EC%B2%B4%EC%96%B4/%ED%8A%B8%EB%A6%BD%ED%8A%B8%EB%9E%A9"
+              },
+              {
+                "name": "사이벡스 레모 하이체어",
+                "link": "https://www.cybex-shop.co.kr/goods/goods_view.php?goodsNo=1000000416"
+              },
+              {
+                "name": "아가드 하이체어",
+                "link": "https://link.coupang.com/a/hb4meaujqC"
+              }
+            ]
+          },
+          {
+            "name": "방수 패드",
+            "qty": 2,
+            "options": [
+              {
+                "name": "베이비앙 방수패드",
+                "link": "https://m.babyan.co.kr/category/%EB%B0%A9%EC%88%98%EC%9A%94/346/"
+              },
+              {
+                "name": "포몽드 방수패드",
+                "link": "https://formongde.com/category/%EB%B0%A9%EC%88%98%ED%8C%A8%EB%93%9C/837/"
+              },
+              {
+                "name": "말랑하니 방수패드",
+                "link": "https://link.coupang.com/a/hb45jGHeGy"
+              }
+            ]
+          },
+          {
+            "name": "쿨매트",
+            "options": [
+              {
+                "name": "비비엔다 쿨매트",
+                "price": 56250,
+                "link": "https://vivienda.co.kr/category/%EC%BF%A8%ED%8C%A8%EB%93%9C%EC%BF%A8%EB%A7%A4%ED%8A%B8/166/"
+              },
+              {
+                "name": "아이레빗 냉감패드",
+                "link": "https://link.coupang.com/a/hb5pRNnG4i"
+              },
+              {
+                "name": "포몽드 쿨매트",
+                "link": "https://formongde.com/category/%EB%B0%A9%EC%88%98%ED%8C%A8%EB%93%9C/837/"
+              }
+            ]
+          },
+          {
+            "name": "기저귀 갈이대",
+            "options": [
+              {
+                "name": "소베맘 기저귀갈이대",
+                "link": "https://link.coupang.com/a/hb5CWW3Ipo",
+                "note": "국민템"
+              },
+              {
+                "name": "도노도노 기저귀갈이대",
+                "link": "https://link.coupang.com/a/hb5FFozTSS"
+              },
+              {
+                "name": "두리 기저귀갈이대",
+                "link": "https://durimall.co.kr/category/%EA%B8%B0%EC%A0%80%EA%B7%80-%EA%B0%88%EC%9D%B4%EB%8C%80/173/?srsltid=AU7gw4VrFyEYve8ICtbNcE_zcfyZD0YXcfd4E_NbVfPeH_eZbD8UokIN"
+              }
+            ]
+          },
+          {
+            "name": "거실 매트",
+            "options": [
+              {
+                "name": "꼬망세 매트",
+                "link": "https://link.coupang.com/a/hb5YLlbPQO"
+              },
+              {
+                "name": "비몰 매트",
+                "link": "https://link.coupang.com/a/hb57UWoI3w"
+              },
+              {
+                "name": "크림하우스 매트",
+                "link": "https://link.coupang.com/a/hb6iAbjD1U"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "수유",
+        "items": [
+          {
+            "name": "젖병",
+            "options": [
+              {
+                "name": "더블하트 모유실감 젖병",
+                "link": "https://link.coupang.com/a/hbZ65mx8eW"
+              },
+              {
+                "name": "란시노 유리젖병",
+                "link": "https://link.coupang.com/a/hb0b7dXL1o"
+              },
+              {
+                "name": "닥터브라운 젖병",
+                "link": "https://link.coupang.com/a/hb0d9Gj4rQ",
+                "note": "배앓이 방지"
+              }
+            ]
+          },
+          {
+            "name": "젖병 세척기",
+            "options": [
+              {
+                "name": "식기세척기로 사용"
+              },
+              {
+                "name": "베이비브레짜 젖병 세척기",
+                "link": "https://link.coupang.com/a/hb7CcFkwOy"
+              }
+            ]
+          },
+          {
+            "name": "젖병 소독기",
+            "options": [
+              {
+                "name": "유팡 젖병소독기",
+                "link": "https://link.coupang.com/a/hb6slGx4Wy"
+              },
+              {
+                "name": "케이 젖병소독기",
+                "link": "https://link.coupang.com/a/hb6BEUHSwK"
+              },
+              {
+                "name": "폴레드 픽셀 젖병소독기",
+                "link": "https://link.coupang.com/a/hb8CtlEuY0"
+              }
+            ]
+          },
+          {
+            "name": "분유",
+            "options": [
+              {
+                "name": "압타밀 프로푸트라 분유",
+                "link": "https://link.coupang.com/a/hb8GSxc0Y0"
+              },
+              {
+                "name": "앱솔루트 산양 분유",
+                "link": "https://link.coupang.com/a/hb6YvtPaMe"
+              },
+              {
+                "name": "파스퇴르 위드맘 제왕 분유",
+                "link": "https://link.coupang.com/a/hb6SyPqM3g"
+              }
+            ]
+          },
+          {
+            "name": "유축기",
+            "options": [
+              {
+                "name": "대여 가능"
+              },
+              {
+                "name": "메델라 유축기",
+                "link": "https://smartstore.naver.com/momsdream/products/4008814821?n_media=27758&n_query=%EB%A9%94%EB%8D%B8%EB%9D%BC%EC%8A%A4%EC%9C%99&n_rank=1&n_ad_group=grp-a001-01-000000020161176&n_ad=nad-a001-01-000000187176112&n_campaign_type=1&n_ad_group_type=1&n_match=2&NaPm=ct%3Dmu9htx1n%7Cci%3DERadff8604%2Db4c4%2D11f1%2Dbbe2%2D5e28beaf1165%7Ctr%3Dsa%7Chk%3D7961e2cbded5f74da4997f035667991245e47b90%7Cnacn%3DJ1naBIBzQNr6"
+              },
+              {
+                "name": "스펙트라 유축기",
+                "link": "https://link.coupang.com/a/hb7aYum3Pw"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "목욕·위생",
+        "items": [
+          {
+            "name": "아기 욕조 (신생아용)",
+            "qty": 2,
+            "options": [
+              {
+                "name": "슈너글 아기욕조",
+                "link": "https://link.coupang.com/a/hcbo0BT6MC"
+              },
+              {
+                "name": "온다베이비 아기욕조",
+                "link": "https://link.coupang.com/a/hcbrgNwUkC"
+              },
+              {
+                "name": "스토케 플레시바스 번들 아기욕조",
+                "link": "https://link.coupang.com/a/hcbw8L21Ho"
+              }
+            ]
+          },
+          {
+            "name": "아기 수전",
+            "options": [
+              {
+                "name": "해피달링 720도 아기수전",
+                "link": "https://link.coupang.com/a/hcbzywiV7A",
+                "note": "720도"
+              },
+              {
+                "name": "퓨어닷 스마트 아기수전",
+                "link": "https://brand.naver.com/petitelinstore/products/12584488197?nl-query=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%95%84%EA%B8%B0%EC%88%98%EC%A0%84&nl-au=1563403e34a2413d8d25f0e89bc90eb5&NaPm=ci%3D1563403e34a2413d8d25f0e89bc90eb5%7Cct%3Dmu9iw69e%7Ctr%3Dnslsl%7Csn%3D395905%7Chk%3D2f5e7d1a97c7eed66703161027997b1abb08abf7",
+                "note": "온도표시 기능"
+              },
+              {
+                "name": "대림바스 아기수전",
+                "link": "https://link.coupang.com/a/hcbLcAute8"
+              }
+            ]
+          },
+          {
+            "name": "아기 비데",
+            "options": [
+              {
+                "name": "포프베베 아기비데",
+                "link": "https://link.coupang.com/a/hcbP2d1DHg",
+                "note": "설치형"
+              },
+              {
+                "name": "폴레드 허그베어 아기비데",
+                "link": "https://link.coupang.com/a/hcbSKNHRqm",
+                "note": "설치형"
+              },
+              {
+                "name": "코니스 이지워시",
+                "link": "https://brand.naver.com/conys/products/13441981574",
+                "note": "스탠딩형"
+              }
+            ]
+          },
+          {
+            "name": "기저귀",
+            "options": [
+              {
+                "name": "하기스 네이처메이드 기저귀",
+                "link": "https://link.coupang.com/a/hb9HHzdto4"
+              },
+              {
+                "name": "킨도 베베가드 기저귀",
+                "link": "https://link.coupang.com/a/hb7TPODXHg"
+              },
+              {
+                "name": "팸퍼스 기저귀",
+                "link": "https://link.coupang.com/a/hb9KSkRAfA"
+              }
+            ]
+          },
+          {
+            "name": "물티슈",
+            "options": [
+              {
+                "name": "베베숲 시그니처 물티슈",
+                "link": "https://link.coupang.com/a/hb8aNX2uYu"
+              },
+              {
+                "name": "페넬로페 본보야지 아기물티슈",
+                "link": "https://link.coupang.com/a/hb90PS5S9Y"
+              },
+              {
+                "name": "브라운 물티슈",
+                "link": "https://link.coupang.com/a/hb8jSafROm"
+              }
+            ]
+          },
+          {
+            "name": "구강 티슈",
+            "options": [
+              {
+                "name": "비앤비 구강티슈",
+                "link": "https://link.coupang.com/a/hb94J4CCSO"
+              },
+              {
+                "name": "마더케이 구강티슈",
+                "link": "https://link.coupang.com/a/hb970FrEse"
+              },
+              {
+                "name": "마이비 구강티슈",
+                "link": "https://link.coupang.com/a/hb99Q11E7w"
+              }
+            ]
+          },
+          {
+            "name": "쪽쪽이",
+            "qty": 3,
+            "options": [
+              {
+                "name": "모윰 소프트윙 쪽쪽이",
+                "link": "https://link.coupang.com/a/hccmFYFiRU"
+              },
+              {
+                "name": "더블하트 쪽쪽이",
+                "link": "https://brand.naver.com/doubleheart_official/category/fcc080cb6c6c4d0aa280b86c27bcefd8?cp=1"
+              },
+              {
+                "name": "누크 센서티브 올실리콘 쪽쪽이",
+                "link": "https://link.coupang.com/a/hccqtn5H5g"
+              }
+            ]
+          },
+          {
+            "name": "아기 샴푸·바디워시",
+            "options": [
+              {
+                "name": "맘뜨레 아기 샴푸앤바스 올인원",
+                "link": "https://link.coupang.com/a/hcakDDjKHk"
+              },
+              {
+                "name": "아토팜 탑투토 워시 올인원",
+                "link": "https://link.coupang.com/a/hcaqSOsLPo"
+              },
+              {
+                "name": "프랭클린 바스앤샴푸",
+                "link": "https://link.coupang.com/a/hcat5wiPNQ"
+              }
+            ]
+          },
+          {
+            "name": "아기칫솔",
+            "options": [
+              {
+                "name": "블랑키즐 아기칫솔",
+                "link": "https://link.coupang.com/a/hccJB6m9bU"
+              },
+              {
+                "name": "마더케이",
+                "link": "https://link.coupang.com/a/hccNjCcGHY"
+              }
+            ]
+          },
+          {
+            "name": "아기치약",
+            "options": [
+              {
+                "name": "블랑키즐 유아용 고불소 치약",
+                "link": "https://link.coupang.com/a/hcfNWHMhB6"
+              },
+              {
+                "name": "픽킷 고불소 어린이 치약",
+                "link": "https://link.coupang.com/a/hcfRnrhtzU"
+              },
+              {
+                "name": "닥터노아 고불소 어린이 치약",
+                "link": "https://link.coupang.com/a/hcfWjSC29I"
+              }
+            ]
+          },
+          {
+            "name": "체온계",
+            "options": [
+              {
+                "name": "브라운 귀 적외선 체온계",
+                "link": "https://link.coupang.com/a/hccRp60Nci"
+              }
+            ]
+          },
+          {
+            "name": "온습도계",
+            "options": [
+              {
+                "name": "드레텍 미니 온습도계",
+                "link": "https://link.coupang.com/a/hcc1nC4Fqe"
+              },
+              {
+                "name": "휴비딕 온습도계",
+                "link": "https://link.coupang.com/a/hcc3ArE1ZY"
+              }
+            ]
+          },
+          {
+            "name": "샤워헤드",
+            "options": [
+              {
+                "name": "슬로운 샤워헤드",
+                "link": "https://brand.naver.com/slown/category/5686debaee2b4e30870249e700df8aea?cp=1"
+              },
+              {
+                "name": "퓨어닷 아기샤워기",
+                "link": "https://search.shopping.naver.com/ns/search?query=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%83%A4%EC%9B%8C%ED%97%A4%EB%93%9C"
+              },
+              {
+                "name": "소베맘 온오프 아기 필터 샤워기 헤드",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%86%8C%EB%B2%A0%EB%A7%98%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0"
+              }
+            ]
+          },
+          {
+            "name": "손톱깎이 세트",
+            "options": [
+              {
+                "name": "마더케이 영유아 핀셋 네일케어",
+                "link": "https://link.coupang.com/a/hccvnIDxpQ"
+              },
+              {
+                "name": "베이비클라우드 네일트리머",
+                "link": "https://smartstore.naver.com/babycloud_int/products/7791988920"
+              }
+            ]
+          },
+          {
+            "name": "콧물 흡입기",
+            "options": [
+              {
+                "name": "노시부 콧물흡입기",
+                "link": "https://link.coupang.com/a/hcb4g6pToa"
+              },
+              {
+                "name": "코니케어 콧물흡입기",
+                "link": "https://link.coupang.com/a/hccbjrYRBQ"
+              }
+            ]
+          },
+          {
+            "name": "주방 세제",
+            "options": [
+              {
+                "name": "토루토루 주방세제",
+                "link": "https://smartstore.naver.com/torutoru/products/296483246"
+              },
+              {
+                "name": "프랭클린 주방세제",
+                "link": "https://link.coupang.com/a/hcaD4Q3sFo"
+              },
+              {
+                "name": "마더케이 주방세제",
+                "link": "https://link.coupang.com/a/hcaG9CzVO9"
+              }
+            ]
+          },
+          {
+            "name": "세탁 세제",
+            "options": [
+              {
+                "name": "호호에미 세탁세제",
+                "link": "https://link.coupang.com/a/hcaJ86DYjs"
+              },
+              {
+                "name": "프랭클린 세탁세제",
+                "link": "https://link.coupang.com/a/hcaMtXCCzY"
+              },
+              {
+                "name": "토루토루 세탁세제",
+                "link": "https://smartstore.naver.com/torutoru/products/115687449?nl-query=%ED%86%A0%EB%A3%A8%ED%86%A0%EB%A3%A8%EC%84%B8%ED%83%81%EC%84%B8%EC%A0%9C&nl-ts-pid=jq%2Bnbdqos5rPSBRVhZh-373640&NaPm=ct%3Dmu9ihn4w%7Cci%3D7fa3305b9f07f23feebc7d6aa9d2e04442bf5b48%7Ctr%3Dsls%7Csn%3D175312%7Chk%3D55fd223a45366c44b19b89bddea621f68c1a4e10"
+              }
+            ]
+          },
+          {
+            "name": "식기세척기 세제",
+            "options": [
+              {
+                "name": "토루토루 식기세척기세제",
+                "link": "https://smartstore.naver.com/torutoru/products/8472224697?nl-query=%ED%86%A0%EB%A3%A8%ED%86%A0%EB%A3%A8%20%EC%8B%9D%EA%B8%B0%EC%84%B8%EC%B2%99%EA%B8%B0%20%EC%84%B8%EC%A0%9C&nl-au=3d94f643a2a744a1bc04c76d9fef875a&NaPm=ci%3D3d94f643a2a744a1bc04c76d9fef875a%7Cct%3Dmu9iirdx%7Ctr%3Dnslsl%7Csn%3D175312%7Chk%3D37d390a3f3290f534a0c033bb897b08975b1cb01",
+                "note": "액상"
+              },
+              {
+                "name": "마더케이 디아 젖병세척기세제",
+                "link": "https://link.coupang.com/a/hcaY1pzKj6",
+                "note": "타블렛형"
+              },
+              {
+                "name": "뽀숑하우스 올인원 파우더",
+                "link": "https://link.coupang.com/a/hca4E3Hc7g"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "외출",
+        "items": [
+          {
+            "name": "카시트 (0세~4세)",
+            "options": [
+              {
+                "name": "브라이텍스 듀얼픽스 프로",
+                "link": "https://safian.co.kr/product/%EB%B8%8C%EB%9D%BC%EC%9D%B4%ED%85%8D%EC%8A%A4-%EB%93%80%EC%96%BC%ED%94%BD%EC%8A%A4-%ED%94%84%EB%A1%9C-%EC%8A%A4%ED%83%80%EC%9D%BC-%EC%95%84%EC%9D%B4%EC%82%AC%EC%9D%B4%EC%A6%88-%EC%8B%A0%EC%83%9D%EC%95%84-%EC%9C%A0%EC%95%84-%EC%95%84%EA%B8%B0-%ED%9A%8C%EC%A0%84%ED%98%95-%EC%B9%B4%EC%8B%9C%ED%8A%B8-isofix/3210/category/478/display/1/"
+              },
+              {
+                "name": "사이벡스 제로나T",
+                "link": "https://www.cybex-shop.co.kr/goods/goods_view.php?goodsNo=1000000447"
+              },
+              {
+                "name": "조이 아이스핀360",
+                "link": "https://joiebaby.co.kr/category/%EC%B9%B4%EC%8B%9C%ED%8A%B8/421/"
+              },
+              {
+                "name": "다이치 원픽스360",
+                "link": "https://www.babyseatmall.net/?act=shop.goods_list&GC=GD000J"
+              },
+              {
+                "name": "뉴나 토들넥스트",
+                "link": "https://nunababy.com/kr/todl-next-convertible-car-seat?color_ref=16693"
+              }
+            ]
+          },
+          {
+            "name": "유모차 (절충형)",
+            "options": [
+              {
+                "name": "부가부 드래곤플라이 플러스",
+                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-dragonfly-plus-seat/%EB%B6%80%EA%B0%80%EB%B6%80-%EB%93%9C%EB%9E%98%EA%B3%A4%ED%94%8C%EB%9D%BC%EC%9D%B4-%ED%94%8C%EB%9F%AC%EC%8A%A4-%EC%A0%88%EC%B6%A9%ED%98%95-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-PM007941.html"
+              },
+              {
+                "name": "줄즈 허브2",
+                "link": "https://link.coupang.com/a/hcecEQBvUa"
+              },
+              {
+                "name": "에그Q 절충형 유모차",
+                "link": "https://www.eggstroller.co.kr/goods/view?no=138"
+              }
+            ]
+          },
+          {
+            "name": "유모차 (휴대용)",
+            "options": [
+              {
+                "name": "부가부 버터플라이2",
+                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-butterfly-2/%EB%B6%80%EA%B0%80%EB%B6%80-%EB%B2%84%ED%84%B0%ED%94%8C%EB%9D%BC%EC%9D%B4-2-%ED%9C%B4%EB%8C%80%EC%9A%A9-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-%EB%B2%94%ED%8D%BC%EB%B0%94-%ED%8F%AC%ED%95%A8-PM007649.html"
+              },
+              {
+                "name": "사이벡스 리베르",
+                "link": "https://brand.naver.com/cybex/category/27038e8e29994589bb3c053f5a127bc3?cp=1"
+              },
+              {
+                "name": "줄즈 에어2",
+                "link": "https://link.coupang.com/a/hceBQA5Piu"
+              },
+              {
+                "name": "스토케 요요5",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%8A%A4%ED%86%A0%EC%BC%80%20%EC%9A%94%EC%9A%945&prevQuery=%EC%8B%B8%EC%9D%B4%EB%B2%A1%EC%8A%A4"
+              }
+            ]
+          },
+          {
+            "name": "유모차 (디럭스)",
+            "options": [
+              {
+                "name": "부가부 폭스5",
+                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-fox-5-renew/%EB%B6%80%EA%B0%80%EB%B6%80-%ED%8F%AD%EC%8A%A4-5-%EB%A6%AC%EB%89%B4-%EB%94%94%EB%9F%AD%EC%8A%A4-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-PM007564.html"
+              },
+              {
+                "name": "줄즈 데이5",
+                "link": "https://link.coupang.com/a/hceUIgi1SK"
+              },
+              {
+                "name": "스토케 익스플로리",
+                "link": "https://link.coupang.com/a/hceYQpAkkm"
+              },
+              {
+                "name": "어파베이비 비스타v3",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%96%B4%ED%8C%8C%EB%B2%A0%EC%9D%B4%EB%B9%84%20%EB%B9%84%EC%8A%A4%ED%83%80v3&prevQuery=%EC%8A%A4%ED%86%A0%EC%BC%80%20%EC%9D%B5%EC%8A%A4%ED%94%8C%EB%A1%9C%EB%A6%AC%20x"
+              }
+            ]
+          },
+          {
+            "name": "아기띠",
+            "options": [
+              {
+                "name": "베이비뵨 아기띠",
+                "link": "https://link.coupang.com/a/hciJIknNlc"
+              },
+              {
+                "name": "베베스완 방탄조끼 아기띠",
+                "link": "https://link.coupang.com/a/hcfgeErzhs"
+              },
+              {
+                "name": "에르고베이비",
+                "link": "https://link.coupang.com/a/hcfix1eqXs"
+              },
+              {
+                "name": "아띠포페 아기띠",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%95%84%EB%9D%A0%ED%8F%AC%ED%8E%98%20%EC%95%84%EA%B8%B0%EB%9D%A0&prevQuery=%EC%96%B4%ED%8C%8C%EB%B2%A0%EC%9D%B4%EB%B9%84%20%EB%B9%84%EC%8A%A4%ED%83%80v3"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "guestbook",
+    "label": "방명록",
+    "desc": "신랑·신부 참석자와 계좌이체 4개 카테고리",
+    "title": "결혼식 방명록",
+    "intro": "예식 당일 받은 축의금을 신랑·신부, 현장·계좌이체로 나눠 적는 칸이에요. 이름과 금액만 넣으면 칸마다 인원과 합계가 계산돼요.",
+    "kind": "guestbook",
+    "categories": [
+      {
+        "name": "신랑 참석자",
+        "items": [
+          {
+            "name": ""
+          }
+        ]
+      },
+      {
+        "name": "신부 참석자",
+        "items": [
+          {
+            "name": ""
+          }
+        ]
+      },
+      {
+        "name": "신랑 (계좌이체)",
+        "items": [
+          {
+            "name": ""
+          }
+        ]
+      },
+      {
+        "name": "신부 (계좌이체)",
+        "items": [
+          {
+            "name": ""
+          }
+        ]
+      }
+    ]
+  }
+]
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script>
+(function(){
+  const STORE_KEY = "prep-budget-v2";
+  const LEGACY_KEY = "prep-budget-v1"; // single-plan format, migrated on first load
+
+  // Templates come from the JSON block #templateData (edited with template-editor.html).
+  // [{ id, label, desc, title, kind: "budget" | "guestbook", categories: [{ name, items: [{ name, qty?, budget?, options?: [{ name, note? }] }] }] }]
+  const TEMPLATE_LIST = (() => {
+    try{ return JSON.parse(document.getElementById("templateData").textContent); }catch(e){ return []; }
+  })();
+  const TEMPLATES = Object.fromEntries(TEMPLATE_LIST.map(t => [t.id, t]));
+  const BLANK_TEMPLATE = { title: "새 예산표", categories: [{ name: "첫 번째 카테고리", items: [{ name: "" }] }] };
+
+  // Menu entries after 빈 목록, in the data's order
+  document.getElementById("tplBlank").insertAdjacentHTML("afterend", TEMPLATE_LIST.map(t => {
+    const e = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    return `<button type="button" data-tpl="${e(t.id)}" data-label="${e(t.label)}">${e(t.label)}<small>${e(t.desc)}</small></button>`;
+  }).join(""));
+
+  let uid = Date.now();
+  const nid = () => (uid++).toString(36);
+
+  function fromTemplate(key){
+    const t = TEMPLATES[key] || BLANK_TEMPLATE;
+    return {
+      title: t.title,
+      intro: t.intro || "",
+      kind: t.kind === "guestbook" ? "guestbook" : undefined,
+      template: TEMPLATES[key] ? key : undefined,
+      categories: (t.categories || []).map(c => ({
+        id: nid(), name: c.name,
+        items: ((c.items || []).length ? c.items : [{ name: "" }]).map(n => {
+          const t = typeof n === "string" ? { name: n } : n;
+          const it = { id: nid(), name: t.name || "", budget: t.budget || 0, actual: 0, done: false };
+          if(t.qty > 1) it.qty = t.qty;
+          if(t.options && t.options.length) it.options = t.options.map(o => ({ id: nid(), name: o.name, link: safeLink(o.link), price: o.price || 0, note: o.note || "" }));
+          return it;
+        })
+      }))
+    };
+  }
+
+  const newPlan = data => Object.assign({ title: "새 예산표", categories: [] }, data, { id: (data && data.id) || nid() });
+
+  function load(){
+    try{
+      const raw = localStorage.getItem(STORE_KEY);
+      if(raw){
+        const s = JSON.parse(raw);
+        if(s && Array.isArray(s.plans) && s.plans.length) return s;
+      }
+      const legacy = localStorage.getItem(LEGACY_KEY);
+      if(legacy){
+        const old = JSON.parse(legacy);
+        if(old && Array.isArray(old.categories)){
+          const plan = newPlan(old);
+          return { activeId: plan.id, plans: [plan] };
+        }
+      }
+    }catch(e){}
+    const plan = newPlan(fromTemplate("blank"));
+    return { activeId: plan.id, plans: [plan] };
+  }
+
+  // store = every plan (one per tab); state = the plan in the active tab
+  let store = load();
+  let state;
+  function syncActive(){
+    state = store.plans.find(p => p.id === store.activeId) || store.plans[0];
+    store.activeId = state.id;
+  }
+  syncActive();
+  function replaceActive(data){
+    const plan = newPlan(Object.assign(data, { id: state.id, accent: state.accent }));
+    store.plans[store.plans.indexOf(state)] = plan;
+    state = plan;
+  }
+
+  let saveTimer = null;
+  function save(){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => {
+      try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
+    }, 250);
+  }
+
+  // ---- formatting ----
+  const won = n => (n || 0).toLocaleString("ko-KR") + "원";
+  const plain = n => n ? n.toLocaleString("ko-KR") : "";
+  const parseMoney = s => {
+    const d = String(s).replace(/[^\d]/g, "");
+    return d ? Math.min(parseInt(d, 10), 999999999999) : 0;
+  };
+  function manwon(n){
+    if(!n || n < 10000) return "\u00a0";
+    const man = Math.round(n / 10000);
+    if(man >= 10000){
+      const eok = Math.floor(man / 10000), rest = man % 10000;
+      return "약 " + eok + "억" + (rest ? " " + rest.toLocaleString("ko-KR") + "만" : "") + " 원";
+    }
+    return "약 " + man.toLocaleString("ko-KR") + "만 원";
+  }
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+  // ---- render ----
+  const catsEl = document.getElementById("cats");
+  const titleEl = document.getElementById("planTitle");
+  const introEl = document.getElementById("planIntro");
+  // The description box grows with its text instead of scrolling
+  function fitIntro(){
+    introEl.style.height = "auto";
+    // scrollHeight excludes the borders, so add whatever they take up
+    introEl.style.height = introEl.scrollHeight + (introEl.offsetHeight - introEl.clientHeight) + "px";
+  }
+
+  function catSums(c){
+    let b = 0, a = 0;
+    c.items.forEach(i => { b += i.budget || 0; a += i.actual || 0; });
+    return { b, a };
+  }
+
+  const isGuest = p => p && p.kind === "guestbook";
+  const guestCount = c => c.items.filter(i => i.name || i.budget).length;
+
+  function catSumHTML(c){
+    const { b, a } = catSums(c);
+    if(isGuest(state)) return `축의금 <b>${won(b)}</b>&nbsp;&nbsp;<b>${guestCount(c)}</b>명`;
+    if(!showActual) return `예산 <b>${won(b)}</b>`;
+    return `예산 <b>${won(b)}</b>&nbsp;&nbsp;지출 <b class="${a > b && b > 0 ? "over" : ""}">${won(a)}</b>`;
+  }
+
+  const chosenOf = it => (it.options || []).find(o => o.id === it.choiceId);
+  const qtyOf = it => Math.max(1, parseInt(it.qty, 10) || 1);
+  // 예산 is the item total; one unit = the chosen option's price, else 예산 ÷ 수량
+  const unitOf = it => { const o = chosenOf(it); return o && o.price ? o.price : (it.budget || 0) / qtyOf(it); };
+  const unitTitle = it => qtyOf(it) > 1 && it.budget ? ` title="개당 ${won(Math.round(unitOf(it)))}"` : "";
+  function pickHTML(it){
+    const n = (it.options || []).length, chosen = chosenOf(it);
+    const cls = chosen ? " chosen" : n ? " has-options" : "";
+    const label = chosen ? esc(chosen.name) : n ? `선택지 ${n}개` : "+ 선택지";
+    const count = chosen && n > 1 ? `<span class="pick-count">${n}</span>` : "";
+    return `<button type="button" class="pick${cls}" aria-haspopup="dialog" aria-label="선택지: ${chosen ? esc(chosen.name) : n ? `${n}개, 선택 안 함` : "없음"}"><span class="pick-name">${label}</span>${count}</button>`;
+  }
+
+  function guestRowHTML(it){
+    return `<div class="row guest" data-iid="${it.id}">
+      <button type="button" class="item-grip" aria-label="순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg></button>
+      <input type="text" class="name" value="${esc(it.name)}" placeholder="이름" aria-label="이름">
+      <input type="text" class="money budget" inputmode="numeric" value="${plain(it.budget)}" placeholder="축의금" aria-label="축의금">
+      <button type="button" class="del-item" aria-label="삭제">×</button>
+    </div>`;
+  }
+
+  function rowHTML(it){
+    const over = it.budget > 0 && it.actual > it.budget;
+    return `<div class="row${it.done ? " done" : ""}" data-iid="${it.id}">
+      <button type="button" class="item-grip" aria-label="순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg></button>
+      <label class="check"><input type="checkbox" class="done-box" ${it.done ? "checked" : ""} aria-label="완료 표시"></label>
+      <input type="text" class="name" value="${esc(it.name)}" placeholder="항목 이름" aria-label="항목 이름">
+      ${pickHTML(it)}
+      <label class="qty"><input type="text" class="qty-in" inputmode="numeric" value="${qtyOf(it)}" aria-label="수량"><span aria-hidden="true">개</span></label>
+      <input type="text" class="money budget" inputmode="numeric" value="${plain(it.budget)}" aria-label="예산"${unitTitle(it)}>
+      <input type="text" class="money actual${over ? " over" : ""}" inputmode="numeric" value="${plain(it.actual)}" aria-label="실제 지출">
+      <button type="button" class="del-item" aria-label="항목 삭제">×</button>
+    </div>`;
+  }
+
+  const tabListEl = document.getElementById("tabList");
+  const planLabel = p => (p.title || "").trim() || "이름 없는 예산표";
+
+  function renderTabs(){
+    const closable = store.plans.length > 1;
+    tabListEl.innerHTML = store.plans.map(p => {
+      const on = p.id === state.id;
+      return `<div class="tab${on ? " active" : ""}${closable ? " closable" : ""}" data-pid="${p.id}" data-accent="${p.accent || "green"}">
+        <span class="tab-dot" aria-hidden="true"></span>
+        <button type="button" class="tab-btn" role="tab" aria-selected="${on}" tabindex="${on ? 0 : -1}" title="${esc(planLabel(p))}">${esc(planLabel(p))}</button>
+        ${closable ? `<button type="button" class="tab-close" aria-label="'${esc(planLabel(p))}' 닫기" tabindex="${on ? 0 : -1}">×</button>` : ""}
+      </div>`;
+    }).join("");
+    const active = tabListEl.querySelector(".tab.active");
+    if(active) active.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
+
+  const swatchEls = document.querySelectorAll(".swatch");
+  const colorNameEl = document.getElementById("colorName");
+  function applyAccent(){
+    const key = state.accent || "green";
+    document.body.dataset.accent = key;
+    swatchEls.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.accent === key)));
+    const on = [...swatchEls].find(b => b.dataset.accent === key);
+    if(on) colorNameEl.textContent = on.textContent.trim();
+  }
+  swatchEls.forEach(b => b.addEventListener("click", () => {
+    closeMenus();
+    state.accent = b.dataset.accent;
+    applyAccent();
+    const tab = tabListEl.querySelector(".tab.active");
+    if(tab) tab.dataset.accent = state.accent;
+    save();
+  }));
+
+  function foldLabel(c){
+    const n = c.items.filter(i => i.name || i.budget || i.actual).length;
+    return c.collapsed ? `항목 펼치기 (${n}${isGuest(state) ? "명" : "개"})` : "항목 접기";
+  }
+  // Icon only; the label (with the hidden item count) goes to the tooltip and screen readers
+  const foldBtnHTML = c => `<button type="button" class="fold-btn" aria-expanded="${!c.collapsed}" aria-label="${foldLabel(c)}" title="${foldLabel(c)}"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 5.5L7 9l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
+
+  function render(){
+    const guest = isGuest(state);
+    document.body.classList.toggle("kind-guestbook", guest);
+    applyAccent();
+    renderTabs();
+    titleEl.value = state.title || "";
+    introEl.value = state.intro || "";
+    fitIntro();
+    if(!state.categories.length){
+      catsEl.innerHTML = `<div class="empty">카테고리가 없어요. 아래에서 카테고리를 추가하거나 위의 템플릿을 불러오세요.</div>`;
+    } else {
+      catsEl.innerHTML = state.categories.map(c => `
+        <section class="cat${c.collapsed ? " collapsed" : ""}" data-cid="${c.id}">
+          <button type="button" class="cat-grip" aria-label="'${esc(catLabel(c))}' 순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 16" aria-hidden="true"><circle cx="2" cy="2.5" r="1.3" fill="currentColor"/><circle cx="6" cy="2.5" r="1.3" fill="currentColor"/><circle cx="2" cy="8" r="1.3" fill="currentColor"/><circle cx="6" cy="8" r="1.3" fill="currentColor"/><circle cx="2" cy="13.5" r="1.3" fill="currentColor"/><circle cx="6" cy="13.5" r="1.3" fill="currentColor"/></svg></button>
+          <div class="cat-head">
+            <input type="text" class="cat-name" value="${esc(c.name)}" placeholder="카테고리 이름" aria-label="카테고리 이름">
+            <span class="cat-sum">${catSumHTML(c)}</span>
+            ${foldBtnHTML(c)}
+            <details class="menu cat-menu">
+              <summary aria-label="카테고리 메뉴" title="카테고리 메뉴"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/></svg></summary>
+              <div class="menu-pop">
+                <button type="button" class="clear-items">항목 모두 지우기<small>카테고리 이름은 남겨요</small></button>
+                ${guest ? `<button type="button" class="clear-money">축의금만 지우기<small>이름은 남겨요</small></button>`
+                        : `<button type="button" class="clear-money">금액·완료 표시만 지우기<small>항목 이름은 남겨요</small></button>`}
+                <hr>
+                <button type="button" class="del-cat danger">카테고리 삭제</button>
+              </div>
+            </details>
+          </div>
+          ${guest
+            ? `<div class="cols guest" aria-hidden="true"><span></span><span>이름</span><span class="r">축의금</span><span></span></div>
+          <div class="rows">${c.items.map(guestRowHTML).join("")}</div>
+          <button type="button" class="add-item">+ 이름 추가</button>`
+            : `<div class="cols" aria-hidden="true"><span></span><span></span><span>항목</span><span>선택지</span><span class="r">수량</span><span class="r">예산</span><span class="r">실제 지출</span><span></span></div>
+          <div class="rows">${c.items.map(rowHTML).join("")}</div>
+          <button type="button" class="add-item">+ 항목 추가</button>`}
+        </section>`).join("");
+    }
+    updateTotals();
+  }
+
+  function updateTotals(){
+    let b = 0, a = 0, done = 0, count = 0;
+    state.categories.forEach(c => c.items.forEach(i => {
+      b += i.budget || 0; a += i.actual || 0;
+      if(i.name || i.budget || i.actual){ count++; if(i.done) done++; }
+    }));
+    const guest = isGuest(state);
+    document.getElementById("tBudgetLabel").textContent = guest ? "축의금 합계" : "예산 합계";
+    document.getElementById("tDoneLabel").textContent = guest ? "인원" : "완료";
+    document.getElementById("tBudget").textContent = won(b);
+    document.getElementById("tBudgetMan").textContent = manwon(b);
+    document.getElementById("tActual").textContent = won(a);
+    const diff = b - a;
+    const diffEl = document.getElementById("tDiff");
+    document.getElementById("tDiffLabel").textContent = diff < 0 ? "예산 초과" : "남은 예산";
+    diffEl.textContent = won(Math.abs(diff));
+    diffEl.classList.toggle("over", diff < 0);
+    document.getElementById("tDone").textContent = guest ? `${count}명` : `${done} / ${count}`;
+  }
+
+  const findCat = el => state.categories.find(c => c.id === el.closest(".cat").dataset.cid);
+  const findItem = (el, c) => c.items.find(i => i.id === el.closest(".row").dataset.iid);
+
+  // ---- events ----
+  titleEl.addEventListener("input", () => {
+    state.title = titleEl.value;
+    const btn = tabListEl.querySelector(".tab.active .tab-btn");
+    if(btn){ btn.textContent = planLabel(state); btn.title = planLabel(state); }
+    save();
+  });
+  introEl.addEventListener("input", () => {
+    state.intro = introEl.value;
+    fitIntro();
+    save();
+  });
+  window.addEventListener("resize", fitIntro);
+  // The webfont lands after the first render and rewraps the text, so measure again
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitIntro);
+
+  // ---- tabs ----
+  function switchTo(id, focusTab){
+    if(id === state.id) return;
+    closeMenus();
+    store.activeId = id;
+    syncActive();
+    render(); save();
+    if(focusTab){ const b = tabListEl.querySelector(".tab.active .tab-btn"); if(b) b.focus(); }
+  }
+
+  tabListEl.addEventListener("click", e => {
+    const tab = e.target.closest(".tab");
+    if(!tab) return;
+    const id = tab.dataset.pid;
+    if(e.target.closest(".tab-close")){
+      const plan = store.plans.find(p => p.id === id);
+      const snap = snapshot();
+      const idx = store.plans.indexOf(plan);
+      store.plans.splice(idx, 1);
+      if(plan === state){
+        store.activeId = store.plans[Math.min(idx, store.plans.length - 1)].id;
+        syncActive();
+      }
+      render(); save();
+      toast(`'${planLabel(plan)}' 예산표를 닫았어요`, snap);
+      return;
+    }
+    switchTo(id);
+  });
+
+  tabListEl.addEventListener("keydown", e => {
+    if(!e.target.classList.contains("tab-btn")) return;
+    const i = store.plans.indexOf(state);
+    let next = null;
+    if(e.key === "ArrowRight") next = store.plans[(i + 1) % store.plans.length];
+    if(e.key === "ArrowLeft") next = store.plans[(i - 1 + store.plans.length) % store.plans.length];
+    if(e.key === "Home") next = store.plans[0];
+    if(e.key === "End") next = store.plans[store.plans.length - 1];
+    if(next){ e.preventDefault(); switchTo(next.id, true); }
+  });
+
+  document.getElementById("addPlan").addEventListener("click", () => {
+    const taken = new Set(store.plans.map(p => p.title));
+    let title = "새 예산표", n = 2;
+    while(taken.has(title)) title = `새 예산표 ${n++}`;
+    // Next color not used by another tab (cycles once all are taken)
+    const keys = [...swatchEls].map(b => b.dataset.accent);
+    const usedColors = store.plans.map(p => p.accent || "green");
+    const accent = keys.find(k => !usedColors.includes(k)) || keys[store.plans.length % keys.length];
+    const plan = newPlan(Object.assign(fromTemplate("blank"), { title, accent }));
+    store.plans.push(plan);
+    store.activeId = plan.id;
+    syncActive();
+    render(); save();
+    titleEl.focus(); titleEl.select();
+  });
+
+  catsEl.addEventListener("input", e => {
+    const t = e.target;
+    const c = findCat(t);
+    if(!c) return;
+    if(t.classList.contains("cat-name")){ c.name = t.value; save(); return; }
+    const it = findItem(t, c);
+    if(!it) return;
+    if(t.classList.contains("name")) it.name = t.value;
+    if(t.classList.contains("qty-in")){
+      t.value = t.value.replace(/[^\d]/g, "").slice(0, 4);
+      const q = parseInt(t.value, 10);
+      if(q) setQty(c, it, q, t);
+      return; // empty while typing; fixed to 1 on change
+    }
+    if(t.classList.contains("money")){
+      const v = parseMoney(t.value);
+      const fromEnd = t.value.length - (t.selectionStart ?? t.value.length);
+      t.value = plain(v);
+      const pos = Math.max(0, t.value.length - fromEnd);
+      try{ t.setSelectionRange(pos, pos); }catch(_){}
+      if(t.classList.contains("budget")) it.budget = v; else it.actual = v;
+      const actualEl = t.closest(".row").querySelector(".actual");
+      if(actualEl) actualEl.classList.toggle("over", it.budget > 0 && it.actual > it.budget);
+      t.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
+    }
+    updateTotals(); save();
+  });
+
+  // Keep one unit price for the whole edit, so typing 1 → 12 doesn't compound rounding
+  catsEl.addEventListener("focusin", e => {
+    if(!e.target.classList.contains("qty-in")) return;
+    const c = findCat(e.target), it = findItem(e.target, c);
+    e.target.dataset.unit = unitOf(it);
+  });
+
+  function setQty(c, it, q, input){
+    const unit = input && input.dataset.unit !== undefined ? Number(input.dataset.unit) : unitOf(it);
+    it.qty = q;
+    if(unit) it.budget = Math.round(unit * q);
+    const rowEl = catsEl.querySelector(`[data-iid="${it.id}"]`);
+    if(rowEl){
+      const b = rowEl.querySelector(".budget");
+      b.value = plain(it.budget);
+      if(q > 1 && it.budget) b.title = `개당 ${won(Math.round(unit || unitOf(it)))}`; else b.removeAttribute("title");
+      rowEl.querySelector(".actual").classList.toggle("over", it.budget > 0 && it.actual > it.budget);
+      rowEl.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
+    }
+    updateTotals(); save();
+  }
+
+  catsEl.addEventListener("change", e => {
+    const t = e.target;
+    if(t.classList.contains("qty-in")){
+      if(!parseInt(t.value, 10)){ t.value = "1"; const c = findCat(t); setQty(c, findItem(t, c), 1, t); }
+      return;
+    }
+    if(!t.classList.contains("done-box")) return;
+    const c = findCat(t), it = findItem(t, c);
+    it.done = t.checked;
+    t.closest(".row").classList.toggle("done", it.done);
+    updateTotals(); save();
+  });
+
+  const newItem = () => ({ id: nid(), name: "", budget: 0, actual: 0, done: false });
+  const hasContent = i => i.name || i.budget || i.actual || (i.options && i.options.length);
+  const snapshot = () => JSON.stringify(store);
+  const catLabel = c => c.name || "이름 없는 카테고리";
+
+  function closeMenus(except){
+    document.querySelectorAll("details.menu[open]").forEach(d => { if(d !== except) d.open = false; });
+  }
+  document.addEventListener("toggle", e => {
+    if(e.target.classList && e.target.classList.contains("menu") && e.target.open) closeMenus(e.target);
+  }, true);
+  document.addEventListener("click", e => { if(!e.target.closest("details.menu")) closeMenus(); });
+  document.addEventListener("keydown", e => {
+    if(e.key !== "Escape") return;
+    const open = document.querySelector("details.menu[open]");
+    if(open){ open.open = false; open.querySelector("summary").focus(); }
+  });
+
+  catsEl.addEventListener("click", e => {
+    const t = e.target.closest("button");
+    if(!t || !t.closest(".cat")) return;
+    const c = findCat(t);
+    if(t.classList.contains("add-item")){
+      const it = newItem();
+      c.items.push(it);
+      render(); save();
+      const input = catsEl.querySelector(`[data-iid="${it.id}"] .name`);
+      if(input) input.focus();
+    }
+    if(t.classList.contains("fold-btn")){
+      c.collapsed = !c.collapsed;
+      t.closest(".cat").classList.toggle("collapsed", !!c.collapsed);
+      t.setAttribute("aria-expanded", String(!c.collapsed));
+      t.setAttribute("aria-label", foldLabel(c));
+      t.title = foldLabel(c);
+      save();
+      return;
+    }
+    if(t.classList.contains("pick")){
+      openOptions(c, findItem(t, c));
+      return;
+    }
+    if(t.classList.contains("del-item")){
+      const it = findItem(t, c);
+      c.items = c.items.filter(i => i !== it);
+      render(); save();
+    }
+    if(t.classList.contains("clear-items")){
+      const n = c.items.filter(hasContent).length;
+      if(!n){ closeMenus(); toast("지울 항목이 없어요"); return; }
+      const snap = snapshot();
+      c.items = [newItem()];
+      render(); save();
+      toast(`'${catLabel(c)}'의 항목 ${n}개를 지웠어요`, snap);
+      const input = catsEl.querySelector(`[data-cid="${c.id}"] .row .name`);
+      if(input) input.focus();
+    }
+    if(t.classList.contains("clear-money")){
+      const snap = snapshot();
+      c.items.forEach(i => { i.budget = 0; i.actual = 0; i.done = false; i.choiceId = null; });
+      render(); save();
+      toast(`'${catLabel(c)}'의 금액을 지웠어요`, snap);
+    }
+    if(t.classList.contains("del-cat")){
+      const snap = snapshot();
+      state.categories = state.categories.filter(x => x !== c);
+      render(); save();
+      toast(`'${catLabel(c)}' 카테고리를 삭제했어요`, snap);
+    }
+  });
+
+  // Enter in an item name → add next item.
+  // Guestbook: 이름 → 축의금 → next 이름, so a whole list can be typed without the mouse.
+  catsEl.addEventListener("keydown", e => {
+    if(e.key !== "Enter" || e.isComposing) return;
+    if(isGuest(state) && e.target.classList.contains("name")){
+      e.preventDefault();
+      e.target.closest(".row").querySelector(".budget").focus();
+      return;
+    }
+    if(e.target.classList.contains("name") || (isGuest(state) && e.target.classList.contains("budget"))){
+      e.preventDefault();
+      const c = findCat(e.target);
+      const cur = findItem(e.target, c);
+      const idx = c.items.indexOf(cur);
+      const it = { id: nid(), name: "", budget: 0, actual: 0, done: false };
+      c.items.splice(idx + 1, 0, it);
+      render(); save();
+      const input = catsEl.querySelector(`[data-iid="${it.id}"] .name`);
+      if(input) input.focus();
+    }
+  });
+
+  // ---- reorder categories and items: drag a grip (mouse or touch), or arrow keys on it ----
+  // While dragging, the card/row floats under the pointer and a dashed slot marks where it will land;
+  // the others slide (FLIP animation) whenever the slot moves. Items can also move to another category.
+  let drag = null;
+  const EASE = "cubic-bezier(.2,.8,.2,1)";
+  const reduceMotion = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Keep a card at the same spot on screen while the layout around it changes
+  function keepInView(el, change){
+    const before = el.getBoundingClientRect().top;
+    change();
+    window.scrollBy(0, el.getBoundingClientRect().top - before);
+  }
+
+  // Slide elements from where they were drawn to their new layout position
+  function flip(els, change){
+    const before = new Map(els.map(el => [el, el.getBoundingClientRect()]));
+    els.forEach(el => el.getAnimations().forEach(a => a.cancel()));
+    change();
+    if(reduceMotion()) return;
+    els.forEach(el => {
+      const a = before.get(el), b = el.getBoundingClientRect();
+      const dx = a.left - b.left, dy = a.top - b.top;
+      if(Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
+      el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 220, easing: EASE });
+    });
+  }
+
+  // Layout boxes relative to the grid (offsets ignore running animations, so hit-testing stays stable)
+  const box = el => ({ l: el.offsetLeft, t: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight });
+  const others = () => [...catsEl.querySelectorAll(".cat:not(.dragging)")];
+
+  const inside = (el, x, y) => { const b = el.getBoundingClientRect(); return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom; };
+
+  // Where a row sits in the layout, ignoring its slide animation (rows are positioned inside their card)
+  function rowBox(row){
+    const c = row.offsetParent.getBoundingClientRect();
+    const top = c.top + row.offsetTop, left = c.left + row.offsetLeft;
+    return { left, top, right: left + row.offsetWidth, bottom: top + row.offsetHeight, mid: top + row.offsetHeight / 2 };
+  }
+
+  function moveItemSlot(x, y){
+    const { slot } = drag;
+    const list = slot.parentElement;
+    const rows = [...catsEl.querySelectorAll(".cat:not(.collapsed) .row:not(.dragging-row)")];
+    const target = rows.find(r => { const b = rowBox(r); return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom; });
+    if(target){
+      const mid = rowBox(target).mid;
+      const dest = target.parentElement;
+      const touched = rows.filter(r => r.parentElement === list || r.parentElement === dest);
+      if(dest === list){
+        const seq = [...list.children].filter(el => el === slot || (el.matches(".row") && !el.classList.contains("dragging-row")));
+        const from = seq.indexOf(slot), to = seq.indexOf(target);
+        if(!(to > from ? y > mid : y < mid)) return; // past the middle only, so rows don't flip back and forth
+        flip(touched, () => { if(to > from) target.after(slot); else target.before(slot); });
+      } else {
+        flip(touched, () => { if(y > mid) target.after(slot); else target.before(slot); }); // into another category
+      }
+      drag.moved = true;
+      return;
+    }
+    // Over a category but not over a row (header, empty list, "+ 항목 추가"): go to the end of that list
+    const card = [...catsEl.querySelectorAll(".cat:not(.collapsed)")].find(c => inside(c, x, y));
+    const cardList = card && card.querySelector(".rows");
+    if(cardList && cardList !== list && !cardList.querySelector(".row:not(.dragging-row)")){
+      cardList.appendChild(slot);
+      drag.moved = true;
+    }
+  }
+
+  function moveDragTo(x, y){
+    const { card, slot, gx, gy } = drag;
+    card.style.left = `${x - gx}px`;
+    card.style.top = `${y - gy}px`;
+    if(drag.kind === "item"){ moveItemSlot(x, y); return; }
+
+    const g = catsEl.getBoundingClientRect();
+    const px = x - g.left, py = y - g.top;
+    const target = others().find(el => { const b = box(el); return px >= b.l && px <= b.l + b.w && py >= b.t && py <= b.t + b.h; });
+    if(!target) return;
+    const seq = [...catsEl.children].filter(el => el === slot || el.matches(".cat:not(.dragging)"));
+    const from = seq.indexOf(slot), to = seq.indexOf(target);
+    const b = box(target), sameRow = Math.abs(b.t - slot.offsetTop) < 8;
+    // Only move once the pointer is past the target's middle, so cards don't flip back and forth
+    const past = sameRow
+      ? (to > from ? px > b.l + b.w / 2 : px < b.l + b.w / 2)
+      : (to > from ? py > b.t + b.h / 2 : py < b.t + b.h / 2);
+    if(!past) return;
+    flip(others(), () => { if(to > from) target.after(slot); else target.before(slot); });
+    drag.moved = true;
+  }
+
+  function autoScroll(){
+    if(!drag) return;
+    const bar = document.querySelector(".totals").getBoundingClientRect().height;
+    const top = 80, bottom = window.innerHeight - bar - 60;
+    const speed = drag.y < top ? -Math.min(24, (top - drag.y) / 3 + 4)
+                : drag.y > bottom ? Math.min(24, (drag.y - bottom) / 3 + 4) : 0;
+    if(speed){ window.scrollBy(0, speed); moveDragTo(drag.x, drag.y); }
+    drag.raf = requestAnimationFrame(autoScroll);
+  }
+
+  function endDrag(cancel){
+    if(!drag) return;
+    const { kind, card, slot, raf, moved } = drag;
+    cancelAnimationFrame(raf);
+    drag = null;
+    document.body.classList.remove("is-sorting");
+    if(cancel){ catsEl.classList.remove("sorting"); render(); return; } // back to the saved order
+
+    if(kind === "item"){
+      const from = card.getBoundingClientRect();
+      slot.replaceWith(card);
+      card.classList.remove("dragging-row");
+      card.removeAttribute("style");
+      const to = card.getBoundingClientRect();
+      if(!reduceMotion()) card.animate(
+        [{ transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)` }, { transform: "none" }],
+        { duration: 180, easing: EASE });
+      if(moved){
+        // Rebuild every category's item order from the page (an item may have changed category)
+        const byId = new Map();
+        state.categories.forEach(c => c.items.forEach(i => byId.set(i.id, i)));
+        catsEl.querySelectorAll(".cat").forEach(cardEl => {
+          const c = state.categories.find(x => x.id === cardEl.dataset.cid);
+          c.items = [...cardEl.querySelectorAll(".row")].map(r => byId.get(r.dataset.iid)).filter(Boolean);
+          cardEl.querySelector(".cat-sum").innerHTML = catSumHTML(c);
+          const fold = cardEl.querySelector(".fold-btn");
+          fold.setAttribute("aria-label", foldLabel(c)); fold.title = foldLabel(c);
+        });
+        save();
+      }
+      return;
+    }
+
+    // Drop: put the card where the slot is, unfold the cards, then glide it in from where it was let go
+    const from = card.getBoundingClientRect();
+    slot.replaceWith(card);
+    card.classList.remove("dragging");
+    card.removeAttribute("style");
+    keepInView(card, () => catsEl.classList.remove("sorting"));
+    const to = card.getBoundingClientRect();
+    if(!reduceMotion()) card.animate(
+      [{ transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)` }, { transform: "none" }],
+      { duration: 200, easing: EASE });
+    if(moved){
+      const order = [...catsEl.querySelectorAll(".cat")].map(el => el.dataset.cid);
+      state.categories.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+      save();
+    }
+  }
+
+  catsEl.addEventListener("pointerdown", e => {
+    const itemGrip = e.target.closest(".item-grip");
+    if(itemGrip && e.button === 0){
+      e.preventDefault();
+      closeMenus();
+      document.activeElement && document.activeElement.blur();
+      const row = itemGrip.closest(".row");
+      const r = row.getBoundingClientRect();
+      const slot = document.createElement("div");
+      slot.className = "row-slot";
+      slot.style.height = `${r.height}px`;
+      row.before(slot);
+      Object.assign(row.style, { position: "fixed", left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, margin: "0" });
+      row.classList.add("dragging-row");
+      document.body.classList.add("is-sorting");
+      try{ itemGrip.setPointerCapture(e.pointerId); }catch(_){}
+      drag = { kind: "item", card: row, slot, gx: e.clientX - r.left, gy: e.clientY - r.top, x: e.clientX, y: e.clientY, moved: false, raf: 0 };
+      drag.raf = requestAnimationFrame(autoScroll);
+      return;
+    }
+    const grip = e.target.closest(".cat-grip");
+    if(!grip || e.button !== 0) return;
+    e.preventDefault();
+    closeMenus();
+    const card = grip.closest(".cat");
+    keepInView(card, () => catsEl.classList.add("sorting"));
+    document.body.classList.add("is-sorting");
+
+    // Lift the card out of the grid; a slot of the same size keeps its place
+    const r = card.getBoundingClientRect();
+    const slot = document.createElement("div");
+    slot.className = "cat-slot";
+    slot.style.height = `${r.height}px`;
+    card.before(slot);
+    Object.assign(card.style, { position: "fixed", left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, margin: "0" });
+    card.classList.add("dragging");
+    try{ grip.setPointerCapture(e.pointerId); }catch(_){}
+    drag = { kind: "cat", card, slot, gx: e.clientX - r.left, gy: e.clientY - r.top, x: e.clientX, y: e.clientY, moved: false, raf: 0 };
+    drag.raf = requestAnimationFrame(autoScroll);
+  });
+  // On window, so the drag keeps working when the pointer leaves the grid (e.g. over the totals bar)
+  window.addEventListener("pointermove", e => {
+    if(!drag) return;
+    drag.x = e.clientX; drag.y = e.clientY;
+    moveDragTo(e.clientX, e.clientY);
+  });
+  window.addEventListener("pointerup", () => endDrag(false));
+  window.addEventListener("pointercancel", () => endDrag(true));
+  document.addEventListener("keydown", e => { if(drag && e.key === "Escape") endDrag(true); });
+
+  catsEl.addEventListener("keydown", e => {
+    const itemGrip = e.target.closest(".item-grip");
+    if(itemGrip){
+      const step = { ArrowUp: -1, ArrowDown: 1 }[e.key];
+      if(!step) return;
+      e.preventDefault();
+      const c = findCat(itemGrip), it = findItem(itemGrip, c);
+      const i = c.items.indexOf(it), j = i + step;
+      if(j < 0 || j >= c.items.length) return;
+      c.items.splice(i, 1);
+      c.items.splice(j, 0, it);
+      render(); save();
+      const g = catsEl.querySelector(`[data-iid="${it.id}"] .item-grip`);
+      if(g){ g.focus(); g.scrollIntoView({ block: "nearest" }); }
+      return;
+    }
+    const grip = e.target.closest(".cat-grip");
+    if(!grip) return;
+    const step = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[e.key];
+    if(!step) return;
+    e.preventDefault();
+    const c = findCat(grip);
+    const i = state.categories.indexOf(c), j = i + step;
+    if(j < 0 || j >= state.categories.length) return;
+    state.categories.splice(i, 1);
+    state.categories.splice(j, 0, c);
+    render(); save();
+    const moved = catsEl.querySelector(`[data-cid="${c.id}"] .cat-grip`);
+    if(moved){ moved.focus(); moved.scrollIntoView({ block: "nearest" }); }
+  });
+
+  document.getElementById("addCat").addEventListener("click", () => {
+    const c = { id: nid(), name: "", items: [{ id: nid(), name: "", budget: 0, actual: 0, done: false }] };
+    state.categories.push(c);
+    render(); save();
+    const input = catsEl.querySelector(`[data-cid="${c.id}"] .cat-name`);
+    if(input){ input.focus(); input.scrollIntoView({ block: "center", behavior: "smooth" }); }
+  });
+
+  document.querySelectorAll("[data-tpl]").forEach(btn => btn.addEventListener("click", () => {
+    closeMenus();
+    // No confirm(): some browsers/embeds block it silently, which made this do nothing. Undo is in the toast.
+    const snap = snapshot();
+    // Keep a name the user typed; only default names get the template's title
+    const title = (state.title || "").trim();
+    const isDefault = !title || /^새 예산표( \d+)?$/.test(title) || title === "우리 아기 출산 준비" || Object.values(TEMPLATES).some(t => t.title === title);
+    const plan = fromTemplate(btn.dataset.tpl);
+    if(!isDefault) plan.title = state.title;
+    replaceActive(plan);
+    render(); save();
+    toast(`'${btn.dataset.label}' 템플릿을 불러왔어요`, snap);
+  }));
+
+  document.getElementById("clearAllItems").addEventListener("click", () => {
+    const n = state.categories.reduce((s, c) => s + c.items.filter(hasContent).length, 0);
+    if(!n){ toast("지울 항목이 없어요"); return; }
+    const snap = snapshot();
+    state.categories.forEach(c => { c.items = [newItem()]; });
+    render(); save();
+    toast(`항목 ${n}개를 지웠어요. 카테고리는 그대로예요`, snap);
+  });
+
+  document.getElementById("resetAll").addEventListener("click", () => {
+    const snap = snapshot();
+    replaceActive({ title: "새 예산표", categories: [] });
+    render(); save();
+    toast("모두 지웠어요", snap);
+  });
+
+  // ---- view: 1 / 2 / 4 columns ----
+  const VIEW_KEY = "prep-budget-view";
+  const viewBtns = document.querySelectorAll(".seg [data-cols]");
+  function setCols(n){
+    document.body.dataset.cols = n;
+    viewBtns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cols === String(n))));
+  }
+  let cols = 1;
+  try{ const v = parseInt(localStorage.getItem(VIEW_KEY), 10); if([1, 2, 4].includes(v)) cols = v; }catch(e){}
+  setCols(cols);
+  viewBtns.forEach(b => b.addEventListener("click", () => {
+    setCols(b.dataset.cols);
+    try{ localStorage.setItem(VIEW_KEY, b.dataset.cols); }catch(e){}
+  }));
+
+  // ---- view: 실제 지출 칸 켜기/끄기 ----
+  const ACTUAL_KEY = "prep-budget-actual";
+  const actualToggle = document.getElementById("actualToggle");
+  let showActual = true;
+  function setActual(on){
+    showActual = on;
+    document.body.classList.toggle("no-actual", !on);
+    actualToggle.checked = on;
+  }
+  let startActual = true;
+  try{ startActual = localStorage.getItem(ACTUAL_KEY) !== "off"; }catch(e){}
+  setActual(startActual);
+  actualToggle.addEventListener("change", () => {
+    setActual(actualToggle.checked);
+    try{ localStorage.setItem(ACTUAL_KEY, showActual ? "on" : "off"); }catch(e){}
+    render();
+  });
+
+  // ---- 선택지 (options per item: products, vendors, ...) ----
+  const optDialog = document.getElementById("optDialog");
+  const optList = document.getElementById("optList");
+  const optForm = document.getElementById("optForm");
+  let optCtx = null; // { cid, iid, editId }
+
+  function optItem(){
+    if(!optCtx) return null;
+    const c = state.categories.find(x => x.id === optCtx.cid);
+    return c ? c.items.find(i => i.id === optCtx.iid) || null : null;
+  }
+  // Only http(s) links; "naver.com" becomes "https://naver.com"
+  function safeLink(raw){
+    let s = String(raw || "").trim();
+    if(!s) return "";
+    if(!/^[a-z][a-z0-9+.-]*:/i.test(s)) s = "https://" + s;
+    try{
+      const u = new URL(s);
+      return u.protocol === "http:" || u.protocol === "https:" ? u.href : "";
+    }catch(e){ return ""; }
+  }
+  const hostOf = link => { try{ return new URL(link).hostname.replace(/^www\./, ""); }catch(e){ return ""; } };
+
+  const ICON_LINK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 3h4v4M13 3L7.5 8.5M11 9.5V12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const ICON_EDIT = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 3l2.5 2.5L6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
+  const ICON_DEL = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+
+  function renderOptions(){
+    const it = optItem();
+    if(!it) return;
+    const opts = it.options || [];
+    document.getElementById("optTitle").textContent = `${it.name || "이름 없는 항목"} 선택지`;
+    document.getElementById("optSub").textContent = opts.length
+      ? "하나를 고르면 이 항목의 선택지와 예산(가격 × 수량)에 들어가요. 다시 누르면 선택이 풀려요."
+      : "비교할 제품이나 업체를 추가해 보세요.";
+    optList.innerHTML = opts.length ? opts.map(o => {
+      const sel = o.id === it.choiceId;
+      const host = o.link ? hostOf(o.link) : "";
+      return `<div class="opt${sel ? " selected" : ""}" data-oid="${o.id}">
+        <button type="button" class="opt-main" aria-pressed="${sel}">
+          <span class="opt-radio" aria-hidden="true"></span>
+          <span class="opt-name">${esc(o.name)}</span>
+          <span class="opt-price${o.price ? "" : " none"}">${o.price ? won(o.price) : "가격 없음"}</span>
+          ${o.note ? `<span class="opt-note">${esc(o.note)}</span>` : ""}
+          ${host ? `<span class="opt-host">${esc(host)}</span>` : ""}
+        </button>
+        ${o.link ? `<a class="opt-tool" href="${esc(o.link)}" target="_blank" rel="noopener noreferrer sponsored nofollow" aria-label="'${esc(o.name)}' 링크 열기" title="링크 열기">${ICON_LINK}</a>` : ""}
+        <button type="button" class="opt-tool opt-edit" aria-label="'${esc(o.name)}' 고치기" title="고치기">${ICON_EDIT}</button>
+        <button type="button" class="opt-tool opt-del danger" aria-label="'${esc(o.name)}' 삭제" title="삭제">${ICON_DEL}</button>
+      </div>`;
+    }).join("") : `<div class="opt-empty">아직 선택지가 없어요</div>`;
+  }
+
+  function resetOptForm(){
+    optForm.reset();
+    optCtx.editId = null;
+    document.getElementById("optFormTitle").textContent = "선택지 추가";
+    document.getElementById("optSubmit").textContent = "추가";
+    document.getElementById("optCancel").hidden = true;
+  }
+
+  function openOptions(c, it){
+    closeMenus();
+    optCtx = { cid: c.id, iid: it.id, editId: null };
+    resetOptForm();
+    renderOptions();
+    optDialog.showModal();
+    if(!(it.options || []).length) optForm.elements.name.focus();
+  }
+
+  optDialog.addEventListener("click", e => {
+    if(e.target === optDialog || e.target.closest("[data-close]")){ optDialog.close(); return; } // backdrop or ×
+    const row = e.target.closest(".opt");
+    if(!row) return;
+    const it = optItem();
+    const o = (it.options || []).find(x => x.id === row.dataset.oid);
+    if(!o) return;
+    if(e.target.closest(".opt-main")){
+      if(it.choiceId === o.id){
+        it.choiceId = null; // keep the budget as it is
+        render(); save(); renderOptions();
+        return;
+      }
+      it.choiceId = o.id;
+      if(o.price) it.budget = o.price * qtyOf(it);
+      render(); save();
+      optDialog.close();
+      toast(!o.price ? `'${o.name}' 선택` : qtyOf(it) > 1 ? `'${o.name}' 선택 · 예산 ${won(it.budget)} (${qtyOf(it)}개)` : `'${o.name}' 선택 · 예산 ${won(it.budget)}`);
+    } else if(e.target.closest(".opt-edit")){
+      optCtx.editId = o.id;
+      optForm.elements.name.value = o.name;
+      optForm.elements.link.value = o.link || "";
+      optForm.elements.price.value = plain(o.price);
+      optForm.elements.note.value = o.note || "";
+      document.getElementById("optFormTitle").textContent = "선택지 고치기";
+      document.getElementById("optSubmit").textContent = "저장";
+      document.getElementById("optCancel").hidden = false;
+      optForm.elements.name.focus();
+    } else if(e.target.closest(".opt-del")){
+      const snap = snapshot();
+      it.options = it.options.filter(x => x !== o);
+      if(it.choiceId === o.id) it.choiceId = null;
+      if(optCtx.editId === o.id) resetOptForm();
+      render(); save(); renderOptions();
+      toast(`'${o.name}' 선택지를 지웠어요`, snap);
+    }
+  });
+
+  optForm.elements.price.addEventListener("input", e => {
+    const t = e.target, v = parseMoney(t.value);
+    t.value = plain(v);
+  });
+  document.getElementById("optCancel").addEventListener("click", () => { resetOptForm(); optForm.elements.name.focus(); });
+
+  optForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const it = optItem();
+    if(!it) return;
+    const name = optForm.elements.name.value.trim();
+    if(!name){ optForm.elements.name.focus(); return; }
+    const rawLink = optForm.elements.link.value.trim();
+    const link = safeLink(rawLink);
+    if(rawLink && !link){ toast("링크는 http나 https 주소만 넣을 수 있어요"); optForm.elements.link.focus(); return; }
+    const price = parseMoney(optForm.elements.price.value);
+    const note = optForm.elements.note.value.trim();
+    it.options = it.options || [];
+    const editing = optCtx.editId && it.options.find(x => x.id === optCtx.editId);
+    if(editing){
+      Object.assign(editing, { name, link, price, note });
+      if(it.choiceId === editing.id && price) it.budget = price * qtyOf(it); // keep the chosen price and budget in sync
+    } else {
+      it.options.push({ id: nid(), name, link, price, note });
+    }
+    render(); save();
+    resetOptForm(); renderOptions();
+    optList.scrollTop = optList.scrollHeight;
+    optForm.elements.name.focus();
+  });
+
+  optDialog.addEventListener("close", () => {
+    const toastEl = document.getElementById("toast");
+    if(toastEl.parentNode === optDialog) document.body.appendChild(toastEl);
+    const pick = optCtx && catsEl.querySelector(`[data-iid="${optCtx.iid}"] .pick`);
+    if(pick) pick.focus();
+  });
+
+  // ---- toast (with optional undo) ----
+  let toastTimer;
+  function toast(msg, undoSnapshot){
+    const el = document.getElementById("toast");
+    const host = optDialog.open ? optDialog : document.body;
+    if(el.parentNode !== host) host.appendChild(el);
+    el.textContent = msg;
+    el.classList.toggle("has-action", !!undoSnapshot);
+    if(undoSnapshot){
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = "되돌리기";
+      b.addEventListener("click", () => {
+        store = JSON.parse(undoSnapshot);
+        syncActive();
+        render(); save();
+        if(optDialog.open){ if(optItem()) renderOptions(); else optDialog.close(); }
+        el.classList.remove("show", "has-action");
+      });
+      el.appendChild(b);
+    }
+    el.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove("show", "has-action"), undoSnapshot ? 6000 : 2600);
+  }
+
+  // ---- Excel export ----
+  const downloadsPromise = (window.claude && typeof window.claude.use === "function")
+    ? window.claude.use("downloads").catch(() => null)
+    : Promise.resolve(null);
+
+  // Tab theme colors in the workbook: fill (header, sheet tab), text on fill, soft tint, readable text color
+  const ACCENT_XL = {
+    green:  { fill: "FF26A392", on: "FFFFFFFF", soft: "FFDDF3EF", text: "FF1A766B" },
+    navy:   { fill: "FF4176E0", on: "FFFFFFFF", soft: "FFE3ECFB", text: "FF3264C8" },
+    pink:   { fill: "FFE0508A", on: "FFFFFFFF", soft: "FFFCE6EF", text: "FFC9336F" },
+    yellow: { fill: "FFFFC933", on: "FF1B2230", soft: "FFFFF4D1", text: "FF8F6A00" },
+    purple: { fill: "FF8E63E6", on: "FFFFFFFF", soft: "FFF0E9FC", text: "FF7A4FD0" },
+    orange: { fill: "FFE2661C", on: "FFFFFFFF", soft: "FFFDEBDD", text: "FFB24A0B" }
+  };
+  const accentXL = key => ACCENT_XL[key] || ACCENT_XL.green;
+
+  const moneyFmt = '#,##0"원";[Red]-#,##0"원"';
+  const solid = argb => ({ type: "pattern", pattern: "solid", fgColor: { argb } });
+  const edge = (argb, style = "thin") => ({ style, color: { argb } });
+  const LINE = "FFDDE2E8", INK = "FF1B2230", MUTED = "FF667085", SOFT_BG = "FFF2F4F6";
+
+  // Excel sheet names: max 31 chars, no [ ] : * ? / \, no leading/trailing ', unique ignoring case
+  function sheetNamer(){
+    const used = new Set();
+    return raw => {
+      const base = (String(raw || "").replace(/[\[\]:*?\/\\]/g, " ").replace(/^'+|'+$/g, "").replace(/\s+/g, " ").trim() || "예산표").slice(0, 31);
+      let name = base, n = 2;
+      while(used.has(name.toLowerCase())){
+        const suffix = ` (${n++})`;
+        name = base.slice(0, 31 - suffix.length) + suffix;
+      }
+      used.add(name.toLowerCase());
+      return name;
+    };
+  }
+  const sheetRef = (sheet, cell) => `'${sheet.replace(/'/g, "''")}'!${cell}`;
+
+  // Plan sheet columns, in the same order as the screen
+  const XC = { name: 1, pick: 2, qty: 3, budget: 4, actual: 5, diff: 6, done: 7, link: 8 };
+  const XHEAD = ["항목", "선택지", "수량", "예산", "실제 지출", "차액", "완료", "링크"];
+  const XL = key => String.fromCharCode(64 + XC[key]); // column letter
+  const isMoneyCol = n => n === XC.budget || n === XC.actual || n === XC.diff;
+
+  // One budget → one sheet. Grand total sits in row 4.
+  // links (optional): { sheet, ranges: Map(item → { first, last }), itemRows: Map(item → row) }
+  // Items with options get a 선택지 dropdown and a 예산 formula (price of the picked option × 수량).
+  function addPlanSheet(wb, plan, sheetName, links){
+    const ws = wb.addWorksheet(sheetName, { views: [{ state: "frozen", ySplit: 4, showGridLines: false }] });
+    const NC = XHEAD.length;
+    ws.columns = [{ width: 28 }, { width: 22 }, { width: 8 }, { width: 16 }, { width: 16 }, { width: 16 }, { width: 8 }, { width: 26 }];
+    ws.pageSetup = { paperSize: 9, orientation: "portrait", fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
+    const eachCol = (row, fn) => { for(let n = 1; n <= NC; n++) fn(row.getCell(n), n); };
+    const theme = accentXL(plan.accent);
+    ws.properties.tabColor = { argb: theme.fill };
+
+    const cats = plan.categories.map(c => ({ name: c.name || "카테고리", items: c.items.filter(hasContent) }));
+    const itemCount = cats.reduce((s, c) => s + c.items.length, 0);
+
+    // Title + meta
+    ws.mergeCells(1, 1, 1, NC);
+    ws.getCell("A1").value = planLabel(plan);
+    ws.getCell("A1").font = { size: 18, bold: true, color: { argb: INK } };
+    ws.getCell("A1").alignment = { vertical: "middle" };
+    ws.getRow(1).height = 32;
+    ws.mergeCells(2, 1, 2, NC);
+    ws.getCell("A2").value = `${new Date().toLocaleDateString("ko-KR")} 기준 · 카테고리 ${cats.length}개 · 항목 ${itemCount}개`;
+    ws.getCell("A2").font = { size: 10, color: { argb: MUTED } };
+    ws.getRow(2).height = 20;
+
+    // Column header (frozen)
+    const head = ws.getRow(3);
+    head.values = XHEAD;
+    head.height = 24;
+    eachCol(head, cell => {
+      cell.font = { bold: true, color: { argb: theme.on } };
+      cell.fill = solid(theme.fill);
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+    });
+
+    // Category blocks start at row 6 (row 4 = grand total, row 5 = spacer)
+    let r = 6;
+    const subRows = [];
+    cats.forEach((c, ci) => {
+      // Every category uses the tab's color; the bands and spacing separate them
+      const { fill: strong, soft, on, text } = theme;
+
+      // Colored band with the category name
+      const band = ws.getRow(r);
+      eachCol(band, cell => { cell.fill = solid(strong); });
+      ws.mergeCells(r, 1, r, NC);
+      band.getCell(1).value = `${ci + 1}. ${c.name}`;
+      band.getCell(1).font = { bold: true, size: 12, color: { argb: on } };
+      band.getCell(1).alignment = { vertical: "middle", indent: 1 };
+      band.height = 26;
+      r++;
+
+      const start = r;
+      c.items.forEach(it => {
+        const row = ws.getRow(r);
+        const chosen = chosenOf(it);
+        row.getCell(XC.name).value = it.name;
+        if(chosen) row.getCell(XC.pick).value = chosen.name;
+        row.getCell(XC.qty).value = qtyOf(it);
+        row.getCell(XC.budget).value = it.budget || 0;
+        row.getCell(XC.actual).value = it.actual || 0;
+        row.getCell(XC.diff).value = { formula: `${XL("budget")}${r}-${XL("actual")}${r}` };
+        row.getCell(XC.done).value = it.done ? "✓" : "";
+        if(chosen && chosen.link) row.getCell(XC.link).value = { text: hostOf(chosen.link) || chosen.link, hyperlink: chosen.link };
+        const range = links && links.ranges.get(it);
+        if(range){
+          links.itemRows.set(it, r);
+          const names = sheetRef(links.sheet, `$D$${range.first}:$D$${range.last}`);
+          const prices = sheetRef(links.sheet, `$E$${range.first}:$E$${range.last}`);
+          const P = `${XL("pick")}${r}`, Q = `${XL("qty")}${r}`;
+          row.getCell(XC.pick).dataValidation = {
+            type: "list", allowBlank: true, formulae: [names],
+            showErrorMessage: true, errorStyle: "warning", errorTitle: "선택지", error: "선택지 시트에 있는 이름을 골라 주세요"
+          };
+          // A budget typed by hand (not price × 수량) stays as typed; otherwise it follows the dropdown.
+          const followsPick = !chosen || !chosen.price || it.budget === chosen.price * qtyOf(it);
+          if(followsPick){
+            const keep = it.budget || 0; // used when the dropdown is emptied or the name isn't found
+            row.getCell(XC.budget).value = {
+              formula: `IF(${P}="",${keep},IFERROR(INDEX(${prices},MATCH(${P},${names},0))*${Q},${keep}))`,
+              result: it.budget || 0
+            };
+          }
+        }
+        row.height = 20;
+        eachCol(row, (cell, n) => {
+          cell.border = { bottom: edge(LINE) };
+          cell.alignment = { vertical: "middle" };
+          if(isMoneyCol(n)) cell.numFmt = moneyFmt;
+        });
+        row.getCell(XC.name).border = { left: edge(strong, "thick"), bottom: edge(LINE) };
+        row.getCell(XC.name).alignment = { vertical: "middle", indent: 1 };
+        row.getCell(XC.qty).numFmt = '#,##0"개"';
+        row.getCell(XC.qty).alignment = { vertical: "middle", horizontal: "center" };
+        row.getCell(XC.done).alignment = { vertical: "middle", horizontal: "center" };
+        row.getCell(XC.done).font = { bold: true, color: { argb: text } };
+        row.getCell(XC.link).font = { color: { argb: text }, underline: true };
+        r++;
+      });
+      const end = r - 1;
+
+      // Subtotal in the category's tint
+      const sub = ws.getRow(r);
+      sub.getCell(1).value = `${c.name} 소계`;
+      if(end >= start){
+        sub.getCell(XC.budget).value = { formula: `SUM(${XL("budget")}${start}:${XL("budget")}${end})` };
+        sub.getCell(XC.actual).value = { formula: `SUM(${XL("actual")}${start}:${XL("actual")}${end})` };
+      } else {
+        sub.getCell(XC.budget).value = 0; sub.getCell(XC.actual).value = 0;
+      }
+      sub.getCell(XC.diff).value = { formula: `${XL("budget")}${r}-${XL("actual")}${r}` };
+      sub.height = 22;
+      eachCol(sub, (cell, n) => {
+        cell.fill = solid(soft);
+        cell.font = { bold: true, color: { argb: n === 1 ? text : INK } };
+        cell.border = { top: edge(strong), bottom: edge(strong) };
+        cell.alignment = { vertical: "middle" };
+        if(isMoneyCol(n)) cell.numFmt = moneyFmt;
+      });
+      sub.getCell(1).border = { left: edge(strong, "thick"), top: edge(strong), bottom: edge(strong) };
+      sub.getCell(1).alignment = { vertical: "middle", indent: 1 };
+
+      subRows.push({ name: c.name, row: r, strong, soft, text, count: c.items.length });
+      r += 2; // blank spacer row between categories
+    });
+
+    // Grand total at the top, right under the header, so it stays visible while scrolling
+    const total = ws.getRow(4);
+    total.getCell(1).value = "전체 합계";
+    const sumOf = col => subRows.length ? { formula: subRows.map(s => `${col}${s.row}`).join("+") } : 0;
+    total.getCell(XC.budget).value = sumOf(XL("budget"));
+    total.getCell(XC.actual).value = sumOf(XL("actual"));
+    total.getCell(XC.diff).value = { formula: `${XL("budget")}4-${XL("actual")}4` };
+    total.height = 26;
+    eachCol(total, (cell, n) => {
+      cell.fill = solid(theme.soft);
+      cell.font = { bold: true, size: 12, color: { argb: INK } };
+      cell.border = { bottom: edge(theme.fill, "medium") };
+      cell.alignment = { vertical: "middle", indent: n === 1 ? 1 : 0 };
+      if(isMoneyCol(n)) cell.numFmt = moneyFmt;
+    });
+
+    return { subRows, itemCount };
+  }
+
+  // Summary table: one colored line per entry, amounts live-linked to other sheets
+  // rows: [{ name, count, budgetRef, actualRef, strong, soft, text? }]
+  const addSummarySheet = (wb, sheetName) => wb.addWorksheet(sheetName, { views: [{ showGridLines: false }] });
+  function fillSummarySheet(ss, firstCol, rows, theme){
+    if(theme) ss.properties.tabColor = { argb: theme.fill };
+    ss.columns = [{ width: 26 }, { width: 10 }, { width: 16 }, { width: 16 }, { width: 16 }, { width: 10 }];
+    const sh = ss.getRow(1);
+    sh.values = [firstCol, "항목 수", "예산", "실제 지출", "차액", "사용률"];
+    sh.height = 24;
+    sh.eachCell(cell => {
+      cell.font = { bold: true, color: { argb: theme ? theme.on : "FFFFFFFF" } };
+      cell.fill = solid(theme ? theme.fill : INK);
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+    });
+    rows.forEach((s, i) => {
+      const n = i + 2;
+      const row = ss.getRow(n);
+      row.getCell(1).value = s.name;
+      row.getCell(2).value = s.count;
+      row.getCell(3).value = { formula: s.budgetRef };
+      row.getCell(4).value = { formula: s.actualRef };
+      row.getCell(5).value = { formula: `C${n}-D${n}` };
+      row.getCell(6).value = { formula: `IF(C${n}=0,"",D${n}/C${n})` };
+      row.height = 22;
+      for(let k = 1; k <= 6; k++){
+        const cell = row.getCell(k);
+        cell.border = { bottom: edge(LINE) };
+        cell.alignment = k === 2 || k === 6 ? { vertical: "middle", horizontal: "center" } : { vertical: "middle" };
+        if(k >= 3 && k <= 5) cell.numFmt = moneyFmt;
+      }
+      row.getCell(6).numFmt = "0%";
+      row.getCell(1).fill = solid(s.soft);
+      row.getCell(1).font = { bold: true, color: { argb: s.text || s.strong } };
+      row.getCell(1).border = { left: edge(s.strong, "thick"), bottom: edge(LINE) };
+      row.getCell(1).alignment = { vertical: "middle", indent: 1 };
+    });
+    const sr = rows.length + 2;
+    const st = ss.getRow(sr);
+    st.getCell(1).value = "합계";
+    if(rows.length){
+      st.getCell(2).value = { formula: `SUM(B2:B${sr - 1})` };
+      st.getCell(3).value = { formula: `SUM(C2:C${sr - 1})` };
+      st.getCell(4).value = { formula: `SUM(D2:D${sr - 1})` };
+      st.getCell(5).value = { formula: `C${sr}-D${sr}` };
+      st.getCell(6).value = { formula: `IF(C${sr}=0,"",D${sr}/C${sr})` };
+    }
+    st.height = 24;
+    for(let k = 1; k <= 6; k++){
+      const cell = st.getCell(k);
+      cell.font = { bold: true };
+      cell.fill = solid(SOFT_BG);
+      cell.border = { top: edge(INK, "medium") };
+      cell.alignment = k === 2 || k === 6 ? { vertical: "middle", horizontal: "center" } : { vertical: "middle", indent: k === 1 ? 1 : 0 };
+      if(k >= 3 && k <= 5) cell.numFmt = moneyFmt;
+    }
+    st.getCell(6).numFmt = "0%";
+  }
+
+  // Guestbook sheet: 이름 · 축의금 only, same band / subtotal / top-total layout as a budget sheet
+  function addGuestSheet(wb, plan, sheetName){
+    const ws = wb.addWorksheet(sheetName, { views: [{ state: "frozen", ySplit: 4, showGridLines: false }] });
+    const NC = 2;
+    ws.columns = [{ width: 26 }, { width: 18 }];
+    ws.pageSetup = { paperSize: 9, orientation: "portrait", fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
+    const t = accentXL(plan.accent);
+    ws.properties.tabColor = { argb: t.fill };
+    const eachCol = (row, fn) => { for(let n = 1; n <= NC; n++) fn(row.getCell(n), n); };
+    const cats = plan.categories.map(c => ({ name: c.name || "카테고리", items: c.items.filter(i => i.name || i.budget) }));
+    const people = cats.reduce((s, c) => s + c.items.length, 0);
+
+    ws.mergeCells(1, 1, 1, NC);
+    ws.getCell("A1").value = planLabel(plan);
+    ws.getCell("A1").font = { size: 18, bold: true, color: { argb: INK } };
+    ws.getCell("A1").alignment = { vertical: "middle" };
+    ws.getRow(1).height = 32;
+    ws.mergeCells(2, 1, 2, NC);
+    ws.getCell("A2").value = `${new Date().toLocaleDateString("ko-KR")} 기준 · ${people}명`;
+    ws.getCell("A2").font = { size: 10, color: { argb: MUTED } };
+
+    const head = ws.getRow(3);
+    head.values = ["이름", "축의금"];
+    head.height = 24;
+    eachCol(head, cell => {
+      cell.font = { bold: true, color: { argb: t.on } };
+      cell.fill = solid(t.fill);
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+    });
+
+    let r = 6;
+    const subRows = [];
+    cats.forEach((c, ci) => {
+      const band = ws.getRow(r);
+      eachCol(band, cell => { cell.fill = solid(t.fill); });
+      ws.mergeCells(r, 1, r, NC);
+      band.getCell(1).value = `${ci + 1}. ${c.name}`;
+      band.getCell(1).font = { bold: true, size: 12, color: { argb: t.on } };
+      band.getCell(1).alignment = { vertical: "middle", indent: 1 };
+      band.height = 26;
+      r++;
+      const start = r;
+      c.items.forEach(it => {
+        const row = ws.getRow(r);
+        row.getCell(1).value = it.name;
+        row.getCell(2).value = it.budget || 0;
+        row.height = 20;
+        eachCol(row, cell => { cell.border = { bottom: edge(LINE) }; cell.alignment = { vertical: "middle" }; });
+        row.getCell(1).border = { left: edge(t.fill, "thick"), bottom: edge(LINE) };
+        row.getCell(1).alignment = { vertical: "middle", indent: 1 };
+        row.getCell(2).numFmt = moneyFmt;
+        r++;
+      });
+      const end = r - 1;
+      const sub = ws.getRow(r);
+      sub.getCell(1).value = `${c.name} 소계`;
+      sub.getCell(2).value = end >= start ? { formula: `SUM(B${start}:B${end})` } : 0;
+      sub.height = 22;
+      eachCol(sub, (cell, n) => {
+        cell.fill = solid(t.soft);
+        cell.font = { bold: true, color: { argb: n === 1 ? t.text : INK } };
+        cell.border = { top: edge(t.fill), bottom: edge(t.fill) };
+        cell.alignment = { vertical: "middle" };
+      });
+      sub.getCell(1).border = { left: edge(t.fill, "thick"), top: edge(t.fill), bottom: edge(t.fill) };
+      sub.getCell(1).alignment = { vertical: "middle", indent: 1 };
+      sub.getCell(2).numFmt = moneyFmt;
+      subRows.push({ name: c.name, row: r, count: c.items.length, start, end });
+      r += 2;
+    });
+
+    const total = ws.getRow(4);
+    total.getCell(1).value = "전체 합계";
+    total.getCell(2).value = subRows.length ? { formula: subRows.map(x => `B${x.row}`).join("+") } : 0;
+    total.height = 26;
+    eachCol(total, (cell, n) => {
+      cell.fill = solid(t.soft);
+      cell.font = { bold: true, size: 12, color: { argb: INK } };
+      cell.border = { bottom: edge(t.fill, "medium") };
+      cell.alignment = { vertical: "middle", indent: n === 1 ? 1 : 0 };
+    });
+    total.getCell(2).numFmt = moneyFmt;
+    return { subRows, people };
+  }
+
+  // Guestbook summary: 카테고리 · 인원 · 축의금, linked to the guestbook sheet
+  const guestAlign = k => k === 2 ? { vertical: "middle", horizontal: "center" } : { vertical: "middle", indent: k === 1 ? 1 : 0 };
+  function fillGuestSummary(ss, sheet, subRows, t){
+    ss.properties.tabColor = { argb: t.fill };
+    ss.columns = [{ width: 24 }, { width: 10 }, { width: 18 }];
+    const head = ss.getRow(1);
+    head.values = ["카테고리", "인원", "축의금"];
+    head.height = 24;
+    head.eachCell(cell => {
+      cell.font = { bold: true, color: { argb: t.on } };
+      cell.fill = solid(t.fill);
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+    });
+    subRows.forEach((x, i) => {
+      const n = i + 2, row = ss.getRow(n);
+      row.getCell(1).value = x.name;
+      row.getCell(2).value = x.end >= x.start
+        ? { formula: `COUNTA(${sheetRef(sheet, `A${x.start}:A${x.end}`)})`, result: x.count } : 0;
+      row.getCell(3).value = { formula: sheetRef(sheet, `B${x.row}`) };
+      row.height = 22;
+      [1, 2, 3].forEach(k => { row.getCell(k).border = { bottom: edge(LINE) }; row.getCell(k).alignment = guestAlign(k); });
+      row.getCell(1).fill = solid(t.soft);
+      row.getCell(1).font = { bold: true, color: { argb: t.text } };
+      row.getCell(1).border = { left: edge(t.fill, "thick"), bottom: edge(LINE) };
+      row.getCell(2).numFmt = '#,##0"명"';
+      row.getCell(3).numFmt = moneyFmt;
+    });
+    const sr = subRows.length + 2, st = ss.getRow(sr);
+    st.getCell(1).value = "합계";
+    if(subRows.length){
+      st.getCell(2).value = { formula: `SUM(B2:B${sr - 1})` };
+      st.getCell(3).value = { formula: `SUM(C2:C${sr - 1})` };
+    }
+    st.height = 24;
+    [1, 2, 3].forEach(k => {
+      const cell = st.getCell(k);
+      cell.font = { bold: true };
+      cell.fill = solid(SOFT_BG);
+      cell.border = { top: edge(INK, "medium") };
+      cell.alignment = guestAlign(k);
+    });
+    st.getCell(2).numFmt = '#,##0"명"';
+    st.getCell(3).numFmt = moneyFmt;
+  }
+
+  // 선택지 sheet: every option of every item, chosen or not, so nothing is lost on export.
+  // plans: [{ plan, sheet }] — "시트" names the budget sheet the item lives on (used when importing).
+  const OPT_HEAD = ["시트", "카테고리", "항목", "선택지", "가격", "링크", "선택", "비고"];
+  function layoutOptions(plans){
+    const rows = [], ranges = new Map();
+    plans.forEach(({ plan, sheet }) => plan.categories.forEach(c => c.items.forEach(it => {
+      if(!(it.options || []).length || !hasContent(it)) return;
+      if(rows.length) rows.push(null); // blank row between items: easier to read, and marks the next item on import
+      const first = rows.length + 2;
+      it.options.forEach(o => rows.push({ sheet, cat: c.name || "카테고리", item: it, o, chosen: o.id === it.choiceId, t: accentXL(plan.accent) }));
+      ranges.set(it, { first, last: rows.length + 1 });
+    })));
+    return { rows, ranges };
+  }
+
+  function addOptionSheet(wb, sheetName, layout, itemRows, theme){
+    const { rows, ranges } = layout;
+    if(!rows.length) return;
+    const ws = wb.addWorksheet(sheetName, { views: [{ state: "frozen", ySplit: 1, showGridLines: false }] });
+    if(theme) ws.properties.tabColor = { argb: theme.fill };
+    ws.columns = [{ width: 18 }, { width: 16 }, { width: 20 }, { width: 28 }, { width: 14 }, { width: 28 }, { width: 7 }, { width: 32 }];
+    const head = ws.getRow(1);
+    head.values = OPT_HEAD;
+    head.height = 24;
+    head.eachCell(cell => {
+      cell.font = { bold: true, color: { argb: theme ? theme.on : "FFFFFFFF" } };
+      cell.fill = solid(theme ? theme.fill : INK);
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+    });
+    rows.forEach((x, i) => {
+      if(!x) return;
+      const n = i + 2;
+      const row = ws.getRow(n);
+      const picked = sheetRef(x.sheet, `${XL("pick")}${itemRows.get(x.item)}`);
+      row.values = [x.sheet, x.cat, x.item.name, x.o.name, x.o.price || 0,
+        x.o.link ? { text: hostOf(x.o.link) || x.o.link, hyperlink: x.o.link } : "",
+        { formula: `IF(${picked}=D${n},"✓","")`, result: x.chosen ? "✓" : "" }, // follows the dropdown
+        x.o.note || ""];
+      row.height = 20;
+      row.eachCell({ includeEmpty: true }, (cell, k) => {
+        if(k > OPT_HEAD.length) return;
+        cell.border = { bottom: edge(LINE) };
+        cell.alignment = k === 7 ? { vertical: "middle", horizontal: "center" } : { vertical: "middle" };
+      });
+      row.getCell(5).numFmt = moneyFmt;
+      row.getCell(6).font = { color: { argb: x.t.text }, underline: !!x.o.link };
+      row.getCell(7).font = { bold: true, color: { argb: x.t.text } };
+    });
+    // Highlight the picked option of each item; conditional, so it moves with the dropdown
+    ranges.forEach(({ first, last }, it) => {
+      const t = rows[first - 2].t;
+      ws.addConditionalFormatting({
+        ref: `A${first}:H${last}`,
+        rules: [{ type: "expression", formulae: [`$G${first}="✓"`], priority: 1,
+                  style: { fill: { type: "pattern", pattern: "solid", bgColor: { argb: t.soft } }, font: { bold: true } } }]
+      });
+    });
+  }
+
+  // scope "current": 예산표 + 요약 (+ 선택지) for the active tab
+  // scope "all": 전체 요약 first, then one sheet per tab (+ one 선택지 sheet for all tabs)
+  async function buildWorkbook(scope){
+    const wb = new ExcelJS.Workbook();
+    if(scope === "all"){
+      const nameOf = sheetNamer();
+      const overview = addSummarySheet(wb, nameOf("전체 요약")); // created first so it is the first tab
+      const sheets = store.plans.map(p => ({ plan: p, sheet: nameOf(planLabel(p)) }));
+      const optName = nameOf("선택지");
+      const layout = layoutOptions(sheets);
+      const links = { sheet: optName, ranges: layout.ranges, itemRows: new Map() };
+      const entries = sheets.map(({ plan: p, sheet }) => {
+        if(isGuest(p)){ addGuestSheet(wb, p, sheet); return null; } // not a budget: kept out of 전체 요약
+        const { itemCount } = addPlanSheet(wb, p, sheet, links);
+        const t = accentXL(p.accent);
+        return { name: sheet, count: itemCount, // sheet name, so duplicate titles stay distinguishable
+                 budgetRef: sheetRef(sheet, `${XL("budget")}4`), actualRef: sheetRef(sheet, `${XL("actual")}4`),
+                 strong: t.fill, soft: t.soft, text: t.text };
+      });
+      fillSummarySheet(overview, "예산표", entries.filter(Boolean));
+      addOptionSheet(wb, optName, layout, links.itemRows, null);
+    } else if(isGuest(state)){
+      const sheet = "방명록";
+      const { subRows } = addGuestSheet(wb, state, sheet);
+      fillGuestSummary(addSummarySheet(wb, "요약"), sheet, subRows, accentXL(state.accent));
+    } else {
+      const sheet = "예산표";
+      const layout = layoutOptions([{ plan: state, sheet }]);
+      const links = { sheet: "선택지", ranges: layout.ranges, itemRows: new Map() };
+      const { subRows } = addPlanSheet(wb, state, sheet, links);
+      fillSummarySheet(addSummarySheet(wb, "요약"), "카테고리", subRows.map(s => ({
+        name: s.name, count: s.count, strong: s.strong, soft: s.soft, text: s.text,
+        budgetRef: sheetRef(sheet, `${XL("budget")}${s.row}`), actualRef: sheetRef(sheet, `${XL("actual")}${s.row}`)
+      })), accentXL(state.accent));
+      addOptionSheet(wb, "선택지", layout, links.itemRows, accentXL(state.accent));
+    }
+    return wb;
+  }
+
+  const fileSafe = s => String(s).replace(/[\\/:*?"<>|]/g, "").trim();
+  const exportMenu = document.getElementById("exportMenu");
+  const exportBtn = document.getElementById("exportBtn");
+  let exporting = false;
+
+  function updateExportNotes(){
+    document.getElementById("exportCurrentNote").textContent = `'${planLabel(state)}' · ${isGuest(state) ? "방명록" : "예산표"}와 요약 시트`;
+    document.getElementById("exportAllNote").textContent = `탭 ${store.plans.length}개를 시트 하나씩 + 전체 요약`;
+  }
+  exportMenu.addEventListener("toggle", () => { if(exportMenu.open) updateExportNotes(); });
+
+  exportBtn.addEventListener("click", e => {
+    if(exporting){ e.preventDefault(); return; }
+    // Only one tab → nothing to choose, export right away
+    if(store.plans.length === 1){ e.preventDefault(); runExport("current"); }
+  });
+  exportMenu.querySelectorAll("[data-export]").forEach(b => b.addEventListener("click", () => {
+    exportMenu.open = false;
+    runExport(b.dataset.export);
+  }));
+
+  async function runExport(scope){
+    if(typeof ExcelJS === "undefined"){ toast("엑셀 도구를 불러오지 못했어요. 새로고침 후 다시 시도해 주세요."); return; }
+    exporting = true;
+    exportBtn.setAttribute("aria-disabled", "true");
+    try{
+      const wb = await buildWorkbook(scope);
+      const buf = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const filename = (scope === "all"
+        ? `예산표 모음 (${store.plans.length}개)`
+        : (fileSafe(planLabel(state)) || "예산표")) + ".xlsx";
+
+      const downloads = window.claude ? await downloadsPromise : null;
+      if(downloads){
+        try{
+          await downloads.save({ filename, data: blob });
+          toast("엑셀 파일을 저장했어요. 구글 드라이브에 올리면 시트로 열려요.");
+        }catch(err){
+          if(err && err.code === "declined") return;
+          if(err && err.code === "rate_limited"){ toast("저장 창이 이미 열려 있어요."); return; }
+          toast("이 화면에서는 파일을 저장할 수 없어요.");
+        }
+      } else {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url; a.download = filename;
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 2000);
+        toast("엑셀 파일을 내려받았어요. 구글 드라이브에 올리면 시트로 열려요.");
+      }
+    }catch(err){
+      toast("엑셀 파일을 만들지 못했어요. 다시 시도해 주세요.");
+    }finally{
+      exporting = false;
+      exportBtn.removeAttribute("aria-disabled");
+    }
+  }
+
+  // ---- Excel import: files exported here, also after editing in Google Sheets ----
+  function cellText(v){
+    if(v == null) return "";
+    if(typeof v === "object"){
+      if(v.richText) return v.richText.map(t => t.text).join("").trim();
+      if("result" in v) return cellText(v.result);
+      if(v.text != null) return String(v.text).trim();
+      return "";
+    }
+    return String(v).trim();
+  }
+  function cellMoney(v){
+    if(v && typeof v === "object" && "result" in v) v = v.result;
+    if(typeof v === "number") return Math.max(0, Math.round(v));
+    return parseMoney(cellText(v));
+  }
+  const cellDone = v => v === true || ["✓", "✔", "v", "o", "true", "y", "yes", "완료"].includes(cellText(v).toLowerCase());
+  const isSumFormula = v => !!(v && typeof v === "object" && /^\s*SUM\(/i.test(v.formula || v.sharedFormula || ""));
+
+  // Columns are found by header name, so every export version (with or without 선택지/수량) reads the same way.
+  // "old" = first version, where 카테고리 had its own column instead of band rows.
+  const HEAD_KEYS = { "이름": "name", "축의금": "budget", "카테고리": "cat", "항목": "name", "선택지": "pick", "수량": "qty", "예산": "budget", "실제 지출": "actual", "완료": "done", "링크": "link" };
+
+  function parsePlanSheet(ws){
+    for(let h = 1; h <= 10; h++){
+      const row = ws.getRow(h);
+      const col = {};
+      for(let n = 1; n <= Math.max(row.cellCount, 12); n++){
+        const key = HEAD_KEYS[cellText(row.getCell(n).value)];
+        if(key && !col[key]) col[key] = n;
+      }
+      const guestHead = cellText(row.getCell(1).value) === "이름" && cellText(row.getCell(2).value) === "축의금";
+      if(guestHead) return Object.assign(readRows(ws, h, "now", { name: 1, budget: 2 }), { kind: "guestbook" });
+      if(!(col.name && col.budget && col.actual)) continue;
+      if(col.cat === 1 && col.name === 2) return readRows(ws, h, "old", col);
+      if(col.name === 1) return readRows(ws, h, "now", col);
+    }
+    return null; // summary sheets and anything else
+  }
+
+  const OLD_FILLS = { green: "2E6F6B", navy: "3A5A94", pink: "B83D6E", yellow: "F2C230", purple: "6B4FA0", orange: "C2571A" }; // colors used by earlier exports
+  function accentFromSheet(ws, headRow){
+    const rgb = a => a ? String(a).slice(-6).toUpperCase() : "";
+    const candidates = [ws.properties && ws.properties.tabColor && ws.properties.tabColor.argb,
+                        (ws.getRow(headRow).getCell(1).fill || {}).fgColor && ws.getRow(headRow).getCell(1).fill.fgColor.argb].map(rgb);
+    for(const c of candidates){
+      const key = c && (Object.keys(ACCENT_XL).find(k => rgb(ACCENT_XL[k].fill) === c) || Object.keys(OLD_FILLS).find(k => OLD_FILLS[k] === c));
+      if(key) return key;
+    }
+    return undefined;
+  }
+
+  function readRows(ws, headRow, format, col){
+    const categories = [];
+    let cur = null;
+    const openCat = name => { cur = { id: nid(), name, items: [] }; categories.push(cur); };
+
+    for(let r = headRow + 1; r <= ws.rowCount; r++){
+      const row = ws.getRow(r);
+      const v = n => n ? row.getCell(n).value : null;
+      const name = cellText(v(col.name));
+      const budget = cellMoney(v(col.budget)), actual = cellMoney(v(col.actual));
+
+      if(format === "now"){
+        if(name === "전체 합계") continue;
+        // Category band: merged across the row, or "N. 이름" with no amounts
+        const blankAmounts = !cellText(v(col.budget)) && !cellText(v(col.actual));
+        if(name && (row.getCell(1).isMerged || (blankAmounts && /^\d+\.\s/.test(name)))){
+          openCat(name.replace(/^\d+\.\s*/, ""));
+          continue;
+        }
+        if(cur && (name === `${cur.name} 소계` || isSumFormula(v(col.budget)))) continue;
+      } else {
+        const cat = cellText(v(col.cat));
+        if(name === "소계" || name === "전체 합계"){ cur = null; continue; }
+        if(cat && (!cur || cat !== cur.name)) openCat(cat);
+      }
+
+      if(!name && !budget && !actual) continue;
+      if(!cur) openCat("기타");
+      const item = { id: nid(), name, budget, actual, done: col.done ? cellDone(v(col.done)) : false };
+      const qty = col.qty ? parseInt(cellText(v(col.qty)).replace(/[^\d]/g, ""), 10) : 0;
+      if(qty > 1) item.qty = Math.min(qty, 9999);
+      const pickName = col.pick ? cellText(v(col.pick)) : "";
+      if(pickName){
+        const lv = col.link ? v(col.link) : null;
+        const opt = { id: nid(), name: pickName, link: col.link ? safeLink((lv && lv.hyperlink) || cellText(lv)) : "", price: Math.round(budget / (item.qty || 1)) };
+        item.options = [opt];
+        item.choiceId = opt.id;
+      }
+      cur.items.push(item);
+    }
+    categories.forEach(c => { if(!c.items.length) c.items.push(newItem()); });
+    // Title sits in A1 above the header; if the header was moved to the top, fall back to the sheet name
+    const title = headRow > 1 ? cellText(ws.getCell("A1").value) : "";
+    return { title: title || ws.name, categories, accent: accentFromSheet(ws, headRow), sheet: ws.name };
+  }
+
+  // Reads a 선택지 sheet and replaces each matching item's options with the full list.
+  // Items are matched by 시트 + 카테고리 + 항목; repeated names are matched in order (groups split by blank rows).
+  function attachOptionSheet(ws, plans){
+    const head = ws.getRow(1);
+    const col = {};
+    for(let n = 1; n <= 12; n++){
+      const i = OPT_HEAD.indexOf(cellText(head.getCell(n).value));
+      if(i >= 0 && !col[OPT_HEAD[i]]) col[OPT_HEAD[i]] = n;
+    }
+    if(!(col["항목"] && col["선택지"])) return;
+
+    const lists = new Map();   // item object → [{ option, chosen }]
+    const seen = new Map();    // "sheet|cat|item" → how many item groups so far
+    let prevKey = null;
+    for(let r = 2; r <= ws.rowCount; r++){
+      const row = ws.getRow(r);
+      const v = name => col[name] ? row.getCell(col[name]).value : null;
+      const optName = cellText(v("선택지"));
+      if(!optName){ prevKey = null; continue; } // blank row = next item
+      const sheet = cellText(v("시트")), catName = cellText(v("카테고리")), itemName = cellText(v("항목"));
+      const key = `${sheet}|${catName}|${itemName}`;
+      if(key !== prevKey){ seen.set(key, (seen.get(key) || 0) + 1); prevKey = key; }
+
+      const plan = plans.find(p => p.sheet === sheet) || (plans.length === 1 ? plans[0] : null);
+      if(!plan) continue;
+      const matches = [];
+      plan.categories.forEach(c => { if(!catName || c.name === catName) c.items.forEach(it => { if(it.name === itemName) matches.push(it); }); });
+      const item = matches[seen.get(key) - 1] || matches[0];
+      if(!item) continue;
+      const lv = v("링크");
+      const option = { id: nid(), name: optName, link: safeLink((lv && lv.hyperlink) || cellText(lv)), price: cellMoney(v("가격")), note: cellText(v("비고")) };
+      if(!lists.has(item)) lists.set(item, []);
+      lists.get(item).push({ option, chosen: cellDone(v("선택")) });
+    }
+
+    lists.forEach((list, item) => {
+      const prevChosen = chosenOf(item); // from the budget sheet's 선택지 column
+      item.options = list.map(x => x.option);
+      const pick = list.find(x => x.chosen) || (prevChosen && list.find(x => x.option.name === prevChosen.name));
+      item.choiceId = pick ? pick.option.id : null;
+    });
+  }
+
+  const importInput = document.getElementById("importFile");
+  document.getElementById("importBtn").addEventListener("click", () => { closeMenus(); importInput.click(); });
+  importInput.addEventListener("change", async () => {
+    const file = importInput.files[0];
+    importInput.value = "";
+    if(!file) return;
+    if(typeof ExcelJS === "undefined"){ toast("엑셀 도구를 불러오지 못했어요. 새로고침 후 다시 시도해 주세요."); return; }
+
+    let found;
+    try{
+      const wb = new ExcelJS.Workbook();
+      await wb.xlsx.load(await file.arrayBuffer());
+      found = wb.worksheets.map(parsePlanSheet).filter(Boolean);
+      wb.worksheets.forEach(ws => attachOptionSheet(ws, found));
+      found.forEach(p => { delete p.sheet; });
+    }catch(err){
+      toast("파일을 읽지 못했어요. 엑셀(.xlsx) 파일인지 확인해 주세요.");
+      return;
+    }
+    if(!found.length){ toast("이 사이트에서 내보낸 형식의 예산표 시트를 찾지 못했어요."); return; }
+
+    const snap = snapshot();
+    // An untouched starter budget is replaced instead of being left behind as an empty tab
+    const pristine = store.plans.length === 1
+      && !state.categories.some(c => c.items.some(hasContent))
+      && state.categories.every(c => !c.name || c.name === "첫 번째 카테고리");
+    if(pristine) store.plans = [];
+    const added = found.map(p => newPlan(p));
+    store.plans.push(...added);
+    store.activeId = added[0].id;
+    syncActive();
+    render(); save();
+    toast(added.length === 1 ? `새 탭으로 불러왔어요 · ${planLabel(added[0])}` : `예산표 ${added.length}개를 탭으로 불러왔어요`, snap);
+  });
+
+  // ---- ?tpl=wedding 처럼 주소로 템플릿 열기 (소개 페이지에서 넘어올 때) ----
+  (function openFromUrl(){
+    let key = "";
+    try{ key = new URLSearchParams(location.search).get("tpl") || ""; }catch(e){}
+    if(!key || !TEMPLATES[key]) return;
+    const plan = newPlan(fromTemplate(key));
+    // A starter budget nobody has typed in yet is replaced, not left behind as an empty tab
+    const pristine = store.plans.length === 1
+      && !store.plans[0].categories.some(c => c.items.some(hasContent))
+      && store.plans[0].categories.every(c => !c.name || c.name === "첫 번째 카테고리");
+    if(pristine) store.plans = [];
+    store.plans.push(plan);
+    store.activeId = plan.id;
+    syncActive();
+    save();
+    // Drop the parameter so a reload doesn't add the template again
+    try{ history.replaceState(null, "", location.pathname + location.hash); }catch(e){}
+  })();
+
+  render();
+})();
+</script>
+</body>
+</html>
