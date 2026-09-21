@@ -118,9 +118,13 @@ body[data-cols="4"]{--wrap:1640px}
 .hero-cta:hover{filter:brightness(1.06)}
 .hero-cta:active{filter:brightness(0.94)}
 .hero-note{color:var(--muted);font-size:13px;margin:10px 0 0}
-.hero-links{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px}
-.hero-links a{color:var(--accent);font-size:13.5px;text-decoration:none;border-bottom:1px solid transparent}
-.hero-links a:hover{border-bottom-color:currentColor}
+.card-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.card-links a{
+  color:var(--accent);font-size:13px;text-decoration:none;
+  border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--sheet);
+  transition:border-color .15s;
+}
+.card-links a:hover{border-color:var(--accent)}
 
 /* 아래쪽 안내 */
 .about{max-width:var(--wrap);margin:0 auto;padding:8px 20px 0}
@@ -183,7 +187,7 @@ body[data-cols="4"]{--wrap:1640px}
 .intro:focus{outline:none;border-bottom-color:var(--accent)}
 .intro::placeholder{color:var(--muted)}
 .intro{margin-bottom:22px}
-.hero-aff{margin:14px 0 0;max-width:60ch}
+.hero-aff{margin:14px 0 0;word-break:keep-all}
 .hero-aff a{color:var(--accent);white-space:nowrap}
 
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;margin-bottom:28px}
@@ -624,18 +628,14 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
       엑셀(xlsx) 파일로 내보내 구글 시트에서 그대로 이어서 쓸 수 있어요.
     </p>
     <ul class="hero-points">
-      <li><b>템플릿으로 시작</b><span>결혼 준비 8개 카테고리, 출산·육아 50개 항목이 미리 들어 있어요.</span></li>
+      <li><b>템플릿으로 시작</b><span>결혼 준비 8개 카테고리, 출산·육아 48개 항목이 미리 들어 있어요.</span>
+        <nav class="card-links" aria-label="템플릿 안내"><a href="wedding/">결혼 준비</a><a href="baby/">출산 준비</a><a href="guestbook/">축의금</a></nav></li>
       <li><b>선택지 비교</b><span>항목마다 제품·업체 후보를 가격과 함께 모아 두고 하나를 고르면 예산이 바뀌어요.</span></li>
       <li><b>엑셀 내보내기·불러오기</b><span>탭마다 시트로 저장되고, 내보낸 파일을 다시 불러와 이어서 작업할 수 있어요.</span></li>
     </ul>
-    <nav class="hero-links" aria-label="템플릿 안내">
-      <a href="wedding/">결혼 준비 예산표</a>
-      <a href="baby/">출산 준비물 리스트</a>
-      <a href="guestbook/">축의금 방명록 양식</a>
-    </nav>
     <a class="hero-cta" href="#planner">예산표 만들기</a>
     <p class="hero-note">무료 · 가입 없음 · 브라우저에 자동 저장</p>
-    <p class="hero-aff aff-note">이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따라 일정액의 수수료를 제공받습니다. <a href="../privacy/">개인정보 처리방침</a></p>
+    <p class="hero-aff aff-note">이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따라 일정액의 수수료를 제공받습니다. · <a href="../privacy/">개인정보 처리방침</a></p>
   </div>
 </header>
 
