@@ -143,3 +143,40 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
 .my-name{font-weight:600}
 .my-meta{color:var(--muted);font-size:13px;margin-left:auto}
 .my-empty,.my-note{color:var(--muted);font-size:13.5px;margin:10px 0 0}
+
+/* 로그인 버튼과 창 */
+.auth-slot{flex:none;display:flex;align-items:center}
+.auth-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  border:1px solid var(--line);background:var(--sheet);color:var(--ink);
+  font-size:13.5px;padding:6px 12px;border-radius:7px;list-style:none;cursor:pointer;
+}
+.auth-btn::-webkit-details-marker{display:none}
+.auth-btn:hover{border-color:color-mix(in srgb, var(--ink) 22%, var(--sheet))}
+.auth-btn img{border-radius:50%}
+.auth-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-fill)}
+.auth-name{max-width:8em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.auth-menu{position:relative}
+.auth-pop{
+  position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:180px;padding:8px;
+  background:var(--sheet);border:1px solid var(--line);border-radius:10px;
+  box-shadow:0 8px 24px rgba(15,20,30,.14);
+}
+.auth-hint{color:var(--muted);font-size:12px;margin:2px 4px 6px}
+.auth-pop button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:6px;font-size:14px}
+.auth-pop button:hover{background:var(--paper)}
+
+.login-dialog{
+  border:0;border-radius:14px;padding:0;background:var(--sheet);color:var(--ink);
+  max-width:380px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(15,20,30,.22);
+}
+.login-dialog::backdrop{background:rgba(15,20,30,.45)}
+.login-inner{padding:26px 24px 20px;display:flex;flex-direction:column;gap:10px}
+.login-inner h2{margin:0;font-size:19px}
+.login-inner p{color:var(--muted);font-size:13.5px;margin:0;line-height:1.6}
+.login-inner button{border:0;border-radius:8px;padding:12px 16px;font-size:15px;font-weight:600}
+.login-kakao{background:#FEE500;color:#191600;margin-top:8px}
+.login-google{background:var(--sheet);color:var(--ink);border:1px solid var(--line) !important}
+.login-kakao:hover,.login-google:hover{filter:brightness(0.97)}
+.login-note{font-size:12px !important;margin-top:4px !important}
+.login-close{background:none;color:var(--muted);font-weight:400 !important;font-size:13.5px !important;padding:6px !important}

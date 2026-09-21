@@ -104,12 +104,39 @@
     state = plan;
   }
 
-  let saveTimer = null;
+  let saveTimer = null, cloudTimer = null;
   function save(){
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
       try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
     }, 250);
+    saveToAccount();
+  }
+
+  // 로그인했을 때만 계정에도 저장합니다. 실패해도 브라우저 저장은 그대로예요.
+  const Auth = window.BudgetAuth;
+  function saveToAccount(){
+    if(!(Auth && Auth.enabled && Auth.user)) return;
+    clearTimeout(cloudTimer);
+    cloudTimer = setTimeout(() => { Auth.savePlans(store.plans); }, 1500);
+  }
+
+  // 로그인 직후: 계정의 예산표와 이 브라우저의 것을 합칩니다
+  async function mergeWithAccount(){
+    if(!(Auth && Auth.enabled && Auth.user)) return;
+    const mine = await Auth.listPlans();
+    if(!mine) return;
+    const byId = new Map(mine.map(p => [p.id, p]));
+    let changed = false;
+    store.plans.forEach(p => { if(!byId.has(p.id)){ byId.set(p.id, p); changed = true; } }); // 이 브라우저에만 있던 것
+    const merged = [...byId.values()];
+    if(merged.length !== store.plans.length) changed = true;
+    store.plans = merged;
+    if(!store.plans.some(p => p.id === store.activeId)) store.activeId = store.plans[0] && store.plans[0].id;
+    syncActive();
+    render();
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
+    if(changed) Auth.savePlans(store.plans);
   }
 
   // ---- formatting ----
@@ -1799,4 +1826,9 @@
   })();
 
   render();
+
+  if(Auth && Auth.enabled){
+    Auth.onChange(user => { if(user) mergeWithAccount(); });
+    Auth.init();
+  }
 })();
