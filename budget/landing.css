@@ -69,6 +69,6 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
 
 footer{border-top:1px solid var(--line);background:var(--sheet)}
 .foot-inner{max-width:var(--wrap);margin:0 auto;padding:24px 20px 40px;color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px 18px}
-.aff-note{max-width:var(--wrap);margin:0 auto;padding:0 20px 32px;color:var(--muted);font-size:12px;line-height:1.6}
+.aff-note{max-width:var(--wrap);margin:0 auto;padding:0 20px 32px;color:var(--muted);font-size:12px;line-height:1.6;word-break:keep-all}
 footer a{text-decoration:none}
 footer a:hover{text-decoration:underline}

@@ -111,14 +111,14 @@ body[data-cols="4"]{--wrap:1640px}
 .hero-points b{display:block;font-size:14.5px;margin-bottom:4px}
 .hero-points span{color:var(--muted);font-size:13.5px;line-height:1.6}
 .hero-cta{
-  display:inline-block;margin-top:22px;
+  display:inline-block;margin-top:18px;
   background:var(--accent-fill);color:var(--on-accent);text-decoration:none;
   font-weight:600;padding:11px 20px;border-radius:8px;
 }
 .hero-cta:hover{filter:brightness(1.06)}
 .hero-cta:active{filter:brightness(0.94)}
 .hero-note{color:var(--muted);font-size:13px;margin:10px 0 0}
-.hero-links{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px}
+.hero-links{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px}
 .hero-links a{color:var(--accent);font-size:13.5px;text-decoration:none;border-bottom:1px solid transparent}
 .hero-links a:hover{border-bottom-color:currentColor}
 
@@ -184,7 +184,7 @@ body[data-cols="4"]{--wrap:1640px}
 .intro::placeholder{color:var(--muted)}
 .intro{margin-bottom:22px}
 .hero-aff{margin:14px 0 0;max-width:60ch}
-.hero-aff a{color:var(--accent)}
+.hero-aff a{color:var(--accent);white-space:nowrap}
 
 .toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;margin-bottom:28px}
 .view-opts{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
@@ -515,7 +515,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 
 .foot-note{color:var(--muted);font-size:13.5px;margin:22px 0 0}
 /* 쿠팡 파트너스 고지 (링크가 보이는 곳마다 표시) */
-.aff-note{color:var(--muted);font-size:12px;line-height:1.6;margin:8px 0 0}
+.aff-note{color:var(--muted);font-size:12px;line-height:1.6;margin:8px 0 0;word-break:keep-all}
 .opt-inner .aff-note{margin:2px 0 0;padding:0 20px 2px}
 .foot-actions{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:13.5px}
 .foot-actions button{border:0;background:none;color:var(--muted);text-decoration:underline;padding:0;font-size:inherit}
@@ -628,13 +628,13 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
       <li><b>선택지 비교</b><span>항목마다 제품·업체 후보를 가격과 함께 모아 두고 하나를 고르면 예산이 바뀌어요.</span></li>
       <li><b>엑셀 내보내기·불러오기</b><span>탭마다 시트로 저장되고, 내보낸 파일을 다시 불러와 이어서 작업할 수 있어요.</span></li>
     </ul>
-    <a class="hero-cta" href="#planner">예산표 만들기</a>
-    <p class="hero-note">무료 · 가입 없음 · 브라우저에 자동 저장</p>
     <nav class="hero-links" aria-label="템플릿 안내">
       <a href="wedding/">결혼 준비 예산표</a>
       <a href="baby/">출산 준비물 리스트</a>
       <a href="guestbook/">축의금 방명록 양식</a>
     </nav>
+    <a class="hero-cta" href="#planner">예산표 만들기</a>
+    <p class="hero-note">무료 · 가입 없음 · 브라우저에 자동 저장</p>
     <p class="hero-aff aff-note">이 사이트는 쿠팡 파트너스 활동의 일환으로, 이에 따라 일정액의 수수료를 제공받습니다. <a href="../privacy/">개인정보 처리방침</a></p>
   </div>
 </header>
