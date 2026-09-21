@@ -2941,6 +2941,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
     };
   }
   const sheetRef = (sheet, cell) => `'${sheet.replace(/'/g, "''")}'!${cell}`;
+  const XL2 = n => String.fromCharCode(64 + n); // column letter by index
 
   // Plan sheet columns, in the same order as the screen
   const XC = { name: 1, pick: 2, qty: 3, budget: 4, actual: 5, diff: 6, done: 7, link: 8 };
@@ -3016,12 +3017,17 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
         const range = links && links.ranges.get(it);
         if(range){
           links.itemRows.set(it, r);
-          const names = sheetRef(links.sheet, `$D$${range.first}:$D$${range.last}`);
-          const prices = sheetRef(links.sheet, `$E$${range.first}:$E$${range.last}`);
+          // The item name jumps to its 선택지 block; the text still reads as the plain name on import
+          row.getCell(XC.name).value = {
+            formula: `HYPERLINK("#'${links.sheet.replace(/'/g, "''")}'!A${range.band}","${String(it.name).replace(/"/g, '""')}")`,
+            result: it.name
+          };
+          const names = sheetRef(links.sheet, `$${XL2(OPT_C.name)}$${range.first}:$${XL2(OPT_C.name)}$${range.last}`);
+          const prices = sheetRef(links.sheet, `$${XL2(OPT_C.price)}$${range.first}:$${XL2(OPT_C.price)}$${range.last}`);
           const P = `${XL("pick")}${r}`, Q = `${XL("qty")}${r}`;
           row.getCell(XC.pick).dataValidation = {
             type: "list", allowBlank: true, formulae: [names],
-            showErrorMessage: true, errorStyle: "warning", errorTitle: "선택지", error: "선택지 시트에 있는 이름을 골라 주세요"
+            showErrorMessage: true, errorStyle: "warning", errorTitle: "선택지", error: "선택지 시트의 이 항목 칸에 있는 이름을 골라 주세요. 새로 적으면 목록에 바로 나타나요."
           };
           // A budget typed by hand (not price × 수량) stays as typed; otherwise it follows the dropdown.
           const followsPick = !chosen || !chosen.price || it.budget === chosen.price * qtyOf(it);
@@ -3284,59 +3290,96 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 
   // 선택지 sheet: every option of every item, chosen or not, so nothing is lost on export.
   // plans: [{ plan, sheet }] — "시트" names the budget sheet the item lives on (used when importing).
-  const OPT_HEAD = ["시트", "카테고리", "항목", "선택지", "가격", "링크", "선택", "비고"];
+  const OPT_HEAD = ["선택", "선택지", "가격", "비고", "링크"];
+  // One block per item: a title row, its 선택지, then two empty lines to type into.
+  // Row numbers are worked out here because the plan sheet's dropdowns point at them.
+  const OPT_SPARE = 2;
+  const OPT_C = { mark: 1, name: 2, price: 3, note: 4, link: 5 }; // 선택지 sheet columns
   function layoutOptions(plans){
-    const rows = [], ranges = new Map();
+    const blocks = [], ranges = new Map();
+    const multi = plans.length > 1;
+    let r = 2; // row 1 is the header
     plans.forEach(({ plan, sheet }) => plan.categories.forEach(c => c.items.forEach(it => {
-      if(!(it.options || []).length || !hasContent(it)) return;
-      if(rows.length) rows.push(null); // blank row between items: easier to read, and marks the next item on import
-      const first = rows.length + 2;
-      it.options.forEach(o => rows.push({ sheet, cat: c.name || "카테고리", item: it, o, chosen: o.id === it.choiceId, t: accentXL(plan.accent) }));
-      ranges.set(it, { first, last: rows.length + 1 });
+      if(!hasContent(it)) return;
+      const opts = it.options || [];
+      const band = r, first = r + 1, last = first + opts.length + OPT_SPARE - 1;
+      blocks.push({ sheet, cat: c.name || "카테고리", item: it, opts, t: accentXL(plan.accent), band, first, last, multi });
+      ranges.set(it, { band, first, last });
+      r = last + 2; // one empty line between blocks
     })));
-    return { rows, ranges };
+    return { blocks, ranges };
   }
 
   function addOptionSheet(wb, sheetName, layout, itemRows, theme){
-    const { rows, ranges } = layout;
-    if(!rows.length) return;
+    const { blocks } = layout;
+    if(!blocks.length) return;
     const ws = wb.addWorksheet(sheetName, { views: [{ state: "frozen", ySplit: 1, showGridLines: false }] });
     if(theme) ws.properties.tabColor = { argb: theme.fill };
-    ws.columns = [{ width: 18 }, { width: 16 }, { width: 20 }, { width: 28 }, { width: 14 }, { width: 28 }, { width: 7 }, { width: 32 }];
+    ws.columns = [{ width: 7 }, { width: 34 }, { width: 14 }, { width: 30 }, { width: 30 }];
+    const NC = OPT_HEAD.length;
+
     const head = ws.getRow(1);
     head.values = OPT_HEAD;
     head.height = 24;
-    head.eachCell(cell => {
+    for(let n = 1; n <= NC; n++){
+      const cell = head.getCell(n);
       cell.font = { bold: true, color: { argb: theme ? theme.on : "FFFFFFFF" } };
       cell.fill = solid(theme ? theme.fill : INK);
-      cell.alignment = { vertical: "middle", horizontal: "center" };
-    });
-    rows.forEach((x, i) => {
-      if(!x) return;
-      const n = i + 2;
-      const row = ws.getRow(n);
-      const picked = sheetRef(x.sheet, `${XL("pick")}${itemRows.get(x.item)}`);
-      row.values = [x.sheet, x.cat, x.item.name, x.o.name, x.o.price || 0,
-        x.o.link ? { text: hostOf(x.o.link) || x.o.link, hyperlink: x.o.link } : "",
-        { formula: `IF(${picked}=D${n},"✓","")`, result: x.chosen ? "✓" : "" }, // follows the dropdown
-        x.o.note || ""];
-      row.height = 20;
-      row.eachCell({ includeEmpty: true }, (cell, k) => {
-        if(k > OPT_HEAD.length) return;
-        cell.border = { bottom: edge(LINE) };
-        cell.alignment = k === 7 ? { vertical: "middle", horizontal: "center" } : { vertical: "middle" };
-      });
-      row.getCell(5).numFmt = moneyFmt;
-      row.getCell(6).font = { color: { argb: x.t.text }, underline: !!x.o.link };
-      row.getCell(7).font = { bold: true, color: { argb: x.t.text } };
-    });
-    // Highlight the picked option of each item; conditional, so it moves with the dropdown
-    ranges.forEach(({ first, last }, it) => {
-      const t = rows[first - 2].t;
+      cell.alignment = { vertical: "middle", horizontal: n === OPT_C.mark ? "center" : "left" };
+    }
+
+    blocks.forEach(b => {
+      // Title row: 카테고리 › 항목, with a jump back to the item on the plan sheet
+      const band = ws.getRow(b.band);
+      ws.mergeCells(b.band, 1, b.band, NC - 1);
+      band.getCell(1).value = (b.multi ? `${b.sheet} › ` : "") + `${b.cat} › ${b.item.name}`;
+      band.getCell(1).font = { bold: true, size: 12, color: { argb: b.t.text } };
+      band.getCell(1).alignment = { vertical: "middle", indent: 1 };
+      const itemRow = itemRows.get(b.item);
+      if(itemRow){
+        band.getCell(NC).value = { formula: `HYPERLINK("#'${b.sheet.replace(/'/g, "''")}'!A${itemRow}","예산표로 ↗")`, result: "예산표로 ↗" };
+        band.getCell(NC).font = { size: 11, color: { argb: b.t.text }, underline: true };
+        band.getCell(NC).alignment = { vertical: "middle", horizontal: "right" };
+      }
+      band.height = 24;
+      for(let n = 1; n <= NC; n++){
+        band.getCell(n).fill = solid(b.t.soft);
+        band.getCell(n).border = { top: edge(b.t.fill), bottom: edge(b.t.fill) };
+      }
+
+      // 선택지 lines, then the spare ones — both inside the dropdown's range
+      const picked = itemRow ? sheetRef(b.sheet, `${XL("pick")}${itemRow}`) : "";
+      for(let i = 0; i < b.opts.length + OPT_SPARE; i++){
+        const r = b.first + i, o = b.opts[i] || null;
+        const row = ws.getRow(r);
+        row.height = 20;
+        if(picked) row.getCell(OPT_C.mark).value = { formula: `IF(AND(${picked}<>"",${picked}=${XL2(OPT_C.name)}${r}),"✓","")`, result: o && o.id === b.item.choiceId ? "✓" : "" };
+        if(o){
+          row.getCell(OPT_C.name).value = o.name;
+          row.getCell(OPT_C.price).value = o.price || 0;
+          row.getCell(OPT_C.note).value = o.note || "";
+          if(o.link) row.getCell(OPT_C.link).value = { text: hostOf(o.link) || o.link, hyperlink: o.link };
+        } else if(i === b.opts.length){
+          row.getCell(OPT_C.note).value = "↑ 이 줄에 이름과 가격을 적으면 예산표 드롭다운에 바로 나와요";
+          row.getCell(OPT_C.note).font = { size: 10, italic: true, color: { argb: MUTED } };
+        }
+        for(let n = 1; n <= NC; n++){
+          const cell = row.getCell(n);
+          cell.border = { bottom: edge(LINE) };
+          if(!cell.alignment) cell.alignment = { vertical: "middle" };
+        }
+        row.getCell(OPT_C.mark).alignment = { vertical: "middle", horizontal: "center" };
+        row.getCell(OPT_C.mark).font = { bold: true, color: { argb: b.t.text } };
+        row.getCell(OPT_C.name).alignment = { vertical: "middle", indent: 1 };
+        row.getCell(OPT_C.price).numFmt = moneyFmt;
+        if(o && o.link) row.getCell(OPT_C.link).font = { color: { argb: b.t.text }, underline: true };
+      }
+
+      // The picked line stays highlighted, wherever it moves to
       ws.addConditionalFormatting({
-        ref: `A${first}:H${last}`,
-        rules: [{ type: "expression", formulae: [`$G${first}="✓"`], priority: 1,
-                  style: { fill: { type: "pattern", pattern: "solid", bgColor: { argb: t.soft } }, font: { bold: true } } }]
+        ref: `A${b.first}:${XL2(NC)}${b.last}`,
+        rules: [{ type: "expression", formulae: [`$${XL2(OPT_C.mark)}${b.first}="✓"`], priority: 1,
+                  style: { fill: { type: "pattern", pattern: "solid", bgColor: { argb: b.t.soft } }, font: { bold: true } } }]
       });
     });
   }
@@ -3538,46 +3581,49 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
     return { title: title || ws.name, categories, accent: accentFromSheet(ws, headRow), sheet: ws.name };
   }
 
-  // Reads a 선택지 sheet and replaces each matching item's options with the full list.
-  // Items are matched by 시트 + 카테고리 + 항목; repeated names are matched in order (groups split by blank rows).
+  // Reads a 선택지 sheet: a title row per item ("카테고리 › 항목", or "시트 › 카테고리 › 항목"
+  // when several tabs were exported), then that item's lines underneath.
   function attachOptionSheet(ws, plans){
     const head = ws.getRow(1);
-    const col = {};
-    for(let n = 1; n <= 12; n++){
-      const i = OPT_HEAD.indexOf(cellText(head.getCell(n).value));
-      if(i >= 0 && !col[OPT_HEAD[i]]) col[OPT_HEAD[i]] = n;
-    }
-    if(!(col["항목"] && col["선택지"])) return;
+    if(cellText(head.getCell(OPT_C.name).value) !== "선택지") return;
 
     const lists = new Map();   // item object → [{ option, chosen }]
-    const seen = new Map();    // "sheet|cat|item" → how many item groups so far
-    let prevKey = null;
+    const seen = new Map();    // "sheet|cat|item" → how many blocks with that title so far
+    let item = null;
+
     for(let r = 2; r <= ws.rowCount; r++){
       const row = ws.getRow(r);
-      const v = name => col[name] ? row.getCell(col[name]).value : null;
-      const optName = cellText(v("선택지"));
-      if(!optName){ prevKey = null; continue; } // blank row = next item
-      const sheet = cellText(v("시트")), catName = cellText(v("카테고리")), itemName = cellText(v("항목"));
-      const key = `${sheet}|${catName}|${itemName}`;
-      if(key !== prevKey){ seen.set(key, (seen.get(key) || 0) + 1); prevKey = key; }
+      const title = cellText(row.getCell(1).value);
+      const name = cellText(row.getCell(OPT_C.name).value);
 
-      const plan = plans.find(p => p.sheet === sheet) || (plans.length === 1 ? plans[0] : null);
-      if(!plan) continue;
-      const matches = [];
-      plan.categories.forEach(c => { if(!catName || c.name === catName) c.items.forEach(it => { if(it.name === itemName) matches.push(it); }); });
-      const item = matches[seen.get(key) - 1] || matches[0];
-      if(!item) continue;
-      const lv = v("링크");
-      const option = { id: nid(), name: optName, link: safeLink((lv && lv.hyperlink) || cellText(lv)), price: cellMoney(v("가격")), note: cellText(v("비고")) };
-      if(!lists.has(item)) lists.set(item, []);
-      lists.get(item).push({ option, chosen: cellDone(v("선택")) });
+      if(title.includes("›")){ // title row
+        const parts = title.split("›").map(t => t.trim());
+        const itemName = parts.pop(), catName = parts.pop() || "", sheet = parts.pop() || "";
+        const key = `${sheet}|${catName}|${itemName}`;
+        seen.set(key, (seen.get(key) || 0) + 1);
+        const plan = (sheet && plans.find(p => p.sheet === sheet)) || (plans.length === 1 ? plans[0] : null);
+        const matches = [];
+        if(plan) plan.categories.forEach(c => { if(!catName || c.name === catName) c.items.forEach(it => { if(it.name === itemName) matches.push(it); }); });
+        item = matches[seen.get(key) - 1] || matches[0] || null;
+        if(item && !lists.has(item)) lists.set(item, []);
+        continue;
+      }
+      if(!item || !name) continue; // spare lines and the gap between blocks
+
+      const lv = row.getCell(OPT_C.link).value;
+      lists.get(item).push({
+        option: { id: nid(), name, price: cellMoney(row.getCell(OPT_C.price).value),
+                  note: cellText(row.getCell(OPT_C.note).value),
+                  link: safeLink((lv && lv.hyperlink) || cellText(lv)) },
+        chosen: cellDone(row.getCell(OPT_C.mark).value)
+      });
     }
 
-    lists.forEach((list, item) => {
-      const prevChosen = chosenOf(item); // from the budget sheet's 선택지 column
-      item.options = list.map(x => x.option);
+    lists.forEach((list, it) => {
+      const prevChosen = chosenOf(it); // from the 예산표 sheet's 선택지 column
+      it.options = list.map(x => x.option);
       const pick = list.find(x => x.chosen) || (prevChosen && list.find(x => x.option.name === prevChosen.name));
-      item.choiceId = pick ? pick.option.id : null;
+      it.choiceId = pick ? pick.option.id : null;
     });
   }
 
