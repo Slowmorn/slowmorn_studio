@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>예산표 만들기 · 준비 예산표</title>
+<meta name="description" content="결혼 준비, 출산·육아 준비, 축의금 방명록 예산표를 만드는 화면. 템플릿으로 시작해 항목별 예산과 실제 지출을 적고 엑셀로 내보낼 수 있어요.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://slowmorn.com/budget/planner/">
+<meta property="og:url" content="https://slowmorn.com/budget/planner/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="예산표 만들기 · 준비 예산표">
+<meta property="og:description" content="템플릿으로 시작해 항목별 예산을 정리하고 엑셀로 내보내세요.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../favicon.svg">
+<meta property="og:image" content="https://slowmorn.com/budget/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://slowmorn.com/budget/og.png">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZB0D0NTBJ8"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-ZB0D0NTBJ8');
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../assets/app.css">
+</head>
+<body>
+<div class="wrap" id="planner">
+  <nav class="tabs" aria-label="예산표 목록">
+    <div id="tabList" class="tab-list" role="tablist"></div>
+    <button id="addPlan" class="tab-add" type="button" aria-label="새 예산표 만들기"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>새 예산표</span></button>
+  </nav>
+
+  <input id="planTitle" class="plan-title" type="text" aria-label="예산표 이름" value="">
+  <textarea id="planIntro" class="intro" rows="1" aria-label="예산표 설명" placeholder="카테고리와 항목을 적고 예산과 실제 쓴 돈을 입력하면 합계가 바로 계산돼요. 이 설명은 눌러서 고칠 수 있어요."></textarea>
+
+  <div class="toolbar">
+    <div class="tool-group">
+    <details class="menu tpl-menu">
+      <summary class="tpl-btn"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="2.5" y="1.5" width="11" height="13" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5 5.5h6M5 8h6M5 10.5h3.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>템플릿 불러오기<svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+      <div class="menu-pop">
+        <div class="menu-note">지금 예산표의 내용이 템플릿으로 바뀌어요</div>
+        <button type="button" id="tplBlank" data-tpl="blank" data-label="빈 목록">빈 목록<small>카테고리 1개와 빈 항목으로 새로 시작</small></button>
+        <!-- the other templates are added from #templateData -->
+      </div>
+    </details>
+    <button id="importBtn" class="tool-btn" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.8 6.8L8 10l3.2-3.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 10.5v2a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>엑셀 불러오기</button>
+    <input id="importFile" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden>
+    </div>
+    <div class="view-opts">
+    <label class="opt-toggle"><input type="checkbox" id="actualToggle" checked><span>실제 지출 칸</span></label>
+    <div class="color-pick">
+      <details class="menu color-menu">
+        <summary class="color-btn" aria-label="테마 색상 고르기" title="테마 색상"><span class="color-dot" aria-hidden="true"></span><span id="colorName">녹색</span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary>
+        <div class="menu-pop" role="group" aria-label="테마 색상"><button type="button" class="swatch" data-accent="green" aria-pressed="false">녹색</button><button type="button" class="swatch" data-accent="navy" aria-pressed="false">네이비</button><button type="button" class="swatch" data-accent="pink" aria-pressed="false">핑크</button><button type="button" class="swatch" data-accent="yellow" aria-pressed="false">노랑</button><button type="button" class="swatch" data-accent="purple" aria-pressed="false">보라</button><button type="button" class="swatch" data-accent="orange" aria-pressed="false">주황</button></div>
+      </details>
+    </div>
+    <div class="view-toggle">
+      <div class="seg" role="group" aria-label="카테고리를 몇 열로 볼지">
+        <button type="button" data-cols="1" aria-pressed="true"><svg viewBox="0 0 16 12" aria-hidden="true"><rect x="0.5" y="0.5" width="15" height="11" rx="1.5" fill="none" stroke="currentColor"/></svg>1열</button>
+        <button type="button" data-cols="2" aria-pressed="false"><svg viewBox="0 0 16 12" aria-hidden="true"><rect x="0.5" y="0.5" width="6.5" height="11" rx="1.5" fill="none" stroke="currentColor"/><rect x="9" y="0.5" width="6.5" height="11" rx="1.5" fill="none" stroke="currentColor"/></svg>2열</button>
+        <button type="button" data-cols="4" aria-pressed="false"><svg viewBox="0 0 16 12" aria-hidden="true"><rect x="0.5" y="0.5" width="2.6" height="11" rx="1" fill="none" stroke="currentColor"/><rect x="4.6" y="0.5" width="2.6" height="11" rx="1" fill="none" stroke="currentColor"/><rect x="8.7" y="0.5" width="2.6" height="11" rx="1" fill="none" stroke="currentColor"/><rect x="12.9" y="0.5" width="2.6" height="11" rx="1" fill="none" stroke="currentColor"/></svg>4열</button>
+      </div>
+    </div>
+    </div>
+  </div>
+
+  <main id="cats" aria-live="polite"></main>
+  <button id="addCat" class="add-cat">카테고리 추가</button>
+
+  <p class="foot-note">입력한 내용은 이 브라우저에 자동으로 저장돼요. 다른 기기에서 보거나 오래 보관하려면 엑셀로 내보내 두세요.</p>
+  <div class="foot-actions"><button id="clearAllItems" type="button">카테고리만 남기고 항목 비우기</button><button id="resetAll" type="button">이 예산표 모두 지우기</button></div>
+</div>
+
+<div class="totals" role="region" aria-label="합계">
+  <div class="totals-inner">
+    <div class="t-main">
+      <div class="t-label" id="tBudgetLabel">예산 합계</div>
+      <div class="t-num" id="tBudget">0원</div>
+      <div class="t-man" id="tBudgetMan">&nbsp;</div>
+    </div>
+    <div class="t-small t-actual">
+      <div class="t-label">실제 지출</div>
+      <div class="t-num" id="tActual">0원</div>
+    </div>
+    <div class="t-small t-diff">
+      <div class="t-label" id="tDiffLabel">남은 예산</div>
+      <div class="t-num" id="tDiff">0원</div>
+    </div>
+    <div class="t-small">
+      <div class="t-label" id="tDoneLabel">완료</div>
+      <div class="t-num" id="tDone">0 / 0</div>
+    </div>
+    <div class="t-spacer"></div>
+    <details id="exportMenu" class="menu export-menu">
+      <summary id="exportBtn" class="export">엑셀로 내보내기</summary>
+      <div class="menu-pop">
+        <div class="menu-note">어떤 예산표를 내보낼까요?</div>
+        <button type="button" data-export="current">지금 탭만<small id="exportCurrentNote"></small></button>
+        <button type="button" data-export="all">모든 탭<small id="exportAllNote"></small></button>
+      </div>
+    </details>
+  </div>
+</div>
+
+<dialog id="optDialog" class="opt-dialog" aria-labelledby="optTitle">
+  <div class="opt-inner">
+    <div class="opt-head">
+      <div>
+        <h2 id="optTitle">선택지</h2>
+        <p id="optSub"></p>
+      </div>
+      <button type="button" class="opt-x" data-close aria-label="닫기">×</button>
+    </div>
+    <div id="optList" class="opt-list"></div>
+    <p class="aff-note">기본 템플릿의 일부 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따라 일정액의 수수료를 제공받습니다.</p>
+    <form id="optForm" class="opt-form" autocomplete="off">
+      <div class="opt-form-title" id="optFormTitle">선택지 추가</div>
+      <input name="name" type="text" placeholder="이름 (제품, 업체 등)" aria-label="선택지 이름" required>
+      <div class="opt-form-row">
+        <input name="link" type="text" inputmode="url" placeholder="참고 링크 (선택)" aria-label="참고 링크">
+        <input name="price" type="text" inputmode="numeric" class="money" placeholder="가격" aria-label="가격">
+      </div>
+      <input name="note" type="text" placeholder="비고 (선택) · 예: 대여 포함, 3월 할인" aria-label="비고">
+      <div class="opt-form-foot">
+        <small>고르면 이 항목의 예산이 가격 × 수량으로 바뀌어요</small>
+        <button type="button" class="btn-ghost" id="optCancel" hidden>취소</button>
+        <button type="submit" class="btn-primary" id="optSubmit">추가</button>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<div id="toast" class="toast" role="status"></div>
+
+<script src="../assets/app.js"></script>
+</body>
+</html>
