@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>예산표 만들기 · 준비 예산표</title>
+<title>예산표 만들기 · 버짓리스트</title>
 <meta name="description" content="결혼 준비, 출산·육아 준비, 축의금 방명록 예산표를 만드는 화면. 템플릿으로 시작해 항목별 예산과 실제 지출을 적고 엑셀로 내보낼 수 있어요.">
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="https://slowmorn.com/budget/planner/">
@@ -29,9 +29,24 @@
 </script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../assets/base.css">
+<link rel="stylesheet" href="../assets/site.css">
 <link rel="stylesheet" href="../assets/app.css">
 </head>
 <body>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="../"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="2.5" y="2" width="15" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 7.5h5M6 11h5M6 14.5h3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12.5 13.8l1.4 1.4 2.6-3" fill="none" stroke="var(--accent-fill)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>버짓리스트</a>
+    <nav aria-label="주요 메뉴">
+      <a href="../wedding/">결혼 준비</a>
+      <a href="../baby/">출산 준비</a>
+      <a href="../guestbook/">축의금</a>
+    </nav>
+    <span class="spacer"></span>
+    
+  </div>
+</header>
+
 <div class="wrap" id="planner">
   <nav class="tabs" aria-label="예산표 목록">
     <div id="tabList" class="tab-list" role="tablist"></div>
@@ -140,6 +155,7 @@
 
 <div id="toast" class="toast" role="status"></div>
 
+<script src="../assets/shell.js"></script>
 <script src="../assets/app.js"></script>
 </body>
 </html>

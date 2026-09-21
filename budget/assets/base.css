@@ -1,0 +1,62 @@
+/* 버짓리스트 공통 토큰과 기본 서식 — 모든 페이지가 먼저 읽습니다 */
+:root{
+  --paper:#F2F4F6;
+  --sheet:#FFFFFF;
+  --ink:#1B2230;
+  --muted:#667085;
+  --line:#DDE2E8;
+  --accent:#1A766B;
+  --accent-soft:#DDF3EF;
+  --accent-fill:#26A392;
+  --on-accent:#FFFFFF;
+  --warn:#B4233C;
+  --bar:#1B2230;
+  --bar-ink:#F2F4F6;
+  --bar-muted:#A9B2C0;
+  --sans:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#12161D; --sheet:#1A2029; --ink:#E7EAEE; --muted:#9AA3B2; --line:#2C3440;
+    --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#12161D; --warn:#F07A8E;
+    --bar:#E7EAEE; --bar-ink:#12161D; --bar-muted:#4B5563;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12161D; --sheet:#1A2029; --ink:#E7EAEE; --muted:#9AA3B2; --line:#2C3440;
+  --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#12161D; --warn:#F07A8E;
+  --bar:#E7EAEE; --bar-ink:#12161D; --bar-muted:#4B5563;
+}
+/* --swatch: brighter display color for the picker and tab dots only. */
+/* Per-tab theme colors. Scoped by [data-accent] so each tab chip can show its own color too. */
+[data-accent="green"]{--accent:#1A766B;--accent-soft:#DDF3EF;--accent-fill:#26A392;--on-accent:#FFFFFF;--swatch:#2FB5A0}
+[data-accent="navy"]{--accent:#3264C8;--accent-soft:#E3ECFB;--accent-fill:#4176E0;--on-accent:#FFFFFF;--swatch:#4B7BE0}
+[data-accent="pink"]{--accent:#C9336F;--accent-soft:#FCE6EF;--accent-fill:#E0508A;--on-accent:#FFFFFF;--swatch:#F0649A}
+[data-accent="yellow"]{--accent:#8F6A00;--accent-soft:#FFF4D1;--accent-fill:#FFC933;--on-accent:#1B2230;--swatch:#FFCC33}
+[data-accent="purple"]{--accent:#7A4FD0;--accent-soft:#F0E9FC;--accent-fill:#8E63E6;--on-accent:#FFFFFF;--swatch:#9B72E8}
+[data-accent="orange"]{--accent:#B24A0B;--accent-soft:#FDEBDD;--accent-fill:#E2661C;--on-accent:#FFFFFF;--swatch:#FF8A3D}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#12161D}
+}
+:root[data-theme="dark"] [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#12161D}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}

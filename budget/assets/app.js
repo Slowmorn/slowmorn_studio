@@ -1768,8 +1768,20 @@
 
   // ---- ?tpl=wedding 처럼 주소로 템플릿 열기 (소개 페이지에서 넘어올 때) ----
   (function openFromUrl(){
-    let key = "";
-    try{ key = new URLSearchParams(location.search).get("tpl") || ""; }catch(e){}
+    let key = "", id = "";
+    try{
+      const q = new URLSearchParams(location.search);
+      key = q.get("tpl") || "";
+      id = q.get("id") || "";
+    }catch(e){}
+    // ?id= : 홈의 '내 예산표'에서 그 탭을 바로 열 때
+    if(id && store.plans.some(p => p.id === id)){
+      store.activeId = id;
+      syncActive();
+      save();
+      try{ history.replaceState(null, "", location.pathname + location.hash); }catch(e){}
+      return;
+    }
     if(!key || !TEMPLATES[key]) return;
     const plan = newPlan(fromTemplate(key));
     // A starter budget nobody has typed in yet is replaced, not left behind as an empty tab
