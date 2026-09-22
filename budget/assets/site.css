@@ -116,22 +116,7 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
 
 /* 홈: 내 책상 — 흰 바탕에 색 유리판 하나를 얹습니다.
    뒤에 비칠 것이 없으므로 유리의 존재감은 색과 테두리, 그림자가 만듭니다. */
-body.desk-page{background:#FAF2DE}
-/* 유리 뒤에 비칠 것. 페이지 전체에 그림 한 장을 깔고, 그 위에서 유리판이
-   뒤를 흐리게 만듭니다. 유리는 자기 색이 없고 이 그림에서 색을 얻습니다.
-   그림은 세로로 길어서, 높이를 채우고 좌우는 그림의 바탕색으로 잇습니다. */
-.page-bg{
-  position:fixed;inset:0;z-index:-2;pointer-events:none;
-  background:#FAF2DE url("page-bg.jpg") center 30% / cover no-repeat;
-}
-.page-bg::after{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(180deg,
-    rgba(250,242,222,.88) 0%,
-    rgba(250,242,222,.66) 18%,
-    rgba(250,242,222,.38) 34%,
-    rgba(250,242,222,.34) 100%);
-}
+body.desk-page{background:#FFFFFF}
 .desk{position:relative;max-width:var(--wrap);margin:0 auto;padding:30px 20px 0}
 .desk-head{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin:0 0 14px;padding:0 4px}
 .desk-head h2{font-size:21px;margin:0;letter-spacing:-0.02em}
@@ -159,34 +144,38 @@ body.desk-page{background:#FAF2DE}
   position:relative;isolation:isolate;
   min-height:360px;padding:28px;
   border-radius:28px;
-  border:1px solid rgba(255,255,255,.78);
+  border:1px solid rgba(64,62,58,.08);
+  /* 뒤에 아무것도 없으니 아주 옅은 회색으로만 존재를 알립니다 */
   background:linear-gradient(162deg,
-    rgba(255,255,255,.22) 0%,
-    rgba(255,255,255,.06) 44%,
-    rgba(255,255,255,.15) 100%);
-  -webkit-backdrop-filter:blur(22px) saturate(165%) brightness(1.03);
-  backdrop-filter:blur(22px) saturate(165%) brightness(1.03);
+    rgba(96,94,88,.045) 0%,
+    rgba(96,94,88,.075) 52%,
+    rgba(96,94,88,.05) 100%);
+  -webkit-backdrop-filter:blur(20px) saturate(150%);
+  backdrop-filter:blur(20px) saturate(150%);
   box-shadow:
     /* 바닥에 놓인 판. 그림자를 멀리 던지면 공중에 떠 보입니다. */
     0 1px 2px rgba(40,36,32,.07),
     0 5px 12px -5px rgba(40,36,32,.15),
     0 14px 26px -16px rgba(40,36,32,.2),
     /* 윗면·바닥면의 빛 */
-    inset 0 1.5px 0 rgba(255,255,255,1),
-    inset 1px 0 0 rgba(255,255,255,.6),
-    inset -1px 0 0 rgba(255,255,255,.45),
-    inset 0 -1.5px 0 rgba(255,255,255,.5),
-    inset 0 0 38px rgba(255,255,255,.14);
+    inset 0 1.5px 0 rgba(255,255,255,.9),
+    inset 1px 0 0 rgba(255,255,255,.55),
+    inset -1px 0 0 rgba(64,62,58,.04),
+    inset 0 -1.5px 0 rgba(64,62,58,.06),
+    inset 0 0 38px rgba(255,255,255,.3);
   display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));
   align-content:start;
   transition:height .18s ease;
 }
-/* 유리의 두께. 가장자리 띠만 한 번 더 흐려서, 빛이 단면을 통과한 것처럼 보이게 합니다. */
+/* 유리의 두께. 가장자리 안쪽에 한 겹 더 밝은 띠를 둬서 단면처럼 보이게 합니다. */
 .desk-board::before{
   content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
-  border-radius:inherit;padding:18px;
-  -webkit-backdrop-filter:blur(10px) brightness(1.07);
-  backdrop-filter:blur(10px) brightness(1.07);
+  border-radius:inherit;padding:16px;
+  background:linear-gradient(160deg,
+    rgba(255,255,255,.75) 0%,
+    rgba(255,255,255,.2) 38%,
+    rgba(255,255,255,.35) 70%,
+    rgba(255,255,255,.6) 100%);
   -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite:xor;
   mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
@@ -319,8 +308,6 @@ body.desk-page{background:#FAF2DE}
 }
 
 @media (max-width:640px){
-  /* 화면이 좁으면 글과 그림이 겹칠 자리가 없어서 그림을 더 눕힙니다 */
-  .page-bg::after{background:rgba(250,242,222,.68)}
   .desk{padding-top:22px}
   .desk-head h2{font-size:19px}
   .desk-board{padding:16px;border-radius:18px;gap:10px;grid-template-columns:1fr}
@@ -434,4 +421,4 @@ body.desk-page .desk{max-width:var(--shell)}
 
 /* 홈에서는 소개 영역도 흰 바탕에 그대로 얹혀, 뒤의 빛 얼룩이 비쳐 보이게 둡니다 */
 body.desk-page .hero{background:none;border-bottom:0}
-body.desk-page footer{background:none;border-top-color:rgba(90,76,50,.14)}
+body.desk-page footer{background:none;border-top-color:rgba(60,58,54,.1)}
