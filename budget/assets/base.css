@@ -2,7 +2,8 @@
 /* 색은 거의 쓰지 않습니다. 종이 같은 따뜻한 회색과 먹색으로 화면을 만들고,
    색(--accent 계열)은 파일 아이콘과 점처럼 '그 파일이 무엇인지' 알려 주는 곳에만 씁니다. */
 :root{
-  --paper:#F7F6F3;
+  --page:#FFFFFF;   /* 페이지 바탕 — 모든 화면이 같습니다 */
+  --paper:#F7F6F3;  /* 살짝 눌러 앉힌 면 (입력칸 배경, 표 머리 등) */
   --sheet:#FFFFFF;
   --ink:#37352F;
   --muted:#787774;
@@ -26,14 +27,14 @@
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
+    --page:#141413; --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
     --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
     --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#191918; --warn:#EE8B82;
     --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
+  --page:#141413; --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
   --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
   --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#191918; --warn:#EE8B82;
   --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
@@ -63,7 +64,7 @@
 *{box-sizing:border-box}
 html,body{margin:0}
 body{
-  background:var(--paper); color:var(--ink);
+  background:var(--page); color:var(--ink);
   font-family:var(--sans); font-size:15.5px; line-height:1.6;
   -webkit-font-smoothing:antialiased;
 }

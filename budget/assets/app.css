@@ -121,6 +121,7 @@ body[data-cols="4"] #cats{--cols:4}
   container-type:inline-size;
   position:relative;
   background:var(--sheet);
+  border:1px solid var(--line);
   border-left:4px solid var(--accent-fill);
   border-radius:0 10px 10px 0;
   padding:18px 20px 12px;
