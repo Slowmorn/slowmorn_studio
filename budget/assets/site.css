@@ -30,12 +30,12 @@
 /* 푸터 */
 footer{border-top:1px solid var(--line);background:var(--sheet);margin-top:56px}
 .foot-inner{
-  max-width:var(--shell);margin:0 auto;padding:24px 20px 16px;
+  max-width:var(--shell);margin:0 auto;padding:0 20px 12px;
   color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px 18px;
 }
 footer a{text-decoration:none}
 footer a:hover{text-decoration:underline}
-.foot-note{max-width:var(--shell);margin:0 auto;padding:0 20px 10px;color:var(--muted);font-size:12px;line-height:1.6;word-break:keep-all}
+.foot-note{max-width:var(--shell);margin:0 auto;padding:22px 20px 14px;color:var(--muted);font-size:12px;line-height:1.6;word-break:keep-all}
 
 /* 소개 영역과 카드 (홈) */
 /* 소개 영역 */
