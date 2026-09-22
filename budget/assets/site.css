@@ -35,7 +35,7 @@ footer{border-top:1px solid var(--line);background:var(--sheet);margin-top:56px}
 }
 footer a{text-decoration:none}
 footer a:hover{text-decoration:underline}
-.foot-note{max-width:var(--shell);margin:0 auto;padding:0 20px 36px;color:var(--muted);font-size:12px;line-height:1.6;word-break:keep-all}
+.foot-note{max-width:var(--shell);margin:0 auto;padding:0 20px 10px;color:var(--muted);font-size:12px;line-height:1.6;word-break:keep-all}
 
 /* 소개 영역과 카드 (홈) */
 /* 소개 영역 */
@@ -417,3 +417,7 @@ body.desk-page .hero-inner,
 body.desk-page .desk{max-width:var(--shell)}
 
 /* 홈에서는 소개 영역도 흰 바탕에 그대로 얹혀, 뒤의 빛 얼룩이 비쳐 보이게 둡니다 */
+.foot-copy{
+  max-width:var(--shell);margin:0 auto;padding:0 20px 34px;
+  color:var(--muted);font-size:12px;
+}
