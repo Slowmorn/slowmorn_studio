@@ -1014,12 +1014,19 @@
 
   // ---- toast (with optional undo) ----
   let toastTimer;
-  function toast(msg, undoSnapshot){
+  // action: { label, run } — 되돌리기 대신 다른 버튼을 붙일 때
+  function toast(msg, undoSnapshot, action){
     const el = document.getElementById("toast");
     const host = optDialog.open ? optDialog : document.body;
     if(el.parentNode !== host) host.appendChild(el);
     el.textContent = msg;
-    el.classList.toggle("has-action", !!undoSnapshot);
+    el.classList.toggle("has-action", !!undoSnapshot || !!action);
+    if(action && !undoSnapshot){
+      const b = document.createElement("button");
+      b.type = "button"; b.textContent = action.label;
+      b.addEventListener("click", () => { el.classList.remove("show", "has-action"); action.run(); });
+      el.appendChild(b);
+    }
     if(undoSnapshot){
       const b = document.createElement("button");
       b.type = "button"; b.textContent = "되돌리기";
@@ -1035,7 +1042,7 @@
     }
     el.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.classList.remove("show", "has-action"), undoSnapshot ? 6000 : 2600);
+    toastTimer = setTimeout(() => el.classList.remove("show", "has-action"), (undoSnapshot || action) ? 6000 : 2600);
   }
 
   // ---- Excel export ----
@@ -1829,8 +1836,88 @@
 
   render();
 
+  // ---- 같이 쓰기 (초대 링크) ----
+  const shareBtn = document.getElementById("shareBtn");
+
+  function showShare(){ if(shareBtn) shareBtn.hidden = !(Auth && Auth.enabled && Auth.user); }
+
+  if(shareBtn) shareBtn.addEventListener("click", async () => {
+    if(!(Auth && Auth.user)) return;
+    if(state.owner && state.owner !== Auth.user.id){
+      toast("공유받은 예산표는 만든 사람만 초대할 수 있어요");
+      return;
+    }
+    shareBtn.disabled = true;
+    // 계정에 아직 없을 수 있으니 먼저 저장하고 초대를 만듭니다
+    await Auth.savePlans(store.plans);
+    const token = await Auth.createInvite(state.id);
+    shareBtn.disabled = false;
+    if(!token){ toast("초대 링크를 만들지 못했어요"); return; }
+    const link = `${location.origin}${location.pathname}?join=${token}`;
+    try{
+      await navigator.clipboard.writeText(link);
+      toast("초대 링크를 복사했어요. 카톡으로 보내면 돼요");
+    }catch(e){
+      prompt("이 링크를 복사해서 보내세요", link);
+    }
+  });
+
+  // 초대 링크로 들어왔을 때
+  async function handleJoin(){
+    let token = "";
+    try{ token = new URLSearchParams(location.search).get("join") || ""; }catch(e){}
+    if(!token) return;
+    if(!(Auth && Auth.enabled)) return;
+    if(!Auth.user){
+      toast("초대를 받으려면 먼저 로그인해 주세요");
+      return; // 로그인하면 아래 onChange에서 다시 처리합니다
+    }
+    const res = await Auth.acceptInvite(token);
+    try{ history.replaceState(null, "", location.pathname); }catch(e){}
+    if(!res || res.error){ toast("초대가 만료됐거나 잘못된 링크예요"); return; }
+    await mergeWithAccount();
+    const joined = store.plans.find(p => p.id === res.planId);
+    if(joined){ store.activeId = joined.id; syncActive(); render(); save(); }
+    toast("예산표를 함께 쓰게 됐어요");
+  }
+
+  // ---- 상대가 고쳤을 때 ----
+  let lastTyped = 0, stopWatch = null;
+  document.addEventListener("input", () => { lastTyped = Date.now(); }, true);
+
+  async function pullRemote(){
+    const mine = await Auth.listPlans();
+    if(!mine) return;
+    const activeId = store.activeId;
+    store.plans = mine;
+    if(!store.plans.some(p => p.id === activeId)) store.activeId = store.plans[0] && store.plans[0].id;
+    syncActive();
+    render();
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
+  }
+
+  async function watchRemote(){
+    if(stopWatch) return;
+    stopWatch = await Auth.watchPlans(payload => {
+      const row = payload.new || payload.old;
+      if(!row) return;
+      const mine = store.plans.find(p => p.id === row.id);
+      const editing = Date.now() - lastTyped < 8000;
+      // 내가 방금 저장한 것과 같은 내용이면 무시
+      if(payload.eventType !== "DELETE" && mine && JSON.stringify(row.data) === JSON.stringify(mine)) return;
+      if(editing){
+        toast("같이 쓰는 사람이 이 예산표를 고쳤어요", null, { label: "불러오기", run: pullRemote });
+      } else {
+        pullRemote();
+      }
+    });
+  }
+
   if(Auth && Auth.enabled){
-    Auth.onChange(user => { if(user) mergeWithAccount(); });
-    Auth.init();
+    Auth.onChange(async user => {
+      showShare();
+      if(user){ await mergeWithAccount(); handleJoin(); watchRemote(); }
+    });
+    Auth.init().then(() => { showShare(); handleJoin(); });
   }
 })();

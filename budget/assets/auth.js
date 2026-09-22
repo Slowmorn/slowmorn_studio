@@ -72,10 +72,13 @@
   }
 
   // ---- 예산표 읽고 쓰기 ----
-  const rowToPlan = row => Object.assign({}, row.data, { id: row.id, title: row.title, kind: row.kind || undefined });
+  // 공유받은 예산표는 주인이 따로 있으므로 주인 id를 함께 들고 다닙니다
+  const rowToPlan = row => Object.assign({}, row.data, {
+    id: row.id, title: row.title, kind: row.kind || undefined, owner: row.user_id
+  });
   const planToRow = (plan, i, userId) => ({
     id: plan.id,
-    user_id: userId,
+    user_id: plan.owner || userId,
     title: (plan.title || "").trim(),
     kind: plan.kind || "budget",
     position: i,
@@ -107,12 +110,41 @@
     if(error) console.warn("삭제하지 못했어요:", error.message);
   }
 
+  // ---- 공유 ----
+  async function createInvite(planId){
+    const sb = await getClient();
+    if(!sb || !session) return null;
+    const { data, error } = await sb.from("plan_invites").insert({ plan_id: planId }).select("token").single();
+    if(error){ console.warn("초대 링크를 만들지 못했어요:", error.message); return null; }
+    return data.token;
+  }
+
+  async function acceptInvite(token){
+    const sb = await getClient();
+    if(!sb || !session) return null;
+    const { data, error } = await sb.rpc("accept_plan_invite", { invite_token: token });
+    if(error){ console.warn("초대를 받지 못했어요:", error.message); return { error: error.message }; }
+    return { planId: data };
+  }
+
+  // 다른 사람이 저장하면 알려 줍니다 (같은 예산표를 함께 쓸 때)
+  async function watchPlans(onChange){
+    const sb = await getClient();
+    if(!sb || !session) return () => {};
+    const channel = sb.channel("plans-watch")
+      .on("postgres_changes", { event: "*", schema: "public", table: "plans" }, payload => {
+        try{ onChange(payload); }catch(e){}
+      })
+      .subscribe();
+    return () => { try{ sb.removeChannel(channel); }catch(e){} };
+  }
+
   window.BudgetAuth = {
     enabled: ENABLED,
     get session(){ return session; },
     get user(){ return session && session.user; },
     onChange(fn){ listeners.add(fn); return () => listeners.delete(fn); },
-    getClient, signIn, signOut, listPlans, savePlans, removePlans,
+    getClient, signIn, signOut, listPlans, savePlans, removePlans, createInvite, acceptInvite, watchPlans,
     // 페이지가 열릴 때: 이미 로그인한 흔적이 있으면 세션을 복구합니다
     async init(){
       if(!ENABLED || !hasStoredSession()) return null;
