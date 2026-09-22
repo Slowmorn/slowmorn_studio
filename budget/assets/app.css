@@ -250,21 +250,6 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 .cat-menu summary::-webkit-details-marker{display:none}
 .cat-menu summary:hover,.cat-menu[open] summary{background:var(--paper);color:var(--ink)}
 .cat-menu summary svg{width:18px;height:18px}
-.menu-pop{
-  color:var(--ink);text-align:left;font-weight:400;
-  position:absolute;right:0;top:calc(100% + 4px);z-index:20;
-  min-width:180px;padding:6px;
-  background:var(--sheet);border:1px solid var(--line);border-radius:10px;
-  box-shadow:0 8px 24px rgba(15,20,30,.14);
-}
-.menu-pop button{
-  display:block;width:100%;text-align:left;
-  border:0;background:none;padding:9px 12px;border-radius:6px;font-size:14px;
-}
-.menu-pop button:hover{background:var(--paper)}
-.menu-pop .danger{color:var(--warn)}
-.menu-pop small{display:block;color:var(--muted);font-size:12px;margin-top:1px}
-.menu-pop hr{border:0;border-top:1px solid var(--line);margin:4px 2px}
 
 .cols,.row{
   display:grid;
@@ -461,17 +446,6 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 .export-menu{position:relative}
 .export-menu .menu-pop{top:auto;bottom:calc(100% + 8px);right:0;min-width:260px}
 
-.toast{
-  position:fixed;left:50%;bottom:120px;transform:translateX(-50%) translateY(10px);
-  background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:14px;
-  opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;z-index:10;max-width:90vw;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast{display:flex;align-items:center;gap:14px}
-.toast.show.has-action{pointer-events:auto}
-.toast button{
-  border:0;background:none;color:var(--accent-soft);font-weight:600;text-decoration:underline;padding:0;
-}
 
 /* Narrow category card (2/4 columns, or phone): item goes onto three lines */
 @container (max-width:620px){
@@ -521,3 +495,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   .toast{bottom:190px}
 }
 @media (prefers-reduced-motion:reduce){.toast,.tpl-btn,.tool-btn,.tpl-btn .chev{transition:none}}
+
+/* 체크리스트 화면은 아래에 합계 바가 깔려 있어 알림을 더 띄웁니다 */
+#planner ~ .toast,
+body:has(#planner) .toast{bottom:120px}

@@ -1,13 +1,12 @@
 /* 버짓리스트 공통 셸 스크립트
    - 상단 바의 현재 메뉴 표시
    - 로그인 버튼과 로그인 창 (assets/auth.js 가 실제 통신을 맡습니다)
-   - 홈의 '내 예산표' 목록: 로그인 전에는 이 브라우저에 저장된 것, 로그인하면 계정의 것 */
+   - 홈의 파일 목록은 assets/desk.js 가 맡습니다 */
 (function(){
   const Auth = window.BudgetAuth;
   // 이 파일은 /budget/assets/ 에 있으므로 두 단계 올라가면 사이트 최상위입니다
   const root = new URL("../../", (document.currentScript && document.currentScript.src) || location.href).pathname;
   const esc = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-  const won = n => (Number(n) || 0).toLocaleString("ko-KR") + "원";
 
   // ---- 현재 페이지 메뉴 표시 ----
   const here = location.pathname.replace(/\/index\.html$/, "/");
@@ -112,52 +111,10 @@
     if(btn.dataset.auth === "delete") openDelete();
   });
 
-  // ---- 내 예산표 (홈) ----
-  const listEl = document.getElementById("myPlans");
-  const noteEl = document.querySelector(".my-note");
-
-  const BS = window.BudgetStore;
-  const localPlans = () => (BS ? BS.plans : []);
-  const planSummary = p => (BS ? BS.summary(p) : { budget: 0, count: 0 });
-
-  function renderPlans(plans){
-    if(!listEl) return;
-    if(!plans.length){
-      listEl.innerHTML = `<p class="my-empty">아직 만든 예산표가 없어요. 위에서 하나 골라 시작해 보세요.</p>`;
-      return;
-    }
-    listEl.innerHTML = plans.map(p => {
-      const { budget, count } = planSummary(p);
-      const guest = p.kind === "guestbook";
-      const title = (p.title || "").trim() || "이름 없는 예산표";
-      return `<a class="my-plan" href="planner/?id=${encodeURIComponent(p.id)}" data-accent="${esc(p.accent || "green")}">
-        <span class="my-dot" aria-hidden="true"></span>
-        <span class="my-name">${esc(title)}</span>
-        <span class="my-meta">${guest ? "방명록" : "예산표"} · ${count}${guest ? "명" : "개"} · ${won(budget)}</span>
-      </a>`;
-    }).join("");
-  }
-
-  async function refreshPlans(){
-    if(!listEl) return;
-    if(Auth && Auth.enabled && Auth.user){
-      const mine = await Auth.listPlans();
-      if(mine){
-        renderPlans(mine);
-        if(noteEl) noteEl.textContent = "이 계정에 저장돼 있어요. 다른 기기에서 같은 계정으로 로그인하면 이어서 쓸 수 있어요.";
-        return;
-      }
-    }
-    renderPlans(localPlans());
-    if(noteEl) noteEl.textContent = Auth && Auth.enabled
-      ? "지금은 이 브라우저에만 저장돼요. 로그인하면 다른 기기에서도 이어서 쓸 수 있어요."
-      : "지금은 이 브라우저에만 저장돼요.";
-  }
-
+  // 홈의 파일 목록은 assets/desk.js 가 그립니다.
   renderAuth();
-  refreshPlans();
   if(Auth && Auth.enabled){
-    Auth.onChange(() => { renderAuth(); refreshPlans(); });
+    Auth.onChange(renderAuth);
     Auth.init();
   }
 })();
