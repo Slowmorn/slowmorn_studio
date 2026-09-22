@@ -366,6 +366,7 @@
         syncActive();
       }
       render(); save();
+      if(Auth && Auth.enabled && Auth.user) Auth.removePlans([id]);
       toast(`'${planLabel(plan)}' 예산표를 닫았어요`, snap);
       return;
     }
@@ -1026,6 +1027,7 @@
         store = JSON.parse(undoSnapshot);
         syncActive();
         render(); save();
+        if(Auth && Auth.enabled && Auth.user) Auth.savePlans(store.plans);
         if(optDialog.open){ if(optItem()) renderOptions(); else optDialog.close(); }
         el.classList.remove("show", "has-action");
       });
