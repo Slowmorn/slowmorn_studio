@@ -114,17 +114,14 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
 .end .cta{margin-top:16px}
 
 
-/* 홈: 내 책상 — 흰 바탕에 옅은 빛 얼룩을 깔고, 그 위에 반투명 유리판을 얹습니다.
-   순백 위에서는 유리가 보이지 않기 때문에 비칠 것이 필요해요. */
+/* 홈: 내 책상 — 흰 바탕에 색 유리판 하나를 얹습니다.
+   뒤에 비칠 것이 없으므로 유리의 존재감은 색과 테두리, 그림자가 만듭니다. */
 body.desk-page{background:#FFFFFF}
-.page-glow{
-  position:fixed;inset:0;z-index:-1;pointer-events:none;
-  background:
-    radial-gradient(42rem 30rem at 10% 4%,  rgba(255,178,140,.30), transparent 62%),
-    radial-gradient(40rem 28rem at 92% 16%, rgba(140,198,224,.32), transparent 60%),
-    radial-gradient(36rem 30rem at 68% 92%, rgba(190,166,234,.28), transparent 62%),
-    radial-gradient(30rem 24rem at 26% 78%, rgba(152,214,190,.26), transparent 64%);
-}
+
+/* 유리 색. body[data-glass] 로 갈아 끼웁니다. */
+body.desk-page{--glass:#FF9C87; --glass-deep:#C2604B; --glass-tint:22%;}
+body.desk-page[data-glass="yellow"]{--glass:#FFC85A; --glass-deep:#B4871C;}
+body.desk-page[data-glass="blue"]{--glass:#8BBCF2; --glass-deep:#3F74AE;}
 
 .desk{max-width:var(--wrap);margin:0 auto;padding:30px 20px 0}
 .desk-head{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin:0 0 14px;padding:0 4px}
@@ -135,6 +132,23 @@ body.desk-page{background:#FFFFFF}
   display:inline-flex;align-items:center;gap:6px;border:0;background:none;
   color:var(--muted);font-size:13.5px;padding:7px 10px;border-radius:var(--radius);
 }
+/* 유리판 색 고르기 */
+.glass-menu .glass-btn{
+  display:grid;place-items:center;width:30px;height:30px;border-radius:50%;
+  list-style:none;cursor:pointer;
+}
+.glass-menu .glass-btn:hover,.glass-menu[open] .glass-btn{background:var(--hover)}
+.glass-dot{
+  width:17px;height:17px;border-radius:50%;
+  background:linear-gradient(150deg, color-mix(in srgb, var(--glass) 85%, white), var(--glass));
+  box-shadow:inset 0 1px 1px rgba(255,255,255,.9), 0 0 0 1px color-mix(in srgb, var(--glass-deep) 28%, transparent);
+}
+.glass-menu .menu-pop{left:auto;right:0;min-width:140px}
+.menu-pop .glass-opt{display:flex;align-items:center;gap:9px}
+.glass-opt[data-g="coral"]{--glass:#FF9C87;--glass-deep:#C2604B}
+.glass-opt[data-g="yellow"]{--glass:#FFC85A;--glass-deep:#B4871C}
+.glass-opt[data-g="blue"]{--glass:#8BBCF2;--glass-deep:#3F74AE}
+.glass-opt[aria-pressed="true"]{font-weight:600;background:var(--hover)}
 .trash-btn[hidden]{display:none}
 .trash-btn svg{width:15px;height:15px}
 .trash-btn:hover{background:var(--hover);color:var(--ink)}
@@ -147,24 +161,45 @@ body.desk-page{background:#FFFFFF}
 .btn-ink:hover{filter:brightness(1.35)}
 .new-menu .menu-pop{left:auto;right:0;min-width:250px}
 
-/* 유리판 */
+/* 유리판 — 두께가 느껴지도록 경사면을 만듭니다.
+   위·왼쪽 모서리는 빛을 받아 희고, 아래·오른쪽은 색이 짙게 고입니다.
+   둥근 모서리에서 두 색이 자연스럽게 섞여 유리 단면처럼 보여요. */
 .desk-board{
-  position:relative;min-height:340px;padding:26px;
-  border-radius:24px;
-  background:rgba(255,255,255,.46);
-  border:1px solid rgba(255,255,255,.7);
-  -webkit-backdrop-filter:blur(18px) saturate(170%);
-  backdrop-filter:blur(18px) saturate(170%);
-  box-shadow:0 18px 50px rgba(70,64,80,.13), inset 0 1px 0 rgba(255,255,255,.85);
+  position:relative;isolation:isolate;
+  min-height:360px;padding:28px;
+  border-radius:30px;
+  border:3px solid;
+  border-top-color:rgba(255,255,255,.95);
+  border-left-color:rgba(255,255,255,.8);
+  border-right-color:color-mix(in srgb, var(--glass-deep) 26%, transparent);
+  border-bottom-color:color-mix(in srgb, var(--glass-deep) 34%, transparent);
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.5) 0%, transparent 42%),
+    linear-gradient(152deg,
+      color-mix(in srgb, var(--glass) 40%, transparent) 0%,
+      color-mix(in srgb, var(--glass) 24%, transparent) 45%,
+      color-mix(in srgb, var(--glass) 44%, transparent) 100%);
+  -webkit-backdrop-filter:blur(22px) saturate(180%);
+  backdrop-filter:blur(22px) saturate(180%);
+  box-shadow:
+    /* 바닥에 드리우는 그림자 — 떠 있는 느낌 */
+    0 3px 3px -1px color-mix(in srgb, var(--glass-deep) 18%, transparent),
+    0 14px 26px -8px color-mix(in srgb, var(--glass-deep) 26%, transparent),
+    0 40px 70px -20px color-mix(in srgb, var(--glass-deep) 44%, transparent),
+    /* 안쪽 단면 — 윗면은 밝고 바닥면은 색이 고입니다 */
+    inset 0 2px 1px -1px rgba(255,255,255,.95),
+    inset 0 -10px 18px -10px color-mix(in srgb, var(--glass-deep) 55%, transparent),
+    inset 0 0 0 1px rgba(255,255,255,.4),
+    inset 0 0 50px 10px rgba(255,255,255,.22);
   display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));
   align-content:start;
-  transition:height .18s ease;
+  transition:height .18s ease, background .3s ease, box-shadow .3s ease, border-color .3s ease;
 }
 /* 자유 배치일 때는 격자를 끄고 자석을 좌표로 놓습니다 */
 .desk-board.free{display:block;padding:0}
 
 /* 자석 */
-.file{position:relative;width:100%}
+.file{position:relative;z-index:1;width:100%}
 .desk-board.free .file{position:absolute;width:208px}
 .file-open{
   position:relative;display:grid;
@@ -229,7 +264,7 @@ body.desk-page{background:#FFFFFF}
 .menu-pop .color-chip:hover{transform:scale(1.12);background:var(--swatch,var(--accent-fill))}
 
 /* 빈 책상 */
-.desk-empty{grid-column:1 / -1;padding:14px 4px}
+.desk-empty{position:relative;z-index:1;grid-column:1 / -1;padding:14px 4px}
 .desk-empty p{color:var(--muted);margin:0 0 14px;word-break:keep-all}
 .start-cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
 .start-card{

@@ -69,6 +69,30 @@
     return new Date(ts).toLocaleDateString("ko-KR", { month: "long", day: "numeric" });
   }
 
+  // ---- 유리판 색 ----
+  // 보는 사람 취향이라 이 브라우저에만 기억합니다.
+  const GLASS_KEY = "prep-budget-glass";
+  const glassMenu = document.querySelector(".glass-menu");
+  function applyGlass(key){
+    document.body.dataset.glass = key;
+    if(!glassMenu) return;
+    glassMenu.querySelectorAll("[data-g]").forEach(b =>
+      b.setAttribute("aria-pressed", String(b.dataset.g === key)));
+  }
+  (function initGlass(){
+    let saved = "coral";
+    try{ saved = localStorage.getItem(GLASS_KEY) || "coral"; }catch(e){}
+    applyGlass(["coral", "yellow", "blue"].includes(saved) ? saved : "coral");
+    if(!glassMenu) return;
+    glassMenu.addEventListener("click", e => {
+      const btn = e.target.closest("[data-g]");
+      if(!btn) return;
+      applyGlass(btn.dataset.g);
+      try{ localStorage.setItem(GLASS_KEY, btn.dataset.g); }catch(e){}
+      glassMenu.open = false;
+    });
+  })();
+
   // ---- 알림 한 줄 ----
   const toastEl = document.getElementById("toast");
   let toastTimer = null;
