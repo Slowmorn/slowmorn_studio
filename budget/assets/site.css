@@ -188,6 +188,9 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
 }
 .file:hover{transform:rotate(0deg) translateY(-2px)}
 .file.dragging{transform:rotate(0deg) scale(1.04);transition:none;z-index:5}
+/* 카드마다 제 쌓임 맥락이 있어서, 메뉴를 펼쳐도 뒤에 있는 카드가 그 위를 덮습니다.
+   펼친 카드를 통째로 끌어올립니다. */
+.file:has(.file-menu[open]){z-index:30}
 .desk-board.free .file{position:absolute;width:208px}
 .file-open{
   position:relative;display:grid;
