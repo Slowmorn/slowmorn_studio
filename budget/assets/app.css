@@ -122,8 +122,7 @@ body[data-cols="4"] #cats{--cols:4}
   position:relative;
   background:var(--sheet);
   border:1px solid var(--line);
-  border-left:4px solid var(--accent-fill);
-  border-radius:0 10px 10px 0;
+  border-radius:10px;
   padding:18px 20px 12px;
 }
 .cat:has(.cat-menu[open]){z-index:3}
@@ -142,15 +141,16 @@ body[data-cols="4"] #cats{--cols:4}
 /* 카테고리 순서 바꾸기 손잡이. 카드 안, 이름 왼쪽에 둡니다.
    예전에는 카드 밖으로 튀어나온 색 탭이었는데 항목 손잡이와 따로 놀았습니다. */
 .cat-grip{
-  width:20px;height:28px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);
-  display:grid;place-items:center;cursor:grab;opacity:.45;
+  width:20px;height:28px;padding:0;border:0;border-radius:5px;background:none;
+  color:var(--swatch, var(--accent-fill));   /* 이 파일의 색이 남는 유일한 자리 */
+  display:grid;place-items:center;cursor:grab;opacity:.75;
   touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
 }
 .cat-grip svg{width:9px;height:17px}
 .cat:hover .cat-grip,.cat-grip:focus-visible{opacity:1}
-.cat-grip:hover{background:var(--hover);color:var(--ink)}
+.cat-grip:hover{background:var(--hover)}
 .cat-grip:active{cursor:grabbing;background:var(--hover-strong)}
-@media (hover:none){.cat-grip{opacity:.7}}
+@media (hover:none){.cat-grip{opacity:1}}
 #cats.sorting .cols,#cats.sorting .rows,#cats.sorting .add-item{display:none}
 #cats.sorting .cat{padding-bottom:12px}
 #cats.sorting .cat-head{margin-bottom:0}
@@ -178,7 +178,7 @@ body[data-cols="4"] #cats{--cols:4}
   transform:scale(1.02);pointer-events:none;
 }
 .cat-slot{
-  border:2px dashed color-mix(in srgb, var(--accent-fill) 70%, transparent);border-radius:0 10px 10px 0;
+  border:2px dashed color-mix(in srgb, var(--accent-fill) 70%, transparent);border-radius:10px;
   background:color-mix(in srgb, var(--accent-soft) 60%, transparent);
 }
 body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-webkit-user-select:none}
