@@ -42,37 +42,26 @@ body[data-cols="4"]{--wrap:1640px}
 .about a{color:var(--accent)}
 .about ol{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:1.8;max-width:66ch}
 
-/* Plan tabs */
-.tabs{display:flex;align-items:flex-end;gap:6px;border-bottom:1px solid var(--line);margin-bottom:28px}
-.tab-list{display:flex;gap:2px;min-width:0;overflow-x:auto;scrollbar-width:none}
-.tab-list::-webkit-scrollbar{display:none}
-.tab{position:relative;display:flex;align-items:center;flex:none;border-radius:8px 8px 0 0}
-.tab:hover{background:color-mix(in srgb, var(--ink) 5%, transparent)}
-.tab-dot{width:8px;height:8px;border-radius:50%;background:var(--swatch, var(--accent-fill));flex:none;margin-left:14px;margin-right:-8px;pointer-events:none}
-.tab-btn{
-  border:0;background:none;color:var(--muted);font-size:14px;font-weight:500;
-  padding:10px 16px;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  border-radius:8px 8px 0 0;
+/* 파일 줄 — 내 책상 / 파일이름 ∨ */
+.file-bar{display:flex;align-items:center;gap:6px;margin-bottom:22px;font-size:14px}
+.back-desk{
+  display:inline-flex;align-items:center;gap:3px;color:var(--muted);text-decoration:none;
+  padding:5px 9px 5px 5px;border-radius:var(--radius);flex:none;
 }
-.tab.closable .tab-btn{padding-right:34px}
-.tab.active{background:var(--sheet);box-shadow:inset 0 -2px 0 var(--accent)}
-.tab.active .tab-btn{color:var(--ink)}
-.tab-close{
-  position:absolute;right:8px;top:50%;transform:translateY(-50%);
-  width:22px;height:22px;border:0;border-radius:5px;background:none;
-  color:var(--muted);font-size:16px;line-height:1;opacity:0;
+.back-desk svg{width:15px;height:15px}
+.back-desk:hover{background:var(--hover);color:var(--ink);text-decoration:none}
+.file-bar-sep{color:var(--line)}
+.file-switch{min-width:0}
+.file-switch-btn{
+  display:inline-flex;align-items:center;gap:7px;min-width:0;
+  padding:5px 9px;border-radius:var(--radius);color:var(--ink);font-weight:600;
 }
-.tab:hover .tab-close,.tab.active .tab-close,.tab-close:focus-visible{opacity:1}
-.tab-close:hover{background:color-mix(in srgb, var(--ink) 10%, transparent);color:var(--ink)}
-.tab-add{
-  flex:none;display:inline-flex;align-items:center;gap:6px;
-  border:0;background:none;color:var(--muted);font-size:14px;
-  padding:8px 10px;margin-bottom:3px;border-radius:6px;
-}
-.tab-add svg{width:14px;height:14px}
-.tab-add:hover{background:color-mix(in srgb, var(--ink) 5%, transparent);color:var(--ink)}
-.tab-add:active{background:color-mix(in srgb, var(--ink) 11%, transparent)}
-@media (hover:none){.tab-close{opacity:1}}
+.file-switch-btn span:not(.file-dot){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-switch-btn:hover,.file-switch[open] .file-switch-btn{background:var(--hover)}
+.file-switch-btn .chev{width:11px;height:11px;color:var(--muted);flex:none}
+.file-switch .menu-pop{left:0;right:auto;min-width:220px;max-height:60vh;overflow:auto}
+.file-switch .menu-pop button{display:flex;align-items:center;gap:9px}
+.file-dot{width:9px;height:9px;border-radius:50%;background:var(--swatch, var(--accent-fill));flex:none}
 
 /* Header */
 .plan-title{
@@ -484,8 +473,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 }
 @media (max-width:640px){
   .wrap{padding-top:12px}
-  .tab-add span{display:none}
-  .tab-btn{max-width:150px}
+  .file-switch-btn{max-width:56vw}
   .cat{padding:14px 14px 10px}
   .totals-inner{gap:14px 20px}
   .t-spacer{display:none}

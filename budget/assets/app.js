@@ -139,20 +139,22 @@
     </div>`;
   }
 
-  const tabListEl = document.getElementById("tabList");
+  // 파일 이름 줄. 이름을 누르면 다른 파일로 건너뜁니다.
+  const fileSwitch = document.querySelector(".file-switch");
+  const fileNameEl = document.getElementById("fileName");
+  const fileListEl = document.getElementById("fileList");
 
-  function renderTabs(){
-    const closable = store.plans.length > 1;
-    tabListEl.innerHTML = store.plans.map(p => {
-      const on = p.id === state.id;
-      return `<div class="tab${on ? " active" : ""}${closable ? " closable" : ""}" data-pid="${p.id}" data-accent="${p.accent || "green"}">
-        <span class="tab-dot" aria-hidden="true"></span>
-        <button type="button" class="tab-btn" role="tab" aria-selected="${on}" tabindex="${on ? 0 : -1}" title="${esc(planLabel(p))}">${esc(planLabel(p))}</button>
-        ${closable ? `<button type="button" class="tab-close" aria-label="'${esc(planLabel(p))}' 닫기" tabindex="${on ? 0 : -1}">×</button>` : ""}
-      </div>`;
-    }).join("");
-    const active = tabListEl.querySelector(".tab.active");
-    if(active) active.scrollIntoView({ block: "nearest", inline: "nearest" });
+  function renderFileBar(){
+    fileNameEl.textContent = planLabel(state);
+    fileSwitch.dataset.accent = state.accent || "green";
+    const others = store.plans.filter(p => p.id !== state.id);
+    fileListEl.innerHTML =
+      (others.length ? others.map(p =>
+        `<button type="button" data-open="${esc(p.id)}" data-accent="${esc(p.accent || "green")}">
+          <span class="file-dot" aria-hidden="true"></span>${esc(planLabel(p))}
+        </button>`).join("") + "<hr>"
+        : `<div class="menu-note">열어 둔 파일이 이것뿐이에요</div>`)
+      + `<button type="button" data-open="__desk">내 책상으로</button>`;
   }
 
   const swatchEls = document.querySelectorAll(".swatch");
@@ -168,8 +170,7 @@
     closeMenus();
     state.accent = b.dataset.accent;
     applyAccent();
-    const tab = tabListEl.querySelector(".tab.active");
-    if(tab) tab.dataset.accent = state.accent;
+    fileSwitch.dataset.accent = state.accent;
     save();
   }));
 
@@ -184,7 +185,7 @@
     const guest = isGuest(state);
     document.body.classList.toggle("kind-guestbook", guest);
     applyAccent();
-    renderTabs();
+    renderFileBar();
     titleEl.value = state.title || "";
     introEl.value = state.intro || "";
     fitIntro();
@@ -247,8 +248,7 @@
   // ---- events ----
   titleEl.addEventListener("input", () => {
     state.title = titleEl.value;
-    const btn = tabListEl.querySelector(".tab.active .tab-btn");
-    if(btn){ btn.textContent = planLabel(state); btn.title = planLabel(state); }
+    fileNameEl.textContent = planLabel(state);
     save();
   });
   introEl.addEventListener("input", () => {
@@ -260,62 +260,27 @@
   // The webfont lands after the first render and rewraps the text, so measure again
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitIntro);
 
-  // ---- tabs ----
-  function switchTo(id, focusTab){
+  // ---- 파일 바꾸기 ----
+  // 주소에 어떤 파일인지 남겨 둡니다. 새로고침하거나 링크를 저장해도 같은 파일이 열려요.
+  function markUrl(){
+    try{ history.replaceState(null, "", location.pathname + "?id=" + encodeURIComponent(state.id) + location.hash); }catch(e){}
+  }
+
+  function switchTo(id){
     if(id === state.id) return;
     closeMenus();
     store.activeId = id;
     syncActive();
     render(); save();
-    if(focusTab){ const b = tabListEl.querySelector(".tab.active .tab-btn"); if(b) b.focus(); }
+    markUrl();
+    window.scrollTo({ top: 0 });
   }
 
-  tabListEl.addEventListener("click", e => {
-    const tab = e.target.closest(".tab");
-    if(!tab) return;
-    const id = tab.dataset.pid;
-    if(e.target.closest(".tab-close")){
-      const plan = store.plans.find(p => p.id === id);
-      const snap = snapshot();
-      const idx = store.plans.indexOf(plan);
-      store.plans.splice(idx, 1);
-      if(plan === state){
-        store.activeId = store.plans[Math.min(idx, store.plans.length - 1)].id;
-        syncActive();
-      }
-      render(); save();
-      if(Auth && Auth.enabled && Auth.user) Auth.removePlans([id]);
-      toast(`'${planLabel(plan)}' 예산표를 닫았어요`, snap);
-      return;
-    }
-    switchTo(id);
-  });
-
-  tabListEl.addEventListener("keydown", e => {
-    if(!e.target.classList.contains("tab-btn")) return;
-    const i = store.plans.indexOf(state);
-    let next = null;
-    if(e.key === "ArrowRight") next = store.plans[(i + 1) % store.plans.length];
-    if(e.key === "ArrowLeft") next = store.plans[(i - 1 + store.plans.length) % store.plans.length];
-    if(e.key === "Home") next = store.plans[0];
-    if(e.key === "End") next = store.plans[store.plans.length - 1];
-    if(next){ e.preventDefault(); switchTo(next.id, true); }
-  });
-
-  document.getElementById("addPlan").addEventListener("click", () => {
-    const taken = new Set(store.plans.map(p => p.title));
-    let title = "새 예산표", n = 2;
-    while(taken.has(title)) title = `새 예산표 ${n++}`;
-    // Next color not used by another tab (cycles once all are taken)
-    const keys = [...swatchEls].map(b => b.dataset.accent);
-    const usedColors = store.plans.map(p => p.accent || "green");
-    const accent = keys.find(k => !usedColors.includes(k)) || keys[store.plans.length % keys.length];
-    const plan = newPlan(Object.assign(fromTemplate("blank"), { title, accent }));
-    store.plans.push(plan);
-    store.activeId = plan.id;
-    syncActive();
-    render(); save();
-    titleEl.focus(); titleEl.select();
+  fileListEl.addEventListener("click", e => {
+    const btn = e.target.closest("[data-open]");
+    if(!btn) return;
+    if(btn.dataset.open === "__desk"){ location.href = "../"; return; }
+    switchTo(btn.dataset.open);
   });
 
   catsEl.addEventListener("input", e => {
@@ -1478,7 +1443,7 @@
 
   function updateExportNotes(){
     document.getElementById("exportCurrentNote").textContent = `'${planLabel(state)}' · ${isGuest(state) ? "방명록" : "예산표"}와 요약 시트`;
-    document.getElementById("exportAllNote").textContent = `탭 ${store.plans.length}개를 시트 하나씩 + 전체 요약`;
+    document.getElementById("exportAllNote").textContent = `파일 ${store.plans.length}개를 시트 하나씩 + 전체 요약`;
   }
   exportMenu.addEventListener("toggle", () => { if(exportMenu.open) updateExportNotes(); });
 
@@ -1707,7 +1672,7 @@
     store.activeId = added[0].id;
     syncActive();
     render(); save();
-    toast(added.length === 1 ? `새 탭으로 불러왔어요 · ${planLabel(added[0])}` : `예산표 ${added.length}개를 탭으로 불러왔어요`, snap);
+    toast(added.length === 1 ? `새 파일로 불러왔어요 · ${planLabel(added[0])}` : `파일 ${added.length}개로 불러왔어요`, snap);
   });
 
   // ---- ?tpl=wedding 처럼 주소로 템플릿 열기 (소개 페이지에서 넘어올 때) ----
@@ -1718,28 +1683,29 @@
       key = q.get("tpl") || "";
       id = q.get("id") || "";
     }catch(e){}
-    // ?id= : 홈의 '내 예산표'에서 그 탭을 바로 열 때
+    // ?id= : 책상에서 그 파일을 눌러 들어온 경우
     if(id && store.plans.some(p => p.id === id)){
       store.activeId = id;
       syncActive();
       save();
-      try{ history.replaceState(null, "", location.pathname + location.hash); }catch(e){}
       return;
     }
-    if(!key || !BS.templates.some(t => t.id === key)) return;
-    const plan = newPlan(fromTemplate(key));
-    // A starter budget nobody has typed in yet is replaced, not left behind as an empty tab
-    const pristine = store.plans.length === 1
-      && !store.plans[0].categories.some(c => c.items.some(hasContent))
-      && store.plans[0].categories.every(c => !c.name || c.name === "첫 번째 카테고리");
-    if(pristine) store.plans = [];
-    store.plans.push(plan);
-    store.activeId = plan.id;
-    syncActive();
-    save();
-    track("template_load", { template: key, source: "link" });
-    // Drop the parameter so a reload doesn't add the template again
-    try{ history.replaceState(null, "", location.pathname + location.hash); }catch(e){}
+    if(key && BS.templates.some(t => t.id === key)){
+      const plan = newPlan(fromTemplate(key));
+      // 아무도 손대지 않은 빈 파일이면 새로 만들지 않고 그 자리에 채웁니다
+      const pristine = store.plans.length === 1
+        && !store.plans[0].categories.some(c => c.items.some(hasContent))
+        && store.plans[0].categories.every(c => !c.name || c.name === "첫 번째 카테고리");
+      if(pristine) store.plans = [];
+      store.plans.push(plan);
+      store.activeId = plan.id;
+      syncActive();
+      save();
+      track("template_load", { template: key, source: "link" });
+    }
+    // 주소에는 늘 지금 파일의 id 만 남깁니다.
+    // 새로고침해도 같은 파일이 열리고, ?tpl= 이 남아 템플릿이 또 들어오지도 않아요.
+    markUrl();
   })();
 
   render();
