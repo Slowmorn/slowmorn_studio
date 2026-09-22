@@ -113,10 +113,10 @@
   // ---- 공유 ----
   async function createInvite(planId){
     const sb = await getClient();
-    if(!sb || !session) return null;
+    if(!sb || !session) return { error: "로그인이 필요해요" };
     const { data, error } = await sb.from("plan_invites").insert({ plan_id: planId }).select("token").single();
-    if(error){ console.warn("초대 링크를 만들지 못했어요:", error.message); return null; }
-    return data.token;
+    if(error){ console.warn("초대 링크를 만들지 못했어요:", error); return { error: error.message || String(error) }; }
+    return { token: data.token };
   }
 
   async function acceptInvite(token){

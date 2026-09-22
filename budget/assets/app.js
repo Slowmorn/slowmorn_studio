@@ -1842,25 +1842,57 @@
   function showShare(){ if(shareBtn) shareBtn.hidden = !(Auth && Auth.enabled && Auth.user); }
 
   if(shareBtn) shareBtn.addEventListener("click", async () => {
-    if(!(Auth && Auth.user)) return;
+    if(!(Auth && Auth.user)){ toast("먼저 로그인해 주세요"); return; }
     if(state.owner && state.owner !== Auth.user.id){
       toast("공유받은 예산표는 만든 사람만 초대할 수 있어요");
       return;
     }
     shareBtn.disabled = true;
-    // 계정에 아직 없을 수 있으니 먼저 저장하고 초대를 만듭니다
-    await Auth.savePlans(store.plans);
-    const token = await Auth.createInvite(state.id);
-    shareBtn.disabled = false;
-    if(!token){ toast("초대 링크를 만들지 못했어요"); return; }
-    const link = `${location.origin}${location.pathname}?join=${token}`;
+    toast("초대 링크를 만드는 중…");
     try{
-      await navigator.clipboard.writeText(link);
-      toast("초대 링크를 복사했어요. 카톡으로 보내면 돼요");
-    }catch(e){
-      prompt("이 링크를 복사해서 보내세요", link);
+      await Auth.savePlans(store.plans); // 계정에 아직 없을 수 있으니 먼저 저장
+      const res = await Auth.createInvite(state.id);
+      if(!res || res.error) throw new Error((res && res.error) || "알 수 없는 오류");
+      showShareLink(`${location.origin}${location.pathname}?join=${res.token || res}`);
+    }catch(err){
+      toast("초대 링크를 만들지 못했어요: " + (err && err.message ? err.message : err));
+    }finally{
+      shareBtn.disabled = false;
     }
   });
+
+  // 링크를 창으로 보여 줍니다 (복사 버튼은 창 안에서 눌러야 브라우저가 허용해요)
+  function showShareLink(link){
+    let dlg = document.getElementById("shareDialog");
+    if(!dlg){
+      dlg = document.createElement("dialog");
+      dlg.id = "shareDialog";
+      dlg.className = "share-dialog";
+      dlg.innerHTML = `<div class="share-inner">
+        <h2>같이 쓰기</h2>
+        <p>이 링크를 받은 사람이 로그인하면 이 예산표를 함께 고칠 수 있어요. 링크는 14일 뒤에 만료돼요.</p>
+        <input id="shareLink" type="text" readonly>
+        <div class="share-actions">
+          <button type="button" class="btn-primary" data-copy>링크 복사</button>
+          <button type="button" class="btn-ghost" data-close>닫기</button>
+        </div>
+      </div>`;
+      document.body.appendChild(dlg);
+      dlg.addEventListener("click", async e => {
+        if(e.target === dlg || e.target.closest("[data-close]")){ dlg.close(); return; }
+        if(e.target.closest("[data-copy]")){
+          const input = dlg.querySelector("#shareLink");
+          input.select();
+          try{ await navigator.clipboard.writeText(input.value); }catch(err){ document.execCommand("copy"); }
+          e.target.textContent = "복사했어요";
+          setTimeout(() => { e.target.textContent = "링크 복사"; }, 1500);
+        }
+      });
+    }
+    dlg.querySelector("#shareLink").value = link;
+    dlg.showModal();
+    dlg.querySelector("#shareLink").select();
+  }
 
   // 초대 링크로 들어왔을 때
   async function handleJoin(){
