@@ -1850,19 +1850,20 @@
     shareBtn.disabled = true;
     toast("초대 링크를 만드는 중…");
     try{
-      await Auth.savePlans(store.plans); // 계정에 아직 없을 수 있으니 먼저 저장
+      const saved = await Auth.savePlans(store.plans); // 계정에 아직 없을 수 있으니 먼저 저장
+      if(saved && saved.error) throw new Error("저장 단계: " + saved.error);
       const res = await Auth.createInvite(state.id);
-      if(!res || res.error) throw new Error((res && res.error) || "알 수 없는 오류");
-      showShareLink(`${location.origin}${location.pathname}?join=${res.token || res}`);
+      if(!res || res.error) throw new Error("초대 단계: " + ((res && res.error) || "알 수 없는 오류"));
+      showShareLink(`${location.origin}${location.pathname}?join=${res.token}`);
     }catch(err){
-      toast("초대 링크를 만들지 못했어요: " + (err && err.message ? err.message : err));
+      showShareLink(null, err && err.message ? err.message : String(err));
     }finally{
       shareBtn.disabled = false;
     }
   });
 
   // 링크를 창으로 보여 줍니다 (복사 버튼은 창 안에서 눌러야 브라우저가 허용해요)
-  function showShareLink(link){
+  function showShareLink(link, errorMessage){
     let dlg = document.getElementById("shareDialog");
     if(!dlg){
       dlg = document.createElement("dialog");
@@ -1889,9 +1890,15 @@
         }
       });
     }
-    dlg.querySelector("#shareLink").value = link;
+    const input = dlg.querySelector("#shareLink"), copyBtn = dlg.querySelector("[data-copy]");
+    dlg.querySelector("h2").textContent = errorMessage ? "링크를 만들지 못했어요" : "같이 쓰기";
+    dlg.querySelector("p").textContent = errorMessage
+      ? "아래 내용을 알려 주시면 원인을 찾을 수 있어요."
+      : "이 링크를 받은 사람이 로그인하면 이 예산표를 함께 고칠 수 있어요. 링크는 14일 뒤에 만료돼요.";
+    input.value = errorMessage || link;
+    copyBtn.hidden = !!errorMessage;
     dlg.showModal();
-    dlg.querySelector("#shareLink").select();
+    input.select();
   }
 
   // 초대 링크로 들어왔을 때

@@ -96,11 +96,11 @@
 
   async function savePlans(plans){
     const sb = await getClient();
-    if(!sb || !session) return false;
+    if(!sb || !session) return { error: "로그인이 필요해요" };
     const rows = plans.map((p, i) => planToRow(p, i, session.user.id));
     const { error } = await sb.from("plans").upsert(rows, { onConflict: "id" });
-    if(error){ console.warn("저장하지 못했어요:", error.message); return false; }
-    return true;
+    if(error){ console.warn("저장하지 못했어요:", error); return { error: error.message || String(error) }; }
+    return { ok: true };
   }
 
   async function removePlans(ids){
