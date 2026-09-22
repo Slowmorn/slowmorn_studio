@@ -86,7 +86,7 @@
   // ---- 예산표 읽고 쓰기 ----
   // 공유받은 예산표는 주인이 따로 있으므로 주인 id를 함께 들고 다닙니다
   const rowToPlan = row => Object.assign({}, row.data, {
-    id: row.id, title: row.title, kind: row.kind || undefined, owner: row.user_id
+    id: row.id, title: row.title, kind: row.kind || undefined, owner: row.user_id, updatedAt: Date.parse(row.updated_at) || undefined
   });
   const planToRow = (plan, i, userId) => ({
     id: plan.id,

@@ -1,6 +1,7 @@
 (async function(){
-  const HERE = (document.currentScript && document.currentScript.src) || location.href;
-  const STORE_KEY = "prep-budget-v2";
+  // 파일 보관과 템플릿은 assets/store.js 가 맡습니다. 이 파일은 화면만 그립니다.
+  const BS = window.BudgetStore;
+  await BS.ready;
   // GA4 events. Silent when analytics is blocked or still loading.
   function track(name, params){
     try{ if(typeof gtag === "function") gtag("event", name, params || {}); }catch(e){}
@@ -21,23 +22,7 @@
     }
     return excelPromise;
   }
-  const LEGACY_KEY = "prep-budget-v1"; // single-plan format, migrated on first load
-
-  // Templates live in assets/templates.json (edited with template-editor.html) and are
-  // fetched next to this script, so the app works from any page depth.
-  // [{ id, label, desc, title, intro, kind: "budget" | "guestbook", categories: [{ name, items: [{ name, qty?, budget?, options?: [{ name, note? }] }] }] }]
-  const TEMPLATE_LIST = await (async () => {
-    try{
-      const res = await fetch(new URL("templates.json", HERE));
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.json();
-    }catch(e){
-      console.warn("템플릿을 불러오지 못했어요:", e);
-      return [];
-    }
-  })();
-  const TEMPLATES = Object.fromEntries(TEMPLATE_LIST.map(t => [t.id, t]));
-  const BLANK_TEMPLATE = { title: "새 예산표", categories: [{ name: "첫 번째 카테고리", items: [{ name: "" }] }] };
+  const TEMPLATE_LIST = BS.templates;
 
   // Menu entries after 빈 목록, in the data's order
   document.getElementById("tplBlank").insertAdjacentHTML("afterend", TEMPLATE_LIST.map(t => {
@@ -45,53 +30,11 @@
     return `<button type="button" data-tpl="${e(t.id)}" data-label="${e(t.label)}">${e(t.label)}<small>${e(t.desc)}</small></button>`;
   }).join(""));
 
-  let uid = Date.now();
-  const nid = () => (uid++).toString(36);
+  const { nid, fromTemplate, newPlan, safeLink, planLabel } = BS;
 
-  function fromTemplate(key){
-    const t = TEMPLATES[key] || BLANK_TEMPLATE;
-    return {
-      title: t.title,
-      intro: t.intro || "",
-      kind: t.kind === "guestbook" ? "guestbook" : undefined,
-      template: TEMPLATES[key] ? key : undefined,
-      categories: (t.categories || []).map(c => ({
-        id: nid(), name: c.name,
-        items: ((c.items || []).length ? c.items : [{ name: "" }]).map(n => {
-          const t = typeof n === "string" ? { name: n } : n;
-          const it = { id: nid(), name: t.name || "", budget: t.budget || 0, actual: 0, done: false };
-          if(t.qty > 1) it.qty = t.qty;
-          if(t.options && t.options.length) it.options = t.options.map(o => ({ id: nid(), name: o.name, link: safeLink(o.link), price: o.price || 0, note: o.note || "" }));
-          return it;
-        })
-      }))
-    };
-  }
-
-  const newPlan = data => Object.assign({ title: "새 예산표", categories: [] }, data, { id: (data && data.id) || nid() });
-
-  function load(){
-    try{
-      const raw = localStorage.getItem(STORE_KEY);
-      if(raw){
-        const s = JSON.parse(raw);
-        if(s && Array.isArray(s.plans) && s.plans.length) return s;
-      }
-      const legacy = localStorage.getItem(LEGACY_KEY);
-      if(legacy){
-        const old = JSON.parse(legacy);
-        if(old && Array.isArray(old.categories)){
-          const plan = newPlan(old);
-          return { activeId: plan.id, plans: [plan] };
-        }
-      }
-    }catch(e){}
-    const plan = newPlan(fromTemplate("blank"));
-    return { activeId: plan.id, plans: [plan] };
-  }
-
-  // store = every plan (one per tab); state = the plan in the active tab
-  let store = load();
+  // store = 모든 파일; state = 지금 열어 둔 파일
+  const store = BS.data;
+  if(!store.plans.length) BS.addPlan("blank");
   let state;
   function syncActive(){
     state = store.plans.find(p => p.id === store.activeId) || store.plans[0];
@@ -104,39 +47,15 @@
     state = plan;
   }
 
-  let saveTimer = null, cloudTimer = null;
-  function save(){
-    clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => {
-      try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
-    }, 250);
-    saveToAccount();
-  }
-
-  // 로그인했을 때만 계정에도 저장합니다. 실패해도 브라우저 저장은 그대로예요.
   const Auth = window.BudgetAuth;
-  function saveToAccount(){
-    if(!(Auth && Auth.enabled && Auth.user)) return;
-    clearTimeout(cloudTimer);
-    cloudTimer = setTimeout(() => { Auth.savePlans(store.plans); }, 1500);
-  }
+  const save = () => BS.save(state);
+  const saveToAccount = () => BS.saveToAccount();
 
-  // 로그인 직후: 계정의 예산표와 이 브라우저의 것을 합칩니다
+  // 로그인 직후: 계정의 파일과 이 브라우저의 것을 합칩니다
   async function mergeWithAccount(){
-    if(!(Auth && Auth.enabled && Auth.user)) return;
-    const mine = await Auth.listPlans();
-    if(!mine) return;
-    const byId = new Map(mine.map(p => [p.id, p]));
-    let changed = false;
-    store.plans.forEach(p => { if(!byId.has(p.id)){ byId.set(p.id, p); changed = true; } }); // 이 브라우저에만 있던 것
-    const merged = [...byId.values()];
-    if(merged.length !== store.plans.length) changed = true;
-    store.plans = merged;
-    if(!store.plans.some(p => p.id === store.activeId)) store.activeId = store.plans[0] && store.plans[0].id;
+    if(!await BS.mergeWithAccount()) return;
     syncActive();
     render();
-    try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
-    if(changed) Auth.savePlans(store.plans);
   }
 
   // ---- formatting ----
@@ -221,7 +140,6 @@
   }
 
   const tabListEl = document.getElementById("tabList");
-  const planLabel = p => (p.title || "").trim() || "이름 없는 예산표";
 
   function renderTabs(){
     const closable = store.plans.length > 1;
@@ -803,7 +721,7 @@
     const snap = snapshot();
     // Keep a name the user typed; only default names get the template's title
     const title = (state.title || "").trim();
-    const isDefault = !title || /^새 예산표( \d+)?$/.test(title) || title === "우리 아기 출산 준비" || Object.values(TEMPLATES).some(t => t.title === title);
+    const isDefault = !title || /^새 예산표( \d+)?$/.test(title) || title === "우리 아기 출산 준비" || BS.templates.some(t => t.title === title);
     const plan = fromTemplate(btn.dataset.tpl);
     if(!isDefault) plan.title = state.title;
     replaceActive(plan);
@@ -871,16 +789,6 @@
     if(!optCtx) return null;
     const c = state.categories.find(x => x.id === optCtx.cid);
     return c ? c.items.find(i => i.id === optCtx.iid) || null : null;
-  }
-  // Only http(s) links; "naver.com" becomes "https://naver.com"
-  function safeLink(raw){
-    let s = String(raw || "").trim();
-    if(!s) return "";
-    if(!/^[a-z][a-z0-9+.-]*:/i.test(s)) s = "https://" + s;
-    try{
-      const u = new URL(s);
-      return u.protocol === "http:" || u.protocol === "https:" ? u.href : "";
-    }catch(e){ return ""; }
   }
   const hostOf = link => { try{ return new URL(link).hostname.replace(/^www\./, ""); }catch(e){ return ""; } };
 
@@ -1818,7 +1726,7 @@
       try{ history.replaceState(null, "", location.pathname + location.hash); }catch(e){}
       return;
     }
-    if(!key || !TEMPLATES[key]) return;
+    if(!key || !BS.templates.some(t => t.id === key)) return;
     const plan = newPlan(fromTemplate(key));
     // A starter budget nobody has typed in yet is replaced, not left behind as an empty tab
     const pristine = store.plans.length === 1
@@ -1932,7 +1840,7 @@
     if(!store.plans.some(p => p.id === activeId)) store.activeId = store.plans[0] && store.plans[0].id;
     syncActive();
     render();
-    try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
+    BS.saveLocalNow();
   }
 
   async function watchRemote(){

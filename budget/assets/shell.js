@@ -3,7 +3,6 @@
    - 로그인 버튼과 로그인 창 (assets/auth.js 가 실제 통신을 맡습니다)
    - 홈의 '내 예산표' 목록: 로그인 전에는 이 브라우저에 저장된 것, 로그인하면 계정의 것 */
 (function(){
-  const STORE_KEY = "prep-budget-v2";
   const Auth = window.BudgetAuth;
   // 이 파일은 /budget/assets/ 에 있으므로 두 단계 올라가면 사이트 최상위입니다
   const root = new URL("../../", (document.currentScript && document.currentScript.src) || location.href).pathname;
@@ -117,21 +116,9 @@
   const listEl = document.getElementById("myPlans");
   const noteEl = document.querySelector(".my-note");
 
-  function localPlans(){
-    try{
-      const store = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
-      return (store && Array.isArray(store.plans)) ? store.plans : [];
-    }catch(e){ return []; }
-  }
-
-  function planSummary(p){
-    let budget = 0, count = 0;
-    (p.categories || []).forEach(c => (c.items || []).forEach(i => {
-      budget += i.budget || 0;
-      if(i.name || i.budget || i.actual) count++;
-    }));
-    return { budget, count };
-  }
+  const BS = window.BudgetStore;
+  const localPlans = () => (BS ? BS.plans : []);
+  const planSummary = p => (BS ? BS.summary(p) : { budget: 0, count: 0 });
 
   function renderPlans(plans){
     if(!listEl) return;
