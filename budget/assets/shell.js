@@ -47,7 +47,7 @@
       dlg.innerHTML = `<div class="login-inner">
         <h2>로그인</h2>
         <p>로그인하면 만든 예산표가 계정에 저장돼서, 휴대폰이나 다른 기기에서도 이어서 쓸 수 있어요.</p>
-        <button type="button" class="login-kakao" data-provider="kakao">카카오로 시작하기</button>
+        ${(window.BUDGET_CONFIG || {}).kakao ? `<button type="button" class="login-kakao" data-provider="kakao">카카오로 시작하기</button>` : ""}
         <button type="button" class="login-google" data-provider="google">구글로 시작하기</button>
         <p class="login-note">로그인 전에 만든 예산표는 로그인할 때 계정으로 함께 옮겨져요.</p>
         <button type="button" class="login-close" data-close>닫기</button>

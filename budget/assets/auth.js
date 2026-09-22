@@ -53,16 +53,13 @@
     return /[#&](access_token|error)=/.test(location.hash) || /[?&]code=/.test(location.search);
   }
 
-  // 카카오는 앱에 설정한 동의항목만 요청해야 합니다 (아니면 KOE205).
-  // 이메일은 비즈니스 앱 전환이 필요해서 쓰지 않고, 닉네임만 받습니다.
-  const SCOPES = { kakao: "profile_nickname" };
-
   async function signIn(provider){
     const sb = await getClient();
     if(!sb) return;
-    const options = { redirectTo: location.href.split("#")[0] };
-    if(SCOPES[provider]) options.scopes = SCOPES[provider];
-    const { error } = await sb.auth.signInWithOAuth({ provider, options });
+    const { error } = await sb.auth.signInWithOAuth({
+      provider,
+      options: { redirectTo: location.href.split("#")[0] }
+    });
     if(error) alert("로그인을 시작하지 못했어요: " + error.message);
   }
 
