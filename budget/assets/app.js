@@ -196,8 +196,8 @@
     } else {
       catsEl.innerHTML = state.categories.map(c => `
         <section class="cat${c.collapsed ? " collapsed" : ""}" data-cid="${c.id}">
-          <button type="button" class="cat-grip" aria-label="'${esc(catLabel(c))}' 순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 16" aria-hidden="true"><circle cx="2" cy="2.5" r="1.3" fill="currentColor"/><circle cx="6" cy="2.5" r="1.3" fill="currentColor"/><circle cx="2" cy="8" r="1.3" fill="currentColor"/><circle cx="6" cy="8" r="1.3" fill="currentColor"/><circle cx="2" cy="13.5" r="1.3" fill="currentColor"/><circle cx="6" cy="13.5" r="1.3" fill="currentColor"/></svg></button>
           <div class="cat-head">
+            <button type="button" class="cat-grip" aria-label="'${esc(catLabel(c))}' 순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 16" aria-hidden="true"><circle cx="2" cy="2.5" r="1.3" fill="currentColor"/><circle cx="6" cy="2.5" r="1.3" fill="currentColor"/><circle cx="2" cy="8" r="1.3" fill="currentColor"/><circle cx="6" cy="8" r="1.3" fill="currentColor"/><circle cx="2" cy="13.5" r="1.3" fill="currentColor"/><circle cx="6" cy="13.5" r="1.3" fill="currentColor"/></svg></button>
             <input type="text" class="cat-name" value="${esc(c.name)}" placeholder="카테고리 이름" aria-label="카테고리 이름">
             <span class="cat-sum">${catSumHTML(c)}</span>
             ${foldBtnHTML(c)}
