@@ -259,7 +259,7 @@
       render();
       return;
     }
-    if(btn.dataset.act === "dday"){ openDday(plan); return; }
+    if(btn.dataset.act === "dday"){ window.BudgetShell.openDday(plan, render); return; }
     if(btn.dataset.act === "duplicate"){
       const copy = BS.duplicate(id);
       render();
@@ -343,48 +343,6 @@
   board.addEventListener("pointerup", endDrag);
   board.addEventListener("pointercancel", endDrag);
   board.addEventListener("dragstart", e => e.preventDefault());
-
-  // ---- 날짜 정하기 ----
-  function openDday(plan){
-    let dlg = document.getElementById("ddayDialog");
-    if(!dlg){
-      dlg = document.createElement("dialog");
-      dlg.id = "ddayDialog";
-      dlg.className = "login-dialog";
-      dlg.innerHTML = `<form method="dialog" class="login-inner">
-        <h2>언제까지 준비하세요?</h2>
-        <p>날짜를 정하면 파일에 남은 날이 표시돼요.</p>
-        <label class="dday-field"><span>이름</span>
-          <input name="label" type="text" maxlength="12" placeholder="결혼식, 출산 예정일…">
-        </label>
-        <label class="dday-field"><span>날짜</span>
-          <input name="date" type="date" required>
-        </label>
-        <button type="submit" class="btn-ink dday-save" value="save">정하기</button>
-        <button type="button" class="login-close" data-clear>날짜 지우기</button>
-        <button type="submit" class="login-close" value="cancel">그만두기</button>
-      </form>`;
-      document.body.appendChild(dlg);
-      dlg.addEventListener("click", e => {
-        if(!e.target.closest("[data-clear]")) return;
-        BS.setDday(dlg.dataset.pid, null);
-        dlg.close("cleared");
-      });
-      dlg.addEventListener("close", () => {
-        if(dlg.returnValue === "save"){
-          const f = dlg.querySelector("form");
-          BS.setDday(dlg.dataset.pid, f.date.value, f.label.value.trim());
-        }
-        render();
-      });
-    }
-    dlg.dataset.pid = plan.id;
-    const f = dlg.querySelector("form");
-    f.label.value = plan.ddayLabel || (BS.isGuest(plan) ? "결혼식" : "");
-    f.date.value = plan.dday || "";
-    dlg.querySelector("[data-clear]").hidden = !plan.dday;
-    dlg.showModal();
-  }
 
   // ---- 휴지통 ----
   function openTrash(){

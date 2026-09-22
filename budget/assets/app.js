@@ -146,6 +146,27 @@
   const fileNameEl = document.getElementById("fileName");
   const fileListEl = document.getElementById("fileList");
 
+  // 남은 날. 여기서도 정하고 고칠 수 있게 버튼으로 둡니다.
+  const ddayChip = document.getElementById("ddayChip");
+  function renderDday(){
+    if(!ddayChip) return;
+    const n = BS.daysLeft(state.dday);
+    if(n === null){
+      ddayChip.className = "dday-chip empty";
+      ddayChip.textContent = "날짜 정하기";
+      ddayChip.title = "결혼식이나 출산 예정일을 정해 두면 남은 날이 보여요";
+      return;
+    }
+    const label = (state.ddayLabel || "").trim();
+    const left = n === 0 ? "오늘이에요" : (n > 0 ? `D-${n}` : `D+${-n}`);
+    ddayChip.className = "dday-chip" + (n < 0 ? " past" : (n <= 14 ? " soon" : ""));
+    ddayChip.textContent = label ? `${label} ${left}` : left;
+    ddayChip.title = `${label ? label + " · " : ""}${state.dday} · 눌러서 고치기`;
+  }
+  if(ddayChip) ddayChip.addEventListener("click", () => {
+    window.BudgetShell.openDday(state, () => { renderDday(); renderFileBar(); });
+  });
+
   function renderFileBar(){
     fileNameEl.textContent = planLabel(state);
     fileSwitch.dataset.accent = state.accent || "green";
@@ -188,6 +209,7 @@
     document.body.classList.toggle("kind-guestbook", guest);
     applyAccent();
     renderFileBar();
+    renderDday();
     titleEl.value = state.title || "";
     introEl.value = state.intro || "";
     fitIntro();

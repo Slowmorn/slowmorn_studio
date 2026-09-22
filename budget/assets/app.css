@@ -454,3 +454,22 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 /* 체크리스트 화면은 아래에 합계 바가 깔려 있어 알림을 더 띄웁니다 */
 #planner ~ .toast,
 body:has(#planner) .toast{bottom:120px}
+
+/* 파일 줄 오른쪽의 남은 날. 눌러서 정하고 고칩니다. */
+.dday-chip{
+  margin-left:auto;flex:none;border:0;
+  font-size:12.5px;font-weight:700;letter-spacing:-0.01em;
+  padding:5px 11px;border-radius:99px;
+  background:var(--ink);color:var(--sheet);white-space:nowrap;
+}
+.dday-chip:hover{filter:brightness(1.35)}
+.dday-chip.soon{background:#C2603F}
+.dday-chip.past{background:color-mix(in srgb, var(--ink) 45%, transparent)}
+.dday-chip.empty{
+  background:none;color:var(--muted);font-weight:400;
+  border:1px dashed var(--line);padding:4px 10px;
+}
+.dday-chip.empty:hover{filter:none;background:var(--hover);color:var(--ink)}
+@media (max-width:640px){
+  .dday-chip.empty{display:none}   /* 좁은 화면에서는 날짜가 있을 때만 */
+}
