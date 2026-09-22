@@ -131,7 +131,7 @@ body[data-cols="4"] #cats{--cols:4}
 /* 1줄: 손잡이 · 이름 · 접기   2줄: 손잡이 · 예산/지출 · ⋯ 메뉴 */
 .cat-head{
   display:grid;grid-template-columns:20px minmax(0,1fr) auto;
-  grid-template-areas:"grip name fold" "grip sum menu";
+  grid-template-areas:"grip name fold" ".    sum  menu";
   align-items:center;column-gap:8px;margin-bottom:6px;
 }
 .cat-head .cat-grip{grid-area:grip}
@@ -142,7 +142,7 @@ body[data-cols="4"] #cats{--cols:4}
 /* 카테고리 순서 바꾸기 손잡이. 카드 안, 이름 왼쪽에 둡니다.
    예전에는 카드 밖으로 튀어나온 색 탭이었는데 항목 손잡이와 따로 놀았습니다. */
 .cat-grip{
-  width:20px;height:34px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);
+  width:20px;height:28px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);
   display:grid;place-items:center;cursor:grab;opacity:.45;
   touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
 }

@@ -179,7 +179,15 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
 .desk-board.free{display:block;padding:0}
 
 /* 자석 */
-.file{position:relative;z-index:1;width:100%}
+/* 기울기와 뜨는 동작을 카드 전체에 겁니다. .file-open 에만 걸어 두면
+   D-day 표와 ⋯ 버튼이 제자리에 남아 따로 놉니다. */
+.file{
+  position:relative;z-index:1;width:100%;
+  transform:rotate(var(--tilt,0deg));
+  transition:transform .16s ease;
+}
+.file:hover{transform:rotate(0deg) translateY(-2px)}
+.file.dragging{transform:rotate(0deg) scale(1.04);transition:none;z-index:5}
 .desk-board.free .file{position:absolute;width:208px}
 .file-open{
   position:relative;display:grid;

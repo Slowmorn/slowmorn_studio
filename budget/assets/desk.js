@@ -218,18 +218,7 @@
 
   function renderSummary(plans){
     if(!summaryEl) return;
-    if(!plans.length){ summaryEl.textContent = ""; return; }
-    let budget = 0, done = 0, total = 0;
-    plans.forEach(p => {
-      if(BS.isGuest(p)) return;
-      budget += BS.summary(p).budget;
-      const pr = BS.progress(p);
-      done += pr.done; total += pr.total;
-    });
-    const bits = [`파일 ${plans.length}개`];
-    if(budget) bits.push(`총 예산 ${manwon(budget)}`);
-    if(total) bits.push(`완료 ${done}/${total}`);
-    summaryEl.textContent = bits.join(" · ");
+    summaryEl.textContent = plans.length ? `파일 ${plans.length}개` : "";
   }
 
   function renderTrashBtn(){
