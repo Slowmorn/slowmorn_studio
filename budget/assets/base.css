@@ -1,31 +1,41 @@
 /* 버짓리스트 공통 토큰과 기본 서식 — 모든 페이지가 먼저 읽습니다 */
+/* 색은 거의 쓰지 않습니다. 종이 같은 따뜻한 회색과 먹색으로 화면을 만들고,
+   색(--accent 계열)은 파일 아이콘과 점처럼 '그 파일이 무엇인지' 알려 주는 곳에만 씁니다. */
 :root{
-  --paper:#F2F4F6;
+  --paper:#F7F6F3;
   --sheet:#FFFFFF;
-  --ink:#1B2230;
-  --muted:#667085;
-  --line:#DDE2E8;
+  --ink:#37352F;
+  --muted:#787774;
+  --line:#E9E8E4;
+  --hover:rgba(55,53,47,.06);      /* 테두리 대신 쓰는 배경 */
+  --hover-strong:rgba(55,53,47,.11);
+  --link:#37352F;
   --accent:#1A766B;
   --accent-soft:#DDF3EF;
   --accent-fill:#26A392;
   --on-accent:#FFFFFF;
-  --warn:#B4233C;
-  --bar:#1B2230;
-  --bar-ink:#F2F4F6;
-  --bar-muted:#A9B2C0;
+  --warn:#B4423A;
+  --bar:#37352F;
+  --bar-ink:#F7F6F3;
+  --bar-muted:#A6A29A;
+  --radius:6px;
+  --radius-lg:10px;
+  --wrap:860px;
   --sans:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#12161D; --sheet:#1A2029; --ink:#E7EAEE; --muted:#9AA3B2; --line:#2C3440;
-    --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#12161D; --warn:#F07A8E;
-    --bar:#E7EAEE; --bar-ink:#12161D; --bar-muted:#4B5563;
+    --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
+    --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
+    --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#191918; --warn:#EE8B82;
+    --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
   }
 }
 :root[data-theme="dark"]{
-  --paper:#12161D; --sheet:#1A2029; --ink:#E7EAEE; --muted:#9AA3B2; --line:#2C3440;
-  --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#12161D; --warn:#F07A8E;
-  --bar:#E7EAEE; --bar-ink:#12161D; --bar-muted:#4B5563;
+  --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
+  --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
+  --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#191918; --warn:#EE8B82;
+  --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
 }
 /* --swatch: brighter display color for the picker and tab dots only. */
 /* Per-tab theme colors. Scoped by [data-accent] so each tab chip can show its own color too. */
@@ -36,27 +46,29 @@
 [data-accent="purple"]{--accent:#7A4FD0;--accent-soft:#F0E9FC;--accent-fill:#8E63E6;--on-accent:#FFFFFF;--swatch:#9B72E8}
 [data-accent="orange"]{--accent:#B24A0B;--accent-soft:#FDEBDD;--accent-fill:#E2661C;--on-accent:#FFFFFF;--swatch:#FF8A3D}
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#12161D}
-  :root:not([data-theme="light"]) [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#12161D}
-  :root:not([data-theme="light"]) [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#12161D}
-  :root:not([data-theme="light"]) [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#12161D}
-  :root:not([data-theme="light"]) [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#12161D}
-  :root:not([data-theme="light"]) [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#12161D}
+  :root:not([data-theme="light"]) [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#191918}
 }
-:root[data-theme="dark"] [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#12161D}
-:root[data-theme="dark"] [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#12161D}
-:root[data-theme="dark"] [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#12161D}
-:root[data-theme="dark"] [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#12161D}
-:root[data-theme="dark"] [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#12161D}
-:root[data-theme="dark"] [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#12161D}
+:root[data-theme="dark"] [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#191918}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{
   background:var(--paper); color:var(--ink);
-  font-family:var(--sans); font-size:15px; line-height:1.55;
+  font-family:var(--sans); font-size:15.5px; line-height:1.6;
   -webkit-font-smoothing:antialiased;
 }
 button,input,textarea,select{font:inherit;color:inherit}
 button{cursor:pointer}
-a{color:var(--accent)}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+/* 본문 링크는 색이 아니라 밑줄로 알립니다 */
+a{color:var(--link);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:2px}
+a:hover{text-decoration-color:var(--muted)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:4px}

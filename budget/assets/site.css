@@ -19,10 +19,10 @@
 .topbar nav a[aria-current="page"]{color:var(--ink);font-weight:600}
 .topbar .spacer{flex:1}
 .topbar .top-cta{
-  flex:none;background:var(--accent-fill);color:var(--on-accent);text-decoration:none;
+  flex:none;background:var(--ink);color:var(--sheet);text-decoration:none;
   font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:7px;white-space:nowrap;
 }
-.topbar .top-cta:hover{filter:brightness(1.06)}
+.topbar .top-cta:hover{filter:brightness(1.18)}
 @media (max-width:640px){
   .topbar nav{display:none}
 }
@@ -41,7 +41,7 @@ footer a:hover{text-decoration:underline}
 /* 소개 영역 */
 .hero{border-bottom:1px solid var(--line);background:var(--sheet)}
 .hero-inner{max-width:var(--wrap);margin:0 auto;padding:44px 20px 36px}
-.hero-kicker{color:var(--accent);font-size:13.5px;font-weight:600;margin:0 0 10px}
+.hero-kicker{color:var(--muted);font-size:13.5px;font-weight:600;margin:0 0 10px}
 .hero h1{
   font-size:clamp(26px,4.4vw,38px);line-height:1.28;letter-spacing:-0.02em;
   margin:0 0 12px;max-width:22ch;
@@ -53,43 +53,42 @@ footer a:hover{text-decoration:underline}
 .hero-points span{color:var(--muted);font-size:13.5px;line-height:1.6}
 .hero-cta{
   display:inline-block;margin-top:18px;
-  background:var(--accent-fill);color:var(--on-accent);text-decoration:none;
+  background:var(--ink);color:var(--sheet);text-decoration:none;
   font-weight:600;padding:11px 20px;border-radius:8px;
 }
-.hero-cta:hover{filter:brightness(1.06)}
+.hero-cta:hover{filter:brightness(1.18)}
 .hero-cta:active{filter:brightness(0.94)}
 .hero-note{color:var(--muted);font-size:13px;margin:10px 0 0}
 .card-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .card-links a{
-  color:var(--accent);font-size:13px;text-decoration:none;
+  font-size:13px;text-decoration:none;
   border:1px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--sheet);
   transition:border-color .15s;
 }
-.card-links a:hover{border-color:var(--accent)}
+.card-links a:hover{background:var(--hover)}
 
 /* 아래쪽 안내 */
 .about{max-width:var(--wrap);margin:0 auto;padding:8px 20px 0}
 .about h2{font-size:19px;margin:32px 0 10px}
 .about h3{font-size:15.5px;margin:18px 0 4px}
 .about p{color:var(--muted);margin:0;max-width:66ch;line-height:1.7}
-.about a{color:var(--accent)}
 .about ol{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:1.8;max-width:66ch}
 .hero-aff{margin:14px 0 0;word-break:keep-all}
-.hero-aff a{color:var(--accent);white-space:nowrap}
+.hero-aff a{white-space:nowrap}
 
 /* 랜딩 페이지 */
 
 .hero{background:var(--sheet);border-bottom:1px solid var(--line)}
 .hero-inner{max-width:var(--wrap);margin:0 auto;padding:48px 20px 40px}
-.hero-kicker{color:var(--accent);font-size:13.5px;font-weight:600;margin:0 0 10px}
+.hero-kicker{color:var(--muted);font-size:13.5px;font-weight:600;margin:0 0 10px}
 h1{font-size:clamp(26px,4.4vw,38px);line-height:1.28;letter-spacing:-0.02em;margin:0 0 12px;max-width:24ch}
 .lead{color:var(--muted);margin:0;max-width:64ch}
 .cta{
   display:inline-block;margin-top:24px;
-  background:var(--accent-fill);color:var(--on-accent);text-decoration:none;
+  background:var(--ink);color:var(--sheet);text-decoration:none;
   font-weight:600;padding:12px 22px;border-radius:8px;
 }
-.cta:hover{filter:brightness(1.06)}
+.cta:hover{filter:brightness(1.18)}
 .cta:active{filter:brightness(0.94)}
 .note{color:var(--muted);font-size:13px;margin:10px 0 0}
 
@@ -124,12 +123,11 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
   border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--sheet);
   text-decoration:none;color:var(--ink);transition:border-color .15s, transform .15s;
 }
-.tool-card:hover{border-color:var(--accent);transform:translateY(-1px)}
+.tool-card:hover{background:var(--hover);border-color:var(--line)}
 .tool-card b{font-size:15.5px}
 .tool-card span{color:var(--muted);font-size:13.5px;line-height:1.6}
-.tool-card .tool-more{color:var(--accent);font-size:13px;font-weight:600;margin-top:4px}
+.tool-card .tool-more{color:var(--muted);font-size:13px;font-weight:600;margin-top:4px}
 .tool-foot{color:var(--muted);font-size:13.5px;margin:14px 0 0}
-.tool-foot a{color:var(--accent)}
 
 .mine{padding-top:40px}
 .my-plans{display:grid;gap:8px}
@@ -138,7 +136,7 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
   border:1px solid var(--line);border-radius:10px;padding:12px 14px;background:var(--sheet);
   text-decoration:none;color:var(--ink);
 }
-.my-plan:hover{border-color:var(--accent)}
+.my-plan:hover{background:var(--hover)}
 .my-dot{width:8px;height:8px;border-radius:50%;background:var(--swatch,var(--accent-fill));flex:none}
 .my-name{font-weight:600}
 .my-meta{color:var(--muted);font-size:13px;margin-left:auto}
@@ -152,7 +150,7 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
   font-size:13.5px;padding:6px 12px;border-radius:7px;list-style:none;cursor:pointer;
 }
 .auth-btn::-webkit-details-marker{display:none}
-.auth-btn:hover{border-color:color-mix(in srgb, var(--ink) 22%, var(--sheet))}
+.auth-btn:hover{background:var(--hover)}
 .auth-btn img{border-radius:50%}
 .auth-dot{width:8px;height:8px;border-radius:50%;background:var(--accent-fill)}
 .auth-name{max-width:8em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -160,11 +158,11 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
 .auth-pop{
   position:absolute;right:0;top:calc(100% + 6px);z-index:30;min-width:180px;padding:8px;
   background:var(--sheet);border:1px solid var(--line);border-radius:10px;
-  box-shadow:0 8px 24px rgba(15,20,30,.14);
+  box-shadow:0 8px 24px rgba(15,15,14,.14);
 }
 .auth-hint{color:var(--muted);font-size:12px;margin:2px 4px 6px}
 .auth-pop button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:6px;font-size:14px}
-.auth-pop button:hover{background:var(--paper)}
+.auth-pop button:hover{background:var(--hover)}
 .auth-danger{color:var(--warn)}
 .login-inner a{color:inherit}
 .login-danger{background:var(--warn);color:#fff;margin-top:8px}
@@ -173,15 +171,15 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
 
 .login-dialog{
   border:0;border-radius:14px;padding:0;background:var(--sheet);color:var(--ink);
-  max-width:380px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(15,20,30,.22);
+  max-width:380px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(15,15,14,.22);
 }
-.login-dialog::backdrop{background:rgba(15,20,30,.45)}
+.login-dialog::backdrop{background:rgba(15,15,14,.45)}
 .login-inner{padding:26px 24px 20px;display:flex;flex-direction:column;gap:10px}
 .login-inner h2{margin:0;font-size:19px}
 .login-inner p{color:var(--muted);font-size:13.5px;margin:0;line-height:1.6}
 .login-inner button{border:0;border-radius:8px;padding:12px 16px;font-size:15px;font-weight:600}
 .login-kakao{background:#FEE500;color:#191600;margin-top:8px}
-.login-google{background:var(--sheet);color:var(--ink);border:1px solid var(--line) !important}
+.login-google{background:var(--sheet);color:var(--ink);border:1px solid var(--line) !important;font-weight:500 !important}
 .login-kakao:hover,.login-google:hover{filter:brightness(0.97)}
 .login-note{font-size:12px !important;margin-top:4px !important}
 .login-close{background:none;color:var(--muted);font-weight:400 !important;font-size:13.5px !important;padding:6px !important}
@@ -189,9 +187,9 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
 /* 같이 쓰기 링크 창 */
 .share-dialog{
   border:0;border-radius:14px;padding:0;background:var(--sheet);color:var(--ink);
-  max-width:440px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(15,20,30,.22);
+  max-width:440px;width:calc(100% - 32px);box-shadow:0 20px 60px rgba(15,15,14,.22);
 }
-.share-dialog::backdrop{background:rgba(15,20,30,.45)}
+.share-dialog::backdrop{background:rgba(15,15,14,.45)}
 .share-inner{padding:24px;display:flex;flex-direction:column;gap:10px}
 .share-inner h2{margin:0;font-size:18px}
 .share-inner p{color:var(--muted);font-size:13.5px;margin:0;line-height:1.6}
@@ -200,5 +198,5 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
   background:var(--paper);color:var(--ink);font-size:13px;
 }
 .share-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px}
-.share-actions .btn-primary{border:0;border-radius:8px;padding:10px 16px;font-weight:600;background:var(--accent-fill);color:var(--on-accent)}
+.share-actions .btn-primary{border:0;border-radius:8px;padding:10px 16px;font-weight:600;background:var(--ink);color:var(--sheet)}
 .share-actions .btn-ghost{border:1px solid var(--line);border-radius:8px;padding:10px 16px;background:none;color:var(--muted)}
