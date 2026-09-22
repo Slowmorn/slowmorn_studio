@@ -165,6 +165,11 @@ main ol,main ul{color:var(--muted);margin:8px 0 0;padding-left:20px;line-height:
 .auth-hint{color:var(--muted);font-size:12px;margin:2px 4px 6px}
 .auth-pop button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;border-radius:6px;font-size:14px}
 .auth-pop button:hover{background:var(--paper)}
+.auth-danger{color:var(--warn)}
+.login-inner a{color:inherit}
+.login-danger{background:var(--warn);color:#fff;margin-top:8px}
+.login-danger:hover{filter:brightness(0.94)}
+.login-danger:disabled{opacity:.6}
 
 .login-dialog{
   border:0;border-radius:14px;padding:0;background:var(--sheet);color:var(--ink);

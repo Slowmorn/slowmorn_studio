@@ -5,6 +5,8 @@
 (function(){
   const STORE_KEY = "prep-budget-v2";
   const Auth = window.BudgetAuth;
+  // 이 파일은 /budget/assets/ 에 있으므로 두 단계 올라가면 사이트 최상위입니다
+  const root = new URL("../../", (document.currentScript && document.currentScript.src) || location.href).pathname;
   const esc = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const won = n => (Number(n) || 0).toLocaleString("ko-KR") + "원";
 
@@ -31,6 +33,7 @@
         <div class="auth-pop">
           <p class="auth-hint">예산표가 이 계정에 저장돼요</p>
           <button type="button" data-auth="out">로그아웃</button>
+          <button type="button" class="auth-danger" data-auth="delete">계정 삭제</button>
         </div>
       </details>`;
     } else {
@@ -50,6 +53,7 @@
         ${(window.BUDGET_CONFIG || {}).kakao ? `<button type="button" class="login-kakao" data-provider="kakao">카카오로 시작하기</button>` : ""}
         <button type="button" class="login-google" data-provider="google">구글로 시작하기</button>
         <p class="login-note">로그인 전에 만든 예산표는 로그인할 때 계정으로 함께 옮겨져요.</p>
+        <p class="login-note">로그인하면 <a href="${root}terms/">이용약관</a>과 <a href="${root}privacy/">개인정보 처리방침</a>에 동의하는 것으로 봅니다.</p>
         <button type="button" class="login-close" data-close>닫기</button>
       </div>`;
       document.body.appendChild(dlg);
@@ -62,11 +66,51 @@
     dlg.showModal();
   }
 
+  function openDelete(){
+    let dlg = document.getElementById("deleteDialog");
+    if(!dlg){
+      dlg = document.createElement("dialog");
+      dlg.id = "deleteDialog";
+      dlg.className = "login-dialog";
+      dlg.innerHTML = `<div class="login-inner">
+        <h2>계정을 지울까요?</h2>
+        <p id="deleteWhat">계정에 저장된 예산표가 모두 함께 지워져요.</p>
+        <p>되돌릴 수 없고, 같이 쓰자고 보낸 링크도 더는 열리지 않아요.</p>
+        <p class="login-note">이 브라우저에 남아 있는 사본은 지워지지 않아요. 예산표 화면에서 탭을 닫으시면 됩니다.</p>
+        <button type="button" class="login-danger" data-del>계정 지우기</button>
+        <button type="button" class="login-close" data-close>그만두기</button>
+      </div>`;
+      document.body.appendChild(dlg);
+      dlg.addEventListener("click", async e => {
+        if(e.target === dlg || e.target.closest("[data-close]")){ dlg.close(); return; }
+        const btn = e.target.closest("[data-del]");
+        if(!btn) return;
+        btn.disabled = true;
+        btn.textContent = "지우는 중…";
+        const res = await Auth.deleteAccount();
+        btn.disabled = false;
+        btn.textContent = "계정 지우기";
+        if(res && res.error){ alert("계정을 지우지 못했어요: " + res.error); return; }
+        dlg.close();
+        location.href = root + "budget/";
+      });
+    }
+    // 몇 개가 지워지는지 먼저 알려 줍니다
+    const what = dlg.querySelector("#deleteWhat");
+    what.textContent = "계정에 저장된 예산표가 모두 함께 지워져요.";
+    Auth.listPlans().then(plans => {
+      if(plans) what.textContent = `계정에 저장된 예산표 ${plans.length}개가 함께 지워져요.`;
+    }).catch(() => {});
+    dlg.showModal();
+  }
+
   document.addEventListener("click", e => {
     const btn = e.target.closest("[data-auth]");
     if(!btn) return;
+    document.querySelectorAll("details.auth-menu[open]").forEach(d => d.open = false);
     if(btn.dataset.auth === "in") openLogin();
-    if(btn.dataset.auth === "out"){ Auth.signOut(); document.querySelectorAll("details.auth-menu[open]").forEach(d => d.open = false); }
+    if(btn.dataset.auth === "out") Auth.signOut();
+    if(btn.dataset.auth === "delete") openDelete();
   });
 
   // ---- 내 예산표 (홈) ----

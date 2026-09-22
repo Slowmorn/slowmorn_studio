@@ -71,6 +71,18 @@
     notify();
   }
 
+  // 계정과 그 계정에 저장된 예산표를 모두 지웁니다 (되돌릴 수 없습니다)
+  async function deleteAccount(){
+    const sb = await getClient();
+    if(!sb || !session) return { error: "로그인이 필요해요" };
+    const { error } = await sb.rpc("delete_my_account");
+    if(error){ console.warn("탈퇴하지 못했어요:", error); return { error: error.message || String(error) }; }
+    try{ await sb.auth.signOut(); }catch(e){}
+    session = null;
+    notify();
+    return { ok: true };
+  }
+
   // ---- 예산표 읽고 쓰기 ----
   // 공유받은 예산표는 주인이 따로 있으므로 주인 id를 함께 들고 다닙니다
   const rowToPlan = row => Object.assign({}, row.data, {
@@ -144,7 +156,8 @@
     get session(){ return session; },
     get user(){ return session && session.user; },
     onChange(fn){ listeners.add(fn); return () => listeners.delete(fn); },
-    getClient, signIn, signOut, listPlans, savePlans, removePlans, createInvite, acceptInvite, watchPlans,
+    getClient, signIn, signOut, deleteAccount,
+    listPlans, savePlans, removePlans, createInvite, acceptInvite, watchPlans,
     // 페이지가 열릴 때: 이미 로그인한 흔적이 있으면 세션을 복구합니다
     async init(){
       if(!ENABLED || !hasStoredSession()) return null;

@@ -96,3 +96,25 @@ grant execute on function public.accept_plan_invite(uuid) to authenticated;
 
 -- 5) 상대의 변경을 실시간으로 받기 ------------------------------------------
 alter publication supabase_realtime add table public.plans;
+
+-- 6) 탈퇴 -----------------------------------------------------------------
+-- 계정과 그 계정의 예산표를 한 번에 지웁니다.
+-- auth.users 를 지우면 plans·plan_members·plan_invites 는 on delete cascade 로 함께 사라지고,
+-- 로그인 기록(identities, sessions)도 같이 정리됩니다.
+--
+-- 실행 전에 이 한 줄로 권한이 있는지 먼저 확인해 보세요. true 가 나와야 합니다.
+--   select has_table_privilege('auth.users', 'delete');
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = public, auth
+as $$
+declare uid uuid := auth.uid();
+begin
+  if uid is null then raise exception '로그인이 필요해요'; end if;
+  delete from auth.users where id = uid;
+end $$;
+
+revoke all on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;
