@@ -149,7 +149,7 @@
         ${guest ? ICON_GUEST : ICON_BUDGET}
         <span class="file-name">${esc(title)}</span>
         <span class="file-meta">${esc(meta)}</span>
-        ${guest || !pr.total ? "" : `<span class="file-bar" aria-label="${pr.done}/${pr.total} 완료">
+        ${guest || !pr.total ? "" : `<span class="file-progress" aria-label="${pr.done}/${pr.total} 완료">
           <span style="width:${Math.round(pr.ratio * 100)}%"></span>
         </span><span class="file-count">${pr.done}/${pr.total}</span>`}
       </a>
