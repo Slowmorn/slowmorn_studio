@@ -144,23 +144,91 @@
     return plan;
   }
 
-  // 되돌리기를 위해 지운 파일과 자리를 돌려줍니다
-  function removePlan(id){
-    const i = indexOf(id);
-    if(i < 0) return null;
-    const [plan] = data.plans.splice(i, 1);
-    if(data.activeId === id) data.activeId = (data.plans[i] || data.plans[i - 1] || data.plans[0] || {}).id || null;
-    saveLocalNow();
-    if(Auth && Auth.enabled && Auth.user) Auth.removePlans([id]);
-    return { plan, index: i };
-  }
+  // ---- 휴지통 ----
+  // 지운 파일은 목록에 남겨 두고 deletedAt 만 찍습니다. 계정 동기화가 그대로 따라오고,
+  // 30일이 지난 것만 진짜로 지웁니다.
+  const TRASH_DAYS = 30;
+  const live = () => data.plans.filter(p => !p.deletedAt);
+  const trashed = () => data.plans.filter(p => p.deletedAt).sort((a, b) => b.deletedAt - a.deletedAt);
 
-  function restorePlan(plan, index){
-    data.plans.splice(Math.max(0, Math.min(index, data.plans.length)), 0, plan);
-    data.activeId = plan.id;
+  function removePlan(id){
+    const plan = find(id);
+    if(!plan || plan.deletedAt) return null;
+    plan.deletedAt = Date.now();
+    if(data.activeId === id) data.activeId = (live()[0] || {}).id || null;
     saveLocalNow();
     saveToAccount();
     return plan;
+  }
+
+  function restorePlan(id){
+    const plan = find(id);
+    if(!plan) return null;
+    delete plan.deletedAt;
+    saveLocalNow();
+    saveToAccount();
+    return plan;
+  }
+
+  // 되돌릴 수 없는 삭제
+  function purge(ids){
+    const gone = [];
+    (ids || []).forEach(id => {
+      const i = indexOf(id);
+      if(i >= 0) gone.push(data.plans.splice(i, 1)[0].id);
+    });
+    if(!gone.length) return 0;
+    if(!data.plans.some(p => p.id === data.activeId)) data.activeId = (live()[0] || {}).id || null;
+    saveLocalNow();
+    if(Auth && Auth.enabled && Auth.user) Auth.removePlans(gone);
+    return gone.length;
+  }
+
+  // 30일 지난 것은 열 때 알아서 비웁니다
+  function purgeExpired(){
+    const cut = Date.now() - TRASH_DAYS * 86400000;
+    return purge(trashed().filter(p => p.deletedAt < cut).map(p => p.id));
+  }
+
+  // ---- 책상 위 자리와 D-day ----
+  function setPos(id, x, y){
+    const p = find(id);
+    if(!p) return null;
+    p.pos = { x: Math.round(x), y: Math.round(y) };
+    save(p);
+    return p;
+  }
+
+  function setDday(id, date, label){
+    const p = find(id);
+    if(!p) return null;
+    if(date){ p.dday = date; p.ddayLabel = label || ""; }
+    else { delete p.dday; delete p.ddayLabel; }
+    save(p);
+    return p;
+  }
+
+  // 남은 날. 오늘이면 0, 지났으면 음수.
+  function daysLeft(dateStr){
+    if(!dateStr) return null;
+    const [y, m, d] = String(dateStr).split("-").map(Number);
+    if(!y || !m || !d) return null;
+    const then = new Date(y, m - 1, d);
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    then.setHours(0, 0, 0, 0);
+    return Math.round((then - now) / 86400000);
+  }
+
+  // 체크리스트 진행률 — 내용이 있는 항목 중 끝낸 것
+  function progress(p){
+    let total = 0, done = 0;
+    ((p && p.categories) || []).forEach(c => (c.items || []).forEach(i => {
+      if(!(i.name || i.budget || i.actual)) return;
+      total++;
+      if(i.done) done++;
+    }));
+    return { total, done, ratio: total ? done / total : 0 };
   }
 
   function duplicate(id){
@@ -179,6 +247,7 @@
         (it.options || []).forEach(o => { o.id = nid(); });
       });
     });
+    delete copy.pos;   // 원본 위에 겹치지 않도록 자리는 다시 잡습니다
     data.plans.splice(indexOf(id) + 1, 0, copy);
     data.activeId = copy.id;
     saveLocalNow();
@@ -214,7 +283,7 @@
     const merged = [...byId.values()];
     if(merged.length !== data.plans.length) changed = true;
     data.plans = merged;
-    if(!data.plans.some(p => p.id === data.activeId)) data.activeId = (data.plans[0] || {}).id || null;
+    if(!data.plans.some(p => p.id === data.activeId)) data.activeId = (live()[0] || {}).id || null;
     saveLocalNow();
     if(changed) Auth.savePlans(data.plans);
     return true;
@@ -226,10 +295,13 @@
     get activeId(){ return data.activeId; },
     set activeId(v){ data.activeId = v; },
     data,
-    nid, newPlan, fromTemplate, safeLink, planLabel, isGuest, summary,
+    get live(){ return live(); },
+    get trashed(){ return trashed(); },
+    nid, newPlan, fromTemplate, safeLink, planLabel, isGuest, summary, progress, daysLeft,
     find, indexOf,
     save, saveLocalNow, saveToAccount,
-    addPlan, addExisting, removePlan, restorePlan, duplicate, rename, setAccent,
+    addPlan, addExisting, removePlan, restorePlan, purge, purgeExpired,
+    duplicate, rename, setAccent, setPos, setDday,
     mergeWithAccount
   };
   window.BudgetStore = API;

@@ -20,7 +20,8 @@
   --bar-muted:#A6A29A;
   --radius:6px;
   --radius-lg:10px;
-  --wrap:860px;
+  --wrap:860px;     /* 본문 폭. 체크리스트는 열 보기에 따라 body 에서 늘립니다 */
+  --shell:1240px;   /* 상단 바와 푸터 폭. 어느 페이지에서나 같아야 해서 따로 둡니다 */
   --sans:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 }
 @media (prefers-color-scheme: dark){

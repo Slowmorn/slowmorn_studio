@@ -34,10 +34,12 @@
 
   // store = 모든 파일; state = 지금 열어 둔 파일
   const store = BS.data;
-  if(!store.plans.length) BS.addPlan("blank");
+  BS.purgeExpired();
+  if(!BS.live.length) BS.addPlan("blank");
   let state;
   function syncActive(){
-    state = store.plans.find(p => p.id === store.activeId) || store.plans[0];
+    // 휴지통에 든 파일은 건너뜁니다
+    state = BS.live.find(p => p.id === store.activeId) || BS.live[0] || store.plans[0];
     store.activeId = state.id;
   }
   syncActive();
@@ -147,7 +149,7 @@
   function renderFileBar(){
     fileNameEl.textContent = planLabel(state);
     fileSwitch.dataset.accent = state.accent || "green";
-    const others = store.plans.filter(p => p.id !== state.id);
+    const others = BS.live.filter(p => p.id !== state.id);
     fileListEl.innerHTML =
       (others.length ? others.map(p =>
         `<button type="button" data-open="${esc(p.id)}" data-accent="${esc(p.accent || "green")}">
@@ -1404,7 +1406,7 @@
     if(scope === "all"){
       const nameOf = sheetNamer();
       const overview = addSummarySheet(wb, nameOf("전체 요약")); // created first so it is the first tab
-      const sheets = store.plans.map(p => ({ plan: p, sheet: nameOf(planLabel(p)) }));
+      const sheets = BS.live.map(p => ({ plan: p, sheet: nameOf(planLabel(p)) }));
       const optName = nameOf("선택지");
       const layout = layoutOptions(sheets);
       const links = { sheet: optName, ranges: layout.ranges, itemRows: new Map() };
@@ -1443,7 +1445,7 @@
 
   function updateExportNotes(){
     document.getElementById("exportCurrentNote").textContent = `'${planLabel(state)}' · ${isGuest(state) ? "방명록" : "예산표"}와 요약 시트`;
-    document.getElementById("exportAllNote").textContent = `파일 ${store.plans.length}개를 시트 하나씩 + 전체 요약`;
+    document.getElementById("exportAllNote").textContent = `파일 ${BS.live.length}개를 시트 하나씩 + 전체 요약`;
   }
   exportMenu.addEventListener("toggle", () => { if(exportMenu.open) updateExportNotes(); });
 

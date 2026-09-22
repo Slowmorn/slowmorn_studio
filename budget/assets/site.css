@@ -4,7 +4,7 @@
 /* 상단 바 */
 .topbar{border-bottom:1px solid var(--line);background:var(--sheet)}
 .topbar-inner{
-  max-width:var(--wrap,860px);margin:0 auto;padding:12px 20px;
+  max-width:var(--shell);margin:0 auto;padding:12px 20px;
   display:flex;align-items:center;gap:10px 20px;
 }
 .brand{
@@ -30,12 +30,12 @@
 /* 푸터 */
 footer{border-top:1px solid var(--line);background:var(--sheet);margin-top:56px}
 .foot-inner{
-  max-width:var(--wrap,860px);margin:0 auto;padding:24px 20px 16px;
+  max-width:var(--shell);margin:0 auto;padding:24px 20px 16px;
   color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;gap:8px 18px;
 }
 footer a{text-decoration:none}
 footer a:hover{text-decoration:underline}
-.foot-note{max-width:var(--wrap,860px);margin:0 auto;padding:0 20px 36px;color:var(--muted);font-size:12px;line-height:1.6;word-break:keep-all}
+.foot-note{max-width:var(--shell);margin:0 auto;padding:0 20px 36px;color:var(--muted);font-size:12px;line-height:1.6;word-break:keep-all}
 
 /* 소개 영역과 카드 (홈) */
 /* 소개 영역 */
@@ -114,11 +114,30 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
 .end .cta{margin-top:16px}
 
 
-/* 홈: 내 책상 */
-.desk{max-width:var(--wrap);margin:0 auto;padding:36px 20px 0}
-.desk-head{display:flex;align-items:center;gap:12px;margin:0 0 16px}
-.desk-head h2{font-size:20px;margin:0;letter-spacing:-0.015em}
-.desk-head .menu{margin-left:auto}
+/* 홈: 내 책상 — 흰 바탕에 옅은 빛 얼룩을 깔고, 그 위에 반투명 유리판을 얹습니다.
+   순백 위에서는 유리가 보이지 않기 때문에 비칠 것이 필요해요. */
+body.desk-page{background:#FFFFFF}
+.page-glow{
+  position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(42rem 30rem at 10% 4%,  rgba(255,178,140,.30), transparent 62%),
+    radial-gradient(40rem 28rem at 92% 16%, rgba(140,198,224,.32), transparent 60%),
+    radial-gradient(36rem 30rem at 68% 92%, rgba(190,166,234,.28), transparent 62%),
+    radial-gradient(30rem 24rem at 26% 78%, rgba(152,214,190,.26), transparent 64%);
+}
+
+.desk{max-width:var(--wrap);margin:0 auto;padding:30px 20px 0}
+.desk-head{display:flex;align-items:center;gap:8px 14px;flex-wrap:wrap;margin:0 0 14px;padding:0 4px}
+.desk-head h2{font-size:21px;margin:0;letter-spacing:-0.02em}
+.desk-summary{color:var(--muted);font-size:13px;margin:0;flex:1;min-width:0}
+.desk-head .new-menu{margin-left:auto}
+.trash-btn{
+  display:inline-flex;align-items:center;gap:6px;border:0;background:none;
+  color:var(--muted);font-size:13.5px;padding:7px 10px;border-radius:var(--radius);
+}
+.trash-btn[hidden]{display:none}
+.trash-btn svg{width:15px;height:15px}
+.trash-btn:hover{background:var(--hover);color:var(--ink)}
 .btn-ink{
   display:inline-flex;align-items:center;gap:6px;
   background:var(--ink);color:var(--sheet);border:0;
@@ -128,49 +147,143 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
 .btn-ink:hover{filter:brightness(1.35)}
 .new-menu .menu-pop{left:auto;right:0;min-width:250px}
 
-.files{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
-.file{position:relative;border-radius:var(--radius-lg)}
-.file-open{
-  display:grid;grid-template-columns:40px 1fr;grid-template-rows:auto auto;
-  column-gap:13px;row-gap:2px;align-items:center;
-  padding:15px 16px;border-radius:var(--radius-lg);
-  text-decoration:none;color:var(--ink);background:var(--sheet);
-  border:1px solid var(--line);transition:background .12s, border-color .12s;
+/* 유리판 */
+.desk-board{
+  position:relative;min-height:340px;padding:26px;
+  border-radius:24px;
+  background:rgba(255,255,255,.46);
+  border:1px solid rgba(255,255,255,.7);
+  -webkit-backdrop-filter:blur(18px) saturate(170%);
+  backdrop-filter:blur(18px) saturate(170%);
+  box-shadow:0 18px 50px rgba(70,64,80,.13), inset 0 1px 0 rgba(255,255,255,.85);
+  display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));
+  align-content:start;
+  transition:height .18s ease;
 }
-.file-open:hover{background:var(--hover);text-decoration:none}
-.file-ico{grid-row:1 / span 2;width:34px;height:41px}
-.file-name{font-weight:600;font-size:15px;align-self:end;word-break:break-all;
-  display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
-.file-meta{color:var(--muted);font-size:12.5px;align-self:start}
+/* 자유 배치일 때는 격자를 끄고 자석을 좌표로 놓습니다 */
+.desk-board.free{display:block;padding:0}
+
+/* 자석 */
+.file{position:relative;width:100%}
+.desk-board.free .file{position:absolute;width:208px}
+.file-open{
+  position:relative;display:grid;
+  grid-template-columns:36px minmax(0,1fr) auto;grid-template-rows:auto auto auto;
+  column-gap:12px;row-gap:1px;align-items:center;
+  padding:13px 14px 11px;border-radius:14px;min-height:96px;
+  text-decoration:none;color:var(--ink);
+  background:rgba(255,255,255,.92);
+  border:1px solid rgba(255,255,255,.9);
+  box-shadow:0 4px 14px rgba(70,64,80,.13), 0 1px 2px rgba(70,64,80,.08);
+  transform:rotate(var(--tilt,0deg));
+  transition:transform .16s ease, box-shadow .16s ease;
+}
+.desk-board.free .file-open{cursor:grab}
+.file-open:hover{
+  transform:rotate(0deg) translateY(-2px);
+  box-shadow:0 10px 24px rgba(70,64,80,.18), 0 2px 4px rgba(70,64,80,.1);
+  text-decoration:none;
+}
+.file.dragging .file-open{
+  cursor:grabbing;transform:rotate(0deg) scale(1.04);
+  box-shadow:0 18px 38px rgba(70,64,80,.26);transition:none;
+}
+.file.dragging{z-index:5}
+.file-ico{grid-row:1 / span 2;width:32px;height:39px}
+.file-name{grid-column:2 / span 2;font-weight:600;font-size:14.5px;align-self:end;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-meta{grid-column:2 / span 2;color:var(--muted);font-size:12px;align-self:start}
+.file-bar{grid-column:1 / 3;grid-row:3;height:4px;border-radius:99px;background:rgba(70,64,80,.12);margin-top:9px;overflow:hidden}
+.file-bar > span{display:block;height:100%;border-radius:99px;background:var(--accent-fill);transition:width .2s}
+.file-count{grid-column:3;grid-row:3;color:var(--muted);font-size:11px;margin-top:9px;font-variant-numeric:tabular-nums}
+
+/* D-day 표 */
+.file-dday{
+  position:absolute;top:-8px;left:-6px;z-index:2;
+  font-size:11.5px;font-weight:700;letter-spacing:-0.01em;
+  padding:3px 8px;border-radius:99px;
+  background:var(--ink);color:var(--sheet);
+  box-shadow:0 2px 6px rgba(70,64,80,.28);
+  transform:rotate(calc(var(--tilt,0deg) * -1.6));
+}
+.file-dday.soon{background:#C2603F}
+.file-dday.past{background:rgba(70,64,80,.45)}
+
+/* 메뉴 자체를 카드 모서리에 붙입니다. summary 만 띄우면 .menu 의 position:relative
+   때문에 details 가 기준이 돼서 버튼이 카드 밖으로 떨어져요. */
+.file .file-menu{position:absolute;top:7px;right:7px;z-index:2}
 .file-more{
-  position:absolute;top:8px;right:8px;
-  width:28px;height:28px;border-radius:var(--radius);display:grid;place-items:center;
+  width:26px;height:26px;border-radius:var(--radius);display:grid;place-items:center;
   color:var(--muted);opacity:0;transition:opacity .12s;
 }
-.file-more svg{width:16px;height:16px;fill:currentColor}
+.file-more svg{width:15px;height:15px;fill:currentColor}
 .file:hover .file-more,.file-menu[open] .file-more,.file-more:focus-visible{opacity:1}
 .file-more:hover,.file-menu[open] .file-more{background:var(--hover-strong);color:var(--ink)}
 .file-menu .menu-pop{min-width:170px}
 .file-colors{display:flex;gap:5px;padding:2px 10px 6px}
-.color-chip{
-  width:20px;height:20px;border-radius:50%;border:1px solid rgba(0,0,0,.08);padding:0;
+/* .menu-pop button 이 더 구체적이라, 칩도 그만큼 구체적으로 적어야 배경이 살아납니다 */
+.menu-pop .color-chip{
+  width:20px;height:20px;flex:none;border-radius:50%;border:1px solid rgba(0,0,0,.08);padding:0;
   background:var(--swatch,var(--accent-fill));
 }
-.color-chip:hover{transform:scale(1.12)}
+.menu-pop .color-chip:hover{transform:scale(1.12);background:var(--swatch,var(--accent-fill))}
 
-.desk-empty{grid-column:1 / -1}
+/* 빈 책상 */
+.desk-empty{grid-column:1 / -1;padding:14px 4px}
 .desk-empty p{color:var(--muted);margin:0 0 14px;word-break:keep-all}
-.start-cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.start-cards{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
 .start-card{
   display:flex;flex-direction:column;gap:4px;text-align:left;
-  border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px 18px;
-  background:var(--sheet);color:var(--ink);
+  border:1px solid rgba(255,255,255,.9);border-radius:14px;padding:15px 16px;
+  background:rgba(255,255,255,.9);color:var(--ink);
+  box-shadow:0 3px 10px rgba(70,64,80,.1);
 }
-.start-card:hover{background:var(--hover)}
+.start-card:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(70,64,80,.15)}
 .start-card b{font-size:15px}
 .start-card span{color:var(--muted);font-size:13px;line-height:1.55}
-.start-blank{background:none}
-.desk-note{color:var(--muted);font-size:13px;margin:14px 0 0}
+.start-blank{background:rgba(255,255,255,.62)}
+.desk-note{color:var(--muted);font-size:13px;margin:14px 4px 0}
+
+/* 날짜 정하기 */
+.dday-field{display:flex;align-items:center;gap:10px;margin-top:2px}
+.dday-field span{color:var(--muted);font-size:13px;width:3em;flex:none}
+.dday-field input{
+  flex:1;min-width:0;border:1px solid var(--line);border-radius:var(--radius);
+  padding:9px 11px;background:var(--paper);color:var(--ink);font-size:14px;
+}
+.dday-save{justify-content:center;margin-top:10px;padding:11px 16px}
+
+/* 휴지통 */
+.trash-list{margin:4px 0 2px;max-height:50vh;overflow:auto}
+.trash-row{display:flex;align-items:center;gap:9px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px}
+.trash-row:last-child{border-bottom:0}
+.trash-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trash-left{color:var(--muted);font-size:12px;white-space:nowrap}
+.trash-row button{border:0;background:none;color:var(--muted);font-size:13px;padding:5px 8px;border-radius:var(--radius)}
+.trash-row button:hover{background:var(--hover);color:var(--ink)}
+.trash-row .danger:hover{color:var(--warn)}
+.trash-empty{color:var(--muted);font-size:13.5px;padding:14px 2px}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) body.desk-page{background:#141414}
+  :root:not([data-theme="light"]) .page-glow{opacity:.5}
+  :root:not([data-theme="light"]) .desk-board{
+    background:rgba(40,40,42,.44);border-color:rgba(255,255,255,.1);
+    box-shadow:0 18px 50px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  :root:not([data-theme="light"]) .file-open,
+  :root:not([data-theme="light"]) .start-card{
+    background:rgba(46,46,48,.92);border-color:rgba(255,255,255,.08);
+    box-shadow:0 4px 14px rgba(0,0,0,.35);
+  }
+}
+
+@media (max-width:640px){
+  .desk{padding-top:22px}
+  .desk-head h2{font-size:19px}
+  .desk-board{padding:16px;border-radius:18px;gap:10px;grid-template-columns:1fr}
+  .desk-summary{flex-basis:100%;order:3}
+}
 
 /* 로그인 버튼과 창 */
 .auth-slot{flex:none;display:flex;align-items:center}
@@ -271,3 +384,12 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
   .desk{padding-top:28px}
   .desk-head h2{font-size:18px}
 }
+
+/* 홈은 상단 바·책상·푸터가 같은 폭으로 서도록 본문도 셸 폭을 씁니다.
+   (글줄은 h1 과 .hero-lead 의 ch 제한이 잡아 주므로 길어지지 않아요.) */
+body.desk-page .hero-inner,
+body.desk-page .desk{max-width:var(--shell)}
+
+/* 홈에서는 소개 영역도 흰 바탕에 그대로 얹혀, 뒤의 빛 얼룩이 비쳐 보이게 둡니다 */
+body.desk-page .hero{background:none;border-bottom:0}
+body.desk-page footer{background:none;border-top-color:rgba(70,64,80,.1)}
