@@ -117,6 +117,22 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
 /* 홈: 내 책상 — 흰 바탕에 색 유리판 하나를 얹습니다.
    뒤에 비칠 것이 없으므로 유리의 존재감은 색과 테두리, 그림자가 만듭니다. */
 body.desk-page{background:#FFFFFF}
+/* 유리 뒤에 비칠 것. 무늬가 있어야 유리가 유리처럼 보입니다.
+   위쪽은 하얗게 덮어 제목이 읽히게 하고, 책상 언저리에서 무늬가 살아납니다. */
+.page-bg{
+  position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:#fff url("desk-bg.jpg") center top / 420px auto repeat;
+}
+.page-bg::after{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,
+    rgba(255,255,255,.99) 0%,
+    rgba(255,255,255,.98) 22%,
+    rgba(255,255,255,.94) 32%,
+    rgba(255,255,255,.80) 42%,
+    rgba(255,255,255,.78) 88%,
+    rgba(255,255,255,.9) 100%);
+}
 
 /* 유리 색. body[data-glass] 로 갈아 끼웁니다. */
 body.desk-page{--glass:#FF9C87; --glass-deep:#C2604B; --glass-tint:22%;}
@@ -174,13 +190,13 @@ body.desk-page[data-glass="blue"]{--glass:#8BBCF2; --glass-deep:#3F74AE;}
   border-right-color:color-mix(in srgb, var(--glass-deep) 26%, transparent);
   border-bottom-color:color-mix(in srgb, var(--glass-deep) 34%, transparent);
   background:
-    radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.5) 0%, transparent 42%),
+    radial-gradient(120% 90% at 50% 0%, rgba(255,255,255,.42) 0%, transparent 44%),
     linear-gradient(152deg,
-      color-mix(in srgb, var(--glass) 40%, transparent) 0%,
-      color-mix(in srgb, var(--glass) 24%, transparent) 45%,
-      color-mix(in srgb, var(--glass) 44%, transparent) 100%);
-  -webkit-backdrop-filter:blur(22px) saturate(180%);
-  backdrop-filter:blur(22px) saturate(180%);
+      color-mix(in srgb, var(--glass) 42%, transparent) 0%,
+      color-mix(in srgb, var(--glass) 26%, transparent) 45%,
+      color-mix(in srgb, var(--glass) 46%, transparent) 100%);
+  -webkit-backdrop-filter:blur(30px) saturate(190%);
+  backdrop-filter:blur(30px) saturate(190%);
   box-shadow:
     /* 바닥에 드리우는 그림자 — 떠 있는 느낌 */
     0 3px 3px -1px color-mix(in srgb, var(--glass-deep) 18%, transparent),
