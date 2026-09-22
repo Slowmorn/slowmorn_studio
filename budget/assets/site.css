@@ -158,28 +158,16 @@ body.desk-page{background:#FFFFFF}
     0 5px 12px -5px rgba(40,36,32,.15),
     0 14px 26px -16px rgba(40,36,32,.2),
     /* 윗면·바닥면의 빛 */
-    inset 0 1.5px 0 rgba(255,255,255,.9),
-    inset 1px 0 0 rgba(255,255,255,.55),
-    inset -1px 0 0 rgba(64,62,58,.04),
-    inset 0 -1.5px 0 rgba(64,62,58,.06),
-    inset 0 0 38px rgba(255,255,255,.3);
+    /* 단면. 띠로 그리면 선이 뚜렷하게 보여서, 가장자리에서 안쪽으로
+       번지는 빛으로 둡니다. 두께는 얇게, 경계는 흐리게. */
+    inset 0 0 0 1px rgba(255,255,255,.5),
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 -1px 0 rgba(64,62,58,.05),
+    inset 0 0 14px -5px rgba(255,255,255,.95),
+    inset 0 0 44px rgba(255,255,255,.22);
   display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(208px,1fr));
   align-content:start;
   transition:height .18s ease;
-}
-/* 유리의 두께. 가장자리 안쪽에 한 겹 더 밝은 띠를 둬서 단면처럼 보이게 합니다. */
-.desk-board::before{
-  content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
-  border-radius:inherit;padding:16px;
-  background:linear-gradient(160deg,
-    rgba(255,255,255,.75) 0%,
-    rgba(255,255,255,.2) 38%,
-    rgba(255,255,255,.35) 70%,
-    rgba(255,255,255,.6) 100%);
-  -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;
-  mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  mask-composite:exclude;
 }
 /* 윗면에 비치는 반사광 */
 .desk-board::after{
