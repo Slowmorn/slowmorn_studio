@@ -979,12 +979,15 @@
       const b = document.createElement("button");
       b.type = "button"; b.textContent = "되돌리기";
       b.addEventListener("click", () => {
-        store = JSON.parse(undoSnapshot);
+        // store 는 store.js 와 함께 쓰는 객체라 통째로 바꾸지 않고 안의 내용을 되돌립니다
+        const prev = JSON.parse(undoSnapshot);
+        Object.keys(store).forEach(k => { delete store[k]; });
+        Object.assign(store, prev);
         syncActive();
         render(); save();
         if(Auth && Auth.enabled && Auth.user) Auth.savePlans(store.plans);
         if(optDialog.open){ if(optItem()) renderOptions(); else optDialog.close(); }
-        el.classList.remove("show", "has-action");
+        toast("되돌렸어요");
       });
       el.appendChild(b);
     }

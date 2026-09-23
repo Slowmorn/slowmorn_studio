@@ -81,7 +81,7 @@
       const b = document.createElement("button");
       b.type = "button";
       b.textContent = "되돌리기";
-      b.addEventListener("click", () => { undo(); hide(); });
+      b.addEventListener("click", () => { undo(); toast("되돌렸어요"); });
       toastEl.appendChild(b);
     }
     toastEl.classList.add("show");
