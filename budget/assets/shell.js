@@ -133,7 +133,8 @@
         </label>
         <button type="submit" class="btn-ink dday-save" value="save">정하기</button>
         <button type="button" class="login-close" data-clear>날짜 지우기</button>
-        <button type="submit" class="login-close" value="cancel">그만두기</button>
+        <!-- 날짜 칸이 required 라서, 빈 채로 그만두려면 검사를 건너뛰어야 창이 닫힙니다 -->
+        <button type="submit" class="login-close" value="cancel" formnovalidate>그만두기</button>
       </form>`;
       document.body.appendChild(dlg);
       dlg.addEventListener("click", e => {
