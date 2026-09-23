@@ -826,14 +826,15 @@
   // ---- view: 실제 지출 칸 켜기/끄기 ----
   const ACTUAL_KEY = "prep-budget-actual";
   const actualToggle = document.getElementById("actualToggle");
-  let showActual = true;
+  let showActual = false;
   function setActual(on){
     showActual = on;
     document.body.classList.toggle("no-actual", !on);
     actualToggle.checked = on;
   }
-  let startActual = true;
-  try{ startActual = localStorage.getItem(ACTUAL_KEY) !== "off"; }catch(e){}
+  // 처음엔 꺼 둡니다. 한 번이라도 켰던 브라우저("on")만 켜진 채로 엽니다.
+  let startActual = false;
+  try{ startActual = localStorage.getItem(ACTUAL_KEY) === "on"; }catch(e){}
   setActual(startActual);
   actualToggle.addEventListener("change", () => {
     setActual(actualToggle.checked);
