@@ -48,6 +48,10 @@ button{cursor:pointer}
 .btn.primary{background:var(--accent-fill);border-color:var(--accent-fill);color:var(--on-accent);font-weight:600}
 .btn.primary:hover{filter:brightness(1.06)}
 .btn svg{width:14px;height:14px}
+.btn[hidden]{display:none}
+.top p code{font-size:12px;background:var(--paper);padding:1px 5px;border-radius:4px}
+.empty .btn{margin-top:14px}
+.empty small{display:block;margin-top:8px;font-size:12.5px}
 
 .layout{max-width:1180px;margin:0 auto;padding:20px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:20px;align-items:start}
 .side{position:sticky;top:86px}
@@ -176,14 +180,16 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
   <div class="top-inner">
     <div>
       <h1>기본 템플릿 편집기</h1>
-      <p>여기서 고친 뒤 <b>JSON 내려받기</b>를 누르면, 그 파일로 예산표 사이트의 템플릿을 바꿀 수 있어요.</p>
+      <p><b>templates.json 열기</b>로 <code>budget/assets/templates.json</code>을 고르면, <b>파일에 저장</b>할 때 그 파일에 바로 써요. 파일을 더블클릭해서 열어도 돼요.</p>
     </div>
     <span class="spacer"></span>
     <span class="saved" id="saved">이 브라우저에 자동 저장돼요</span>
+    <button class="btn" id="openBtn" type="button" title="budget/assets/templates.json을 골라 주세요">templates.json 열기</button>
     <button class="btn" id="importBtn" type="button" title=".json 파일이나 budget-checklist.html에서 템플릿을 불러와요">불러오기</button>
     <input type="file" id="importFile" accept=".json,.html,application/json,text/html" hidden>
     <button class="btn" id="resetBtn" type="button">처음 상태로</button>
     <button class="btn" id="copyBtn" type="button">JSON 복사</button>
+    <button class="btn primary" id="saveBtn" type="button" hidden title="열어 둔 파일에 바로 써요 (⌘S / Ctrl+S)">파일에 저장</button>
     <button class="btn primary" id="downloadBtn" type="button"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 2v8M4.8 6.8L8 10l3.2-3.2M2.5 10.5v2a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1v-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>JSON 내려받기</button>
   </div>
 </header>
@@ -209,21 +215,24 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 (async function(){
   const KEY = "template-editor-v1";
   // 사이트에 지금 들어 있는 템플릿 (처음 상태)
-  const ORIGINAL = await (async () => {
+  // 서버로 열면 바로 읽어 옵니다. 파일을 더블클릭해서 열면(file://) 브라우저가 이 fetch 를 막으므로
+  // 그때는 비워 두고, 'templates.json 열기'로 파일을 직접 고르게 합니다.
+  let ORIGINAL = await (async () => {
     try{
       const res = await fetch("assets/templates.json");
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       return await res.json();
-    }catch(e){
-      alert("assets/templates.json을 불러오지 못했어요. 파일을 직접 열지 말고 로컬 서버로 열어 주세요.");
-      return [];
-    }
+    }catch(e){ return null; }
   })();
   const clone = v => JSON.parse(JSON.stringify(v));
 
   let data = null, sel = 0;
   try{ const raw = localStorage.getItem(KEY); if(raw){ const s = JSON.parse(raw); if(Array.isArray(s.templates)){ data = s.templates; sel = s.sel || 0; } } }catch(e){}
-  if(!data) data = clone(ORIGINAL);
+  if(!data) data = clone(ORIGINAL || []);
+
+  // 크롬·엣지는 고른 파일에 바로 다시 쓸 수 있습니다. 사파리·파이어폭스는 불러오기 + 내려받기로 씁니다.
+  const canWrite = "showOpenFilePicker" in window;
+  let fileHandle = null;
 
   const openOpts = new WeakSet(); // items whose 선택지 are expanded
   const folded = new WeakSet();   // collapsed categories
@@ -250,11 +259,19 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
   }
 
   // ---- save / undo ----
-  let saveTimer;
+  let saveTimer, dirty = false, fileSavedAt = null;
+  const hhmm = d => d.toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+  function showSaved(){
+    const el = document.getElementById("saved");
+    if(fileHandle) el.textContent = dirty ? `${fileHandle.name} · 저장하지 않은 변경이 있어요`
+      : fileSavedAt ? `${fileHandle.name}에 저장됨 · ${hhmm(fileSavedAt)}` : `${fileHandle.name}에 연결됨`;
+    else el.textContent = "자동 저장됨 · " + hhmm(new Date());
+  }
   function save(){
+    dirty = true;
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => {
-      try{ localStorage.setItem(KEY, JSON.stringify({ templates: data, sel })); document.getElementById("saved").textContent = "자동 저장됨 · " + new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" }); }catch(e){}
+      try{ localStorage.setItem(KEY, JSON.stringify({ templates: data, sel })); showSaved(); }catch(e){}
     }, 300);
   }
   const snapshot = () => JSON.stringify({ data, sel });
@@ -318,7 +335,14 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 
   function renderEditor(){
     const t = tpl();
-    if(!t){ edEl.innerHTML = `<div class="empty">템플릿이 없어요. 왼쪽에서 새 템플릿을 추가하세요.</div>`; return; }
+    if(!t){
+      edEl.innerHTML = ORIGINAL || fileHandle
+        ? `<div class="empty">템플릿이 없어요. 왼쪽에서 새 템플릿을 추가하세요.</div>`
+        : `<div class="empty">템플릿 파일을 아직 열지 않았어요.<br>
+            <button class="btn primary" type="button" data-open-file>templates.json 열기</button>
+            <small>budget/assets/templates.json 을 골라 주세요</small></div>`;
+      return;
+    }
     const guest = t.kind === "guestbook";
     edEl.innerHTML = `
       <section class="card meta">
@@ -599,8 +623,8 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
       id: t.id || newId(),
       label: (t.label || "").trim() || "이름 없는 템플릿",
       desc: (t.desc || "").trim(),
-      intro: (t.intro || "").trim(),
       title: (t.title || "").trim() || (t.label || "새 예산표"),
+      intro: (t.intro || "").trim(),
       kind: t.kind === "guestbook" ? "guestbook" : "budget",
       categories: t.categories.map(c => ({
         name: (c.name || "").trim(),
@@ -623,7 +647,7 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
   }
   const exportText = () => JSON.stringify(cleanData(), null, 2);
 
-  document.getElementById("downloadBtn").addEventListener("click", () => {
+  function download(){
     const blob = new Blob([exportText() + "\n"], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -631,7 +655,8 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 2000);
     toast("templates.json을 내려받았어요");
-  });
+  }
+  document.getElementById("downloadBtn").addEventListener("click", download);
   document.getElementById("copyBtn").addEventListener("click", async () => {
     const text = exportText();
     try{ await navigator.clipboard.writeText(text); toast("JSON을 복사했어요"); }
@@ -648,21 +673,75 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
   importFile.addEventListener("change", async () => {
     const file = importFile.files[0]; importFile.value = "";
     if(!file) return;
-    let text = await file.text();
-    const m = text.match(/<script[^>]*id="templateData"[^>]*>([\s\S]*?)<\/script>/);
-    if(m) text = m[1];
-    let list;
-    try{ list = JSON.parse(text.replace(/<\\\//g, "</")); }catch(e){ toast("읽을 수 없는 파일이에요. templates.json이나 budget-checklist.html을 골라 주세요."); return; }
-    if(!Array.isArray(list) || !list.every(t => t && Array.isArray(t.categories))){ toast("템플릿 형식이 아니에요"); return; }
+    const list = parseList(await file.text());
+    if(!list) return;
+    if(!ORIGINAL && /^templates.*\.json$/i.test(file.name)) ORIGINAL = clone(list);
     const snap = snapshot();
     data = list; sel = 0; renderAll(); save();
     toast(`템플릿 ${list.length}개를 불러왔어요`, snap);
   });
 
   document.getElementById("resetBtn").addEventListener("click", () => {
+    if(!ORIGINAL){ toast("처음 상태를 알 수 없어요. templates.json을 먼저 열어 주세요."); return; }
     const snap = snapshot();
     data = clone(ORIGINAL); sel = 0; renderAll(); save();
     toast("사이트에 들어 있던 처음 상태로 되돌렸어요", snap);
+  });
+
+  // .json, or budget-checklist.html with its #templateData block
+  function parseList(text){
+    const m = text.match(/<script[^>]*id="templateData"[^>]*>([\s\S]*?)<\/script>/);
+    if(m) text = m[1];
+    let list;
+    try{ list = JSON.parse(text.replace(/<\\\//g, "</")); }catch(e){ toast("읽을 수 없는 파일이에요. templates.json이나 budget-checklist.html을 골라 주세요."); return null; }
+    if(!Array.isArray(list) || !list.every(t => t && Array.isArray(t.categories))){ toast("템플릿 형식이 아니에요"); return null; }
+    return list;
+  }
+
+  // ---- templates.json 열기 / 파일에 저장 ----
+  const saveBtn = document.getElementById("saveBtn");
+  const downloadBtn = document.getElementById("downloadBtn");
+  function showFileState(){
+    saveBtn.hidden = !fileHandle;
+    downloadBtn.classList.toggle("primary", !fileHandle); // 파일이 연결되면 저장이 주 버튼
+    if(fileHandle) showSaved();
+  }
+  async function openFile(){
+    if(!canWrite){ importFile.click(); return; }
+    let handle;
+    try{
+      [handle] = await window.showOpenFilePicker({
+        types: [{ description: "템플릿 JSON", accept: { "application/json": [".json"] } }]
+      });
+    }catch(e){ return; } // 고르지 않고 닫음
+    const list = parseList(await (await handle.getFile()).text());
+    if(!list) return;
+    const snap = snapshot();
+    fileHandle = handle;
+    if(!ORIGINAL) ORIGINAL = clone(list);
+    data = list; sel = 0; renderAll(); save();
+    dirty = false; fileSavedAt = null; showFileState(); // 방금 연 그대로이니 저장할 것이 없습니다
+    toast(`${handle.name}을(를) 열었어요. 저장하면 이 파일에 바로 써요.`, snap);
+  }
+  async function saveToFile(){
+    if(!fileHandle){ download(); return; }
+    try{
+      const w = await fileHandle.createWritable(); // 처음 한 번은 브라우저가 쓰기 허용을 물어요
+      await w.write(exportText() + "\n");
+      await w.close();
+      dirty = false; fileSavedAt = new Date(); showSaved();
+      toast(`${fileHandle.name}에 저장했어요`);
+    }catch(e){
+      toast(e && e.name === "NotAllowedError"
+        ? "파일에 쓰는 걸 허용하지 않아서 저장하지 못했어요"
+        : "파일에 저장하지 못했어요. JSON 내려받기를 써 주세요.");
+    }
+  }
+  document.getElementById("openBtn").addEventListener("click", openFile);
+  edEl.addEventListener("click", e => { if(e.target.closest("[data-open-file]")) openFile(); });
+  saveBtn.addEventListener("click", saveToFile);
+  document.addEventListener("keydown", e => {
+    if((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "s"){ e.preventDefault(); saveToFile(); }
   });
 
   renderAll();
