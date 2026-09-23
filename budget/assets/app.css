@@ -164,6 +164,8 @@ body[data-cols="4"] #cats{--cols:4}
 }
 .cat:has(.cat-menu[open]){z-index:3}
 .toolbar{position:relative;z-index:4}
+/* 메뉴를 펼친 동안은 합계 바(5)와 떠 있는 단추(6) 위로 올려, 템플릿 목록 끝의 '엑셀 불러오기'가 가려지지 않게 합니다 */
+.toolbar:has(details[open]){z-index:7}
 /* 1줄: 손잡이 · 이름 · 접기   2줄: 손잡이 · 예산/지출 · ⋯ 메뉴 */
 .cat-head{
   display:grid;grid-template-columns:20px minmax(0,1fr) auto;
@@ -435,12 +437,9 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   border:0;border-radius:var(--radius);padding:11px 18px;font-weight:600;
   background:var(--ink);color:var(--sheet);white-space:nowrap;
 }
-.export{list-style:none;cursor:pointer;display:inline-block;text-align:center;user-select:none}
-.export::-webkit-details-marker{display:none}
+.export{cursor:pointer;display:inline-block;text-align:center;user-select:none}
 .export:hover{filter:brightness(1.35)}
 .export[aria-disabled="true"]{opacity:.6;cursor:wait}
-.export-menu{position:relative}
-.export-menu .menu-pop{top:auto;bottom:calc(100% + 8px);right:0;min-width:260px}
 
 
 /* Narrow category card (2/4 columns, or phone): item goes onto three lines */
@@ -484,8 +483,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   .cat{padding:14px 14px 10px}
   .totals-inner{gap:14px 20px}
   .t-spacer{display:none}
-  .export-menu,.export{display:block;width:100%}
-  .export-menu .menu-pop{left:0;right:0;min-width:0}
+  .export{display:block;width:100%}
   body{padding-bottom:210px}
   .toast{bottom:190px}
 }

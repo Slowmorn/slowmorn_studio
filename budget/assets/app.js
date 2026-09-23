@@ -1017,20 +1017,7 @@
   const edge = (argb, style = "thin") => ({ style, color: { argb } });
   const LINE = "FFDDE2E8", INK = "FF1B2230", MUTED = "FF667085", SOFT_BG = "FFF2F4F6";
 
-  // Excel sheet names: max 31 chars, no [ ] : * ? / \, no leading/trailing ', unique ignoring case
-  function sheetNamer(){
-    const used = new Set();
-    return raw => {
-      const base = (String(raw || "").replace(/[\[\]:*?\/\\]/g, " ").replace(/^'+|'+$/g, "").replace(/\s+/g, " ").trim() || "예산표").slice(0, 31);
-      let name = base, n = 2;
-      while(used.has(name.toLowerCase())){
-        const suffix = ` (${n++})`;
-        name = base.slice(0, 31 - suffix.length) + suffix;
-      }
-      used.add(name.toLowerCase());
-      return name;
-    };
-  }
+  // A cell on another sheet, e.g. '예산표'!C4
   const sheetRef = (sheet, cell) => `'${sheet.replace(/'/g, "''")}'!${cell}`;
   const XL2 = n => String.fromCharCode(64 + n); // column letter by index
 
@@ -1475,28 +1462,10 @@
     });
   }
 
-  // scope "current": 예산표 + 요약 (+ 선택지) for the active tab
-  // scope "all": 전체 요약 first, then one sheet per tab (+ one 선택지 sheet for all tabs)
-  async function buildWorkbook(scope){
+  // The open file only: 예산표 (or 방명록) + 요약 (+ 선택지)
+  async function buildWorkbook(){
     const wb = new ExcelJS.Workbook();
-    if(scope === "all"){
-      const nameOf = sheetNamer();
-      const overview = addSummarySheet(wb, nameOf("전체 요약")); // created first so it is the first tab
-      const sheets = BS.live.map(p => ({ plan: p, sheet: nameOf(planLabel(p)) }));
-      const optName = nameOf("선택지");
-      const layout = layoutOptions(sheets);
-      const links = { sheet: optName, ranges: layout.ranges, itemRows: new Map() };
-      const entries = sheets.map(({ plan: p, sheet }) => {
-        if(isGuest(p)){ addGuestSheet(wb, p, sheet); return null; } // not a budget: kept out of 전체 요약
-        const { itemCount } = addPlanSheet(wb, p, sheet, links);
-        const t = accentXL(p.accent);
-        return { name: sheet, count: itemCount, // sheet name, so duplicate titles stay distinguishable
-                 budgetRef: sheetRef(sheet, `${XL("budget")}4`), actualRef: sheetRef(sheet, `${XL("actual")}4`),
-                 strong: t.fill, soft: t.soft, text: t.text };
-      });
-      fillSummarySheet(overview, "예산표", entries.filter(Boolean));
-      addOptionSheet(wb, optName, layout, links.itemRows, null);
-    } else if(isGuest(state)){
+    if(isGuest(state)){
       const sheet = "방명록";
       const { subRows } = addGuestSheet(wb, state, sheet);
       fillGuestSummary(addSummarySheet(wb, "요약"), sheet, subRows, accentXL(state.accent));
@@ -1515,38 +1484,22 @@
   }
 
   const fileSafe = s => String(s).replace(/[\\/:*?"<>|]/g, "").trim();
-  const exportMenu = document.getElementById("exportMenu");
   const exportBtn = document.getElementById("exportBtn");
   let exporting = false;
 
-  function updateExportNotes(){
-    document.getElementById("exportCurrentNote").textContent = `'${planLabel(state)}' · ${isGuest(state) ? "방명록" : "예산표"}와 요약 시트`;
-    document.getElementById("exportAllNote").textContent = `파일 ${BS.live.length}개를 시트 하나씩 + 전체 요약`;
-  }
-  exportMenu.addEventListener("toggle", () => { if(exportMenu.open) updateExportNotes(); });
+  // 늘 지금 열어 둔 파일만 내보냅니다
+  exportBtn.addEventListener("click", () => { if(!exporting) runExport(); });
 
-  exportBtn.addEventListener("click", e => {
-    if(exporting){ e.preventDefault(); return; }
-    // Only one tab → nothing to choose, export right away
-    if(store.plans.length === 1){ e.preventDefault(); runExport("current"); }
-  });
-  exportMenu.querySelectorAll("[data-export]").forEach(b => b.addEventListener("click", () => {
-    exportMenu.open = false;
-    runExport(b.dataset.export);
-  }));
-
-  async function runExport(scope){
-    track("excel_export", { scope: scope, tabs: store.plans.length });
+  async function runExport(){
+    track("excel_export", { scope: "current", tabs: store.plans.length });
     try{ await loadExcel(); }catch(e){ toast("엑셀 도구를 불러오지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요."); return; }
     exporting = true;
     exportBtn.setAttribute("aria-disabled", "true");
     try{
-      const wb = await buildWorkbook(scope);
+      const wb = await buildWorkbook();
       const buf = await wb.xlsx.writeBuffer();
       const blob = new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-      const filename = (scope === "all"
-        ? `예산표 모음 (${store.plans.length}개)`
-        : (fileSafe(planLabel(state)) || "예산표")) + ".xlsx";
+      const filename = (fileSafe(planLabel(state)) || "예산표") + ".xlsx";
 
       const downloads = window.claude ? await downloadsPromise : null;
       if(downloads){
@@ -1739,18 +1692,18 @@
     }
     if(!found.length){ toast("이 사이트에서 내보낸 형식의 예산표 시트를 찾지 못했어요."); return; }
 
+    // 새 파일을 만들지 않고 지금 파일의 내용을 바꿉니다. 색·날짜·책상 위 자리·함께 쓰기는 그대로 둡니다.
+    // 예전의 '모든 파일' 엑셀처럼 시트가 여럿이면 첫 번째 것만 씁니다.
     const snap = snapshot();
-    // An untouched starter budget is replaced instead of being left behind as an empty tab
-    const pristine = store.plans.length === 1
-      && !state.categories.some(c => c.items.some(hasContent))
-      && state.categories.every(c => !c.name || c.name === "첫 번째 카테고리");
-    if(pristine) store.plans = [];
-    const added = found.map(p => newPlan(p));
-    store.plans.push(...added);
-    store.activeId = added[0].id;
-    syncActive();
+    const [p] = found;
+    const next = Object.assign({}, state, { title: p.title || state.title, categories: p.categories });
+    if(p.kind) next.kind = p.kind; else delete next.kind;
+    replaceActive(next);
     render(); save();
-    toast(added.length === 1 ? `새 파일로 불러왔어요 · ${planLabel(added[0])}` : `파일 ${added.length}개로 불러왔어요`, snap);
+    track("excel_import", { sheets: found.length, kind: p.kind || "budget" });
+    toast(found.length > 1
+      ? `예산표 시트 ${found.length}개 중 첫 번째('${planLabel(state)}')로 바꿨어요`
+      : `엑셀 내용으로 바꿨어요 · ${planLabel(state)}`, snap);
   });
 
   // ---- ?tpl=wedding 처럼 주소로 템플릿 열기 (소개 페이지에서 넘어올 때) ----
