@@ -483,6 +483,81 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 #planner ~ .toast,
 body:has(#planner) .toast{bottom:120px}
 
+/* 카테고리로 건너뛰기 — 합계 바 위 오른쪽에 뜬 유리 단추와 목록.
+   뒤로 카드와 글자가 지나가므로 흐림만으로도 유리로 읽힙니다. */
+.cat-nav{
+  position:fixed;z-index:6;
+  right:max(20px, env(safe-area-inset-right));
+  bottom:calc(var(--totals-h, 88px) + 16px);
+}
+.cat-nav[hidden],body.is-sorting .cat-nav{display:none}
+.cat-nav-btn,.cat-nav-pop{
+  background:rgba(255,255,255,.58);
+  border:1px solid rgba(255,255,255,.85);
+  -webkit-backdrop-filter:blur(18px) saturate(160%);
+  backdrop-filter:blur(18px) saturate(160%);
+  box-shadow:
+    0 1px 2px rgba(40,36,32,.08),
+    0 10px 28px -10px rgba(40,36,32,.32),
+    inset 0 1px 0 rgba(255,255,255,.95),
+    inset 0 0 0 1px rgba(255,255,255,.35);
+}
+.cat-nav-btn{
+  list-style:none;cursor:pointer;user-select:none;
+  width:48px;height:48px;border-radius:50%;
+  display:grid;place-items:center;color:var(--ink);
+  transition:transform .16s ease, background-color .16s ease;
+}
+.cat-nav-btn::-webkit-details-marker{display:none}
+.cat-nav-btn:hover{background:rgba(255,255,255,.75);transform:translateY(-1px)}
+.cat-nav-btn:active{transform:scale(.96)}
+.cat-nav-btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.cat-nav-btn svg{width:20px;height:20px;grid-area:1 / 1}
+.cat-nav .ico-close,.cat-nav[open] .ico-list{display:none}
+.cat-nav[open] .ico-close{display:block}
+.cat-nav-pop{
+  position:absolute;right:0;bottom:calc(100% + 10px);
+  width:min(280px, calc(100vw - 40px));
+  max-height:min(60vh, calc(100vh - var(--totals-h, 88px) - 110px));
+  overflow:auto;overscroll-behavior:contain;
+  padding:6px;border-radius:18px;
+  transform-origin:bottom right;
+  animation:cat-nav-in .16s ease;
+}
+@keyframes cat-nav-in{from{opacity:0;transform:translateY(6px) scale(.97)}}
+.cat-nav-title{color:var(--muted);font-size:12px;font-weight:600;padding:8px 12px 6px}
+.cat-nav-pop button{
+  display:flex;align-items:center;gap:10px;width:100%;
+  border:0;background:none;color:var(--ink);text-align:left;
+  padding:9px 12px;border-radius:11px;font-size:14px;
+}
+.cat-nav-pop button::before{
+  content:"";width:7px;height:7px;border-radius:50%;flex:none;
+  background:var(--swatch, var(--accent-fill));opacity:.35;
+}
+.cat-nav-pop button:hover{background:rgba(55,53,47,.07)}
+.cat-nav-pop button[aria-current="true"]{font-weight:600;background:rgba(55,53,47,.06)}
+.cat-nav-pop button[aria-current="true"]::before{opacity:1}
+.cat-nav-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cat-nav-meta{flex:none;color:var(--muted);font-size:12px;font-weight:400;font-variant-numeric:tabular-nums}
+/* 내려앉은 카테고리를 잠깐 표시합니다 */
+.cat.cat-flash{animation:cat-flash 1.4s ease}
+@keyframes cat-flash{
+  0%,35%{box-shadow:0 0 0 3px color-mix(in srgb, var(--swatch, var(--accent-fill)) 45%, transparent)}
+  100%{box-shadow:0 0 0 3px transparent}
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .cat-nav-btn,
+  :root:not([data-theme="light"]) .cat-nav-pop{
+    background:rgba(40,40,42,.6);border-color:rgba(255,255,255,.1);
+    box-shadow:0 12px 32px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  :root:not([data-theme="light"]) .cat-nav-btn:hover{background:rgba(52,52,54,.7)}
+  :root:not([data-theme="light"]) .cat-nav-pop button:hover,
+  :root:not([data-theme="light"]) .cat-nav-pop button[aria-current="true"]{background:rgba(255,255,255,.07)}
+}
+@media (prefers-reduced-motion:reduce){.cat-nav-pop,.cat.cat-flash{animation:none}.cat-nav-btn{transition:none}}
+
 /* 파일 줄 오른쪽의 남은 날. 눌러서 정하고 고칩니다. */
 .dday-chip{
   margin-left:auto;flex:none;border:0;

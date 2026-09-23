@@ -31,7 +31,7 @@
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/base.css?v=20260923v">
 <link rel="stylesheet" href="../assets/site.css?v=20260923v">
-<link rel="stylesheet" href="../assets/app.css?v=20260923v">
+<link rel="stylesheet" href="../assets/app.css?v=20260923x">
 </head>
 <body>
 <header class="topbar">
@@ -165,12 +165,24 @@
   </div>
 </dialog>
 
+<!-- 카테고리로 건너뛰기. 합계 바 위 오른쪽에 떠 있습니다. -->
+<details class="menu cat-nav" id="catNav" hidden>
+  <summary class="cat-nav-btn" aria-label="카테고리로 이동" title="카테고리로 이동">
+    <svg class="ico-list" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5.5h9M7 10h9M7 14.5h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="3.8" cy="5.5" r="1.2" fill="currentColor"/><circle cx="3.8" cy="10" r="1.2" fill="currentColor"/><circle cx="3.8" cy="14.5" r="1.2" fill="currentColor"/></svg>
+    <svg class="ico-close" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+  </summary>
+  <div class="cat-nav-pop">
+    <div class="cat-nav-title">카테고리</div>
+    <div id="catNavList"></div>
+  </div>
+</details>
+
 <div id="toast" class="toast" role="status"></div>
 
 <script src="../assets/config.js?v=20260923v"></script>
 <script src="../assets/auth.js?v=20260923v"></script>
 <script src="../assets/store.js?v=20260923v"></script>
 <script src="../assets/shell.js?v=20260923x"></script>
-<script src="../assets/app.js?v=20260923v"></script>
+<script src="../assets/app.js?v=20260923x"></script>
 </body>
 </html>

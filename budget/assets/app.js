@@ -244,7 +244,52 @@
         </section>`).join("");
     }
     updateTotals();
+    catNav.hidden = state.categories.length < 2;
   }
+
+  // ---- 카테고리로 건너뛰기 ----
+  // 목록은 열 때마다 새로 그립니다. 이름을 고치거나 순서를 바꿔도 따로 챙길 게 없어요.
+  const catNav = document.getElementById("catNav");
+  const catNavList = document.getElementById("catNavList");
+  const totalsEl = document.querySelector(".totals");
+  // 합계 바 높이는 화면 폭에 따라 달라서, 그 위에 뜨도록 재어서 넘깁니다
+  if(totalsEl && window.ResizeObserver){
+    new ResizeObserver(() => document.body.style.setProperty("--totals-h", totalsEl.offsetHeight + "px")).observe(totalsEl);
+  }
+  // 화면 위쪽 1/3 선에 걸쳐 있는 카테고리를 '지금 보는 곳'으로 칩니다
+  function currentCatId(){
+    const line = window.innerHeight / 3;
+    const cards = [...catsEl.querySelectorAll(".cat")];
+    const hit = cards.find(el => el.getBoundingClientRect().bottom > line);
+    return hit ? hit.dataset.cid : null;
+  }
+  function renderCatNav(){
+    const here = currentCatId();
+    const guest = isGuest(state);
+    catNavList.innerHTML = state.categories.map(c => {
+      const n = c.items.filter(i => i.name || i.budget || i.actual).length;
+      return `<button type="button" data-go="${esc(c.id)}"${c.id === here ? ` aria-current="true"` : ""}>
+        <span class="cat-nav-name">${esc(catLabel(c))}</span>
+        <span class="cat-nav-meta">${n}${guest ? "명" : "개"}</span>
+      </button>`;
+    }).join("");
+  }
+  catNav.addEventListener("toggle", () => { if(catNav.open) renderCatNav(); });
+  catNavList.addEventListener("click", e => {
+    const btn = e.target.closest("[data-go]");
+    if(!btn) return;
+    const el = catsEl.querySelector(`.cat[data-cid="${CSS.escape(btn.dataset.go)}"]`);
+    catNav.open = false;
+    if(!el) return;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 16, behavior: still ? "auto" : "smooth" });
+    // 어디에 내렸는지 잠깐 테두리로 알려 줍니다
+    el.classList.remove("cat-flash");
+    void el.offsetWidth;
+    el.classList.add("cat-flash");
+    setTimeout(() => el.classList.remove("cat-flash"), 1400);
+    track("category_jump", { count: state.categories.length });
+  });
 
   function updateTotals(){
     let b = 0, a = 0, done = 0, count = 0;
