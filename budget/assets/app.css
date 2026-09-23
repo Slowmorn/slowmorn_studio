@@ -78,29 +78,39 @@ body[data-cols="4"]{--wrap:1640px}
 .opt-toggle input:checked + .switch::after{transform:translateX(16px)}
 .opt-toggle input:focus-visible + .switch{outline:2px solid var(--ink);outline-offset:2px}
 body.kind-guestbook .opt-toggle{display:none}
-.color-pick{display:flex;align-items:center;gap:8px}
-/* 색상 드롭다운 */
+/* 색상은 파일 줄 오른쪽, 날짜 칩 왼쪽. 날짜 칩과 같은 점선 알약입니다. */
+.color-pick{display:flex;align-items:center;flex:none;margin-left:auto}
 .color-menu{position:relative}
 .color-btn{
   list-style:none;cursor:pointer;user-select:none;
-  display:inline-flex;align-items:center;gap:8px;
-  border:1px solid var(--line);background:var(--sheet);color:var(--ink);
-  padding:5px 8px 5px 10px;border-radius:7px;font-size:13px;gap:6px;
-  transition:background-color .15s, border-color .15s;
+  display:inline-flex;align-items:center;gap:6px;
+  border:1px dashed var(--line);border-radius:99px;
+  padding:4px 11px 4px 9px;
+  font-size:12.5px;color:var(--muted);white-space:nowrap;
+  transition:background-color .15s, color .15s;
 }
 .color-btn::-webkit-details-marker{display:none}
-.color-btn .chev{width:11px;height:11px;color:var(--muted);transition:transform .15s}
-.color-menu[open] .chev{transform:rotate(180deg)}
-.color-btn:hover,.color-menu[open] .color-btn{background:var(--hover);border-color:var(--line)}
+.color-btn:hover,.color-menu[open] .color-btn{background:var(--hover);color:var(--ink)}
 .color-btn:active{background:var(--hover-strong)}
+.color-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .color-dot,.swatch::before{
-  content:"";width:12px;height:12px;border-radius:50%;flex:none;
+  content:"";width:10px;height:10px;border-radius:50%;flex:none;
   background:var(--swatch, var(--accent-fill));
   box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--ink) 12%, transparent);
 }
-.color-menu .menu-pop{left:0;right:auto;min-width:132px}
-.menu-pop .swatch{display:flex;align-items:center;gap:9px;padding:7px 10px;font-size:13.5px}
-.menu-pop .swatch[aria-pressed="true"]{font-weight:600;background:var(--hover)}
+.color-menu .menu-pop{
+  left:auto;right:0;min-width:0;padding:6px;
+  display:grid;grid-template-columns:repeat(3, 34px);gap:2px;
+}
+.menu-pop .swatch{
+  width:34px;height:34px;padding:0;border-radius:50%;
+  display:grid;place-items:center;
+}
+.menu-pop .swatch::before{width:20px;height:20px}
+.menu-pop .swatch[aria-pressed="true"]::before{
+  /* 고른 색은 바탕색 틈을 두고 같은 색 고리를 두릅니다 */
+  box-shadow:0 0 0 2px var(--sheet), 0 0 0 3.5px var(--swatch, var(--accent-fill));
+}
 .view-toggle{display:flex;align-items:center;gap:8px}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;background:var(--sheet);padding:2px}
 .seg button{
@@ -562,7 +572,7 @@ body:has(#planner) .toast{bottom:120px}
 
 /* 파일 줄 오른쪽의 남은 날. 눌러서 정하고 고칩니다. */
 .dday-chip{
-  margin-left:auto;flex:none;border:0;
+  flex:none;border:0;
   font-size:12.5px;font-weight:700;letter-spacing:-0.01em;
   padding:5px 11px;border-radius:99px;
   background:var(--ink);color:var(--sheet);white-space:nowrap;

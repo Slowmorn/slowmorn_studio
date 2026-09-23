@@ -181,13 +181,19 @@
   }
 
   const swatchEls = document.querySelectorAll(".swatch");
+  const colorBtn = document.getElementById("colorBtn");
   const colorNameEl = document.getElementById("colorName");
   function applyAccent(){
     const key = state.accent || "green";
     document.body.dataset.accent = key;
     swatchEls.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.accent === key)));
     const on = [...swatchEls].find(b => b.dataset.accent === key);
-    if(on) colorNameEl.textContent = on.textContent.trim();
+    if(on){
+      colorNameEl.textContent = on.getAttribute("aria-label");
+      const name = "테마 색상: " + on.getAttribute("aria-label");
+      colorBtn.setAttribute("aria-label", name);
+      colorBtn.title = name;
+    }
   }
   swatchEls.forEach(b => b.addEventListener("click", () => {
     closeMenus();
