@@ -384,7 +384,9 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 }
 .add-cat:hover{border-color:var(--accent);color:var(--accent)}
 
-.empty{
+/* 카테고리가 없을 때의 안내 상자. #cats 안으로 좁혀 둡니다 —
+   날짜 칩의 .empty 에도 걸려서 아래 여백 18px 이 파일 줄을 밀어냈어요. */
+#cats .empty{
   text-align:center;color:var(--muted);padding:40px 20px;
   border:1.5px dashed var(--line);border-radius:10px;margin-bottom:18px;
 }
