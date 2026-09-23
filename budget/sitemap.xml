@@ -6,6 +6,6 @@
   <url><loc>https://slowmorn.com/budget/wedding/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://slowmorn.com/budget/baby/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://slowmorn.com/budget/guestbook/</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://slowmorn.com/privacy/</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
-  <url><loc>https://slowmorn.com/terms/</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://slowmorn.com/budget/privacy/</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
+  <url><loc>https://slowmorn.com/budget/terms/</loc><changefreq>yearly</changefreq><priority>0.2</priority></url>
 </urlset>

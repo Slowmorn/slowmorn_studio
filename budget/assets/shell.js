@@ -51,7 +51,7 @@
         ${(window.BUDGET_CONFIG || {}).kakao ? `<button type="button" class="login-kakao" data-provider="kakao">카카오로 시작하기</button>` : ""}
         <button type="button" class="login-google" data-provider="google">구글로 시작하기</button>
         <p class="login-note">로그인 전에 만든 예산표는 로그인할 때 계정으로 함께 옮겨져요.</p>
-        <p class="login-note">로그인하면 <a href="${root}terms/">이용약관</a>과 <a href="${root}privacy/">개인정보 처리방침</a>에 동의하는 것으로 봅니다.</p>
+        <p class="login-note">로그인하면 <a href="${root}budget/terms/">이용약관</a>과 <a href="${root}budget/privacy/">개인정보 처리방침</a>에 동의하는 것으로 봅니다.</p>
         <button type="button" class="login-close" data-close>닫기</button>
       </div>`;
       document.body.appendChild(dlg);
