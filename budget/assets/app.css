@@ -403,7 +403,8 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   border:1.5px dashed var(--line);border-radius:10px;margin-bottom:18px;
 }
 
-.foot-note{color:var(--muted);font-size:13.5px;margin:22px 0 0}
+/* 체크리스트 아래 안내. site.css 의 .foot-note(푸터 쿠팡 고지)와 이름이 겹쳐 좌우 여백 20px 이 붙었기에 따로 둡니다. */
+.save-note{color:var(--muted);font-size:13.5px;margin:22px 0 0}
 /* 쿠팡 파트너스 고지 (링크가 보이는 곳마다 표시) */
 .aff-note{color:var(--muted);font-size:12px;line-height:1.6;margin:8px 0 0;word-break:keep-all}
 .opt-inner .aff-note{margin:2px 0 0;padding:0 20px 2px}
