@@ -132,7 +132,9 @@
     if(n === null) return "";
     const label = n === 0 ? "D-DAY" : (n > 0 ? "D-" + n : "D+" + (-n));
     const cls = n < 0 ? " past" : (n <= 14 ? " soon" : "");
-    return `<span class="file-dday${cls}" title="${esc((p.ddayLabel || "") + " " + p.dday)}">${label}</span>`;
+    // 표를 눌러도 ⋯ 메뉴의 '날짜 바꾸기'와 같은 창이 열립니다 (data-act="dday")
+    const target = ((p.ddayLabel || "") + " " + p.dday).trim();
+    return `<button type="button" class="file-dday${cls}" data-act="dday" title="${esc(target)} · 눌러서 바꾸기" aria-label="${esc(label + ", " + target)} · 날짜 바꾸기">${label}</button>`;
   }
 
   function cardHTML(p, at){

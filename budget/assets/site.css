@@ -232,7 +232,11 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
   background:var(--ink);color:var(--sheet);
   box-shadow:0 2px 6px rgba(70,64,80,.28);
   transform:rotate(calc(var(--tilt,0deg) * -1.6));
+  border:0;
+  transition:filter .12s;
 }
+.file-dday:hover{filter:brightness(1.3)}
+.file-dday:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
 .file-dday.soon{background:#C2603F}
 .file-dday.past{background:rgba(70,64,80,.45)}
 
