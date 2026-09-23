@@ -27,7 +27,7 @@
   };
 
   const COLORS = [
-    ["green", "녹색"], ["navy", "네이비"], ["pink", "핑크"],
+    ["green", "초록"], ["navy", "파랑"], ["pink", "분홍"],
     ["yellow", "노랑"], ["purple", "보라"], ["orange", "주황"]
   ];
 
