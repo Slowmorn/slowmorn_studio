@@ -1,6 +1,6 @@
 /* ============================================================
-   Slowmorn Studio — shared stylesheet
-   Cool, minimal, composed. Light (bluish-gray) by default; .night for dark.
+   Slowmorn Studio — app pages (Benedi, ErrorSpace)
+   The home page has its own home.css.
    ============================================================ */
 
 :root {
@@ -115,61 +115,6 @@ nav .mark {
   text-decoration: none;
   color: inherit;
 }
-nav .mark .dot { color: var(--accent); }
-nav .links {
-  display: flex;
-  gap: 32px;
-  font-size: 14.5px;
-  font-weight: 450;
-}
-nav .links a {
-  position: relative;
-  color: var(--ink-soft);
-  text-decoration: none;
-  padding-bottom: 3px;
-  transition: color 0.3s var(--ease);
-}
-nav .links a::after {
-  content: "";
-  position: absolute;
-  left: 0; bottom: 0;
-  width: 100%; height: 1px;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.4s var(--ease);
-}
-nav .links a:hover { color: var(--ink); }
-nav .links a:hover::after { transform: scaleX(1); }
-@media (max-width: 560px) { nav .links { gap: 20px; font-size: 13.5px; } }
-
-/* ---------- hero ---------- */
-header { padding: 150px 0 130px; }
-@media (max-width: 720px) { header { padding: 96px 0 80px; } }
-.eyebrow {
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
-  color: var(--ink-faint);
-  margin-bottom: 38px;
-}
-h1 {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(46px, 7.6vw, 96px);
-  line-height: 1.04;
-  letter-spacing: -0.04em;
-  max-width: 15ch;
-}
-h1 em { font-style: normal; color: var(--accent); }
-.hero-sub {
-  margin-top: 42px;
-  max-width: 52ch;
-  font-size: 19px;
-  line-height: 1.65;
-  color: var(--ink-soft);
-}
 
 /* ---------- entrance + scroll reveals ---------- */
 .reveal {
@@ -218,123 +163,6 @@ section { padding: 100px 0; }
   background: var(--line);
 }
 
-/* ---------- philosophy ---------- */
-.manifesto {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(27px, 3.8vw, 44px);
-  line-height: 1.28;
-  letter-spacing: -0.03em;
-  max-width: 20ch;
-}
-.manifesto em { font-style: normal; color: var(--accent); }
-
-.note {
-  margin-top: 40px;
-  max-width: 58ch;
-  font-size: 17px;
-  color: var(--ink-soft);
-}
-
-.creed {
-  margin-top: 80px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  border-top: 1px solid var(--line);
-}
-@media (max-width: 760px) { .creed { grid-template-columns: 1fr; } }
-.creed > div {
-  padding: 36px 32px 40px 0;
-  border-bottom: 1px solid var(--line-soft);
-}
-@media (min-width: 761px) {
-  .creed > div + div { padding-left: 32px; border-left: 1px solid var(--line-soft); }
-}
-.creed .num {
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--accent);
-  letter-spacing: 0.04em;
-  margin-bottom: 18px;
-}
-.creed h3 {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 21px;
-  letter-spacing: -0.02em;
-  margin-bottom: 10px;
-}
-.creed p { font-size: 16px; line-height: 1.6; color: var(--ink-soft); }
-
-/* ---------- works (clickable cards) ---------- */
-.work {
-  position: relative;
-  display: grid;
-  grid-template-columns: 56px 168px 1fr auto;
-  gap: 40px;
-  align-items: center;
-  padding: 50px 8px;
-  border-top: 1px solid var(--line);
-  text-decoration: none;
-  color: inherit;
-  transition: padding-left 0.45s var(--ease);
-}
-.work:last-of-type { border-bottom: 1px solid var(--line); }
-.work:hover { padding-left: 20px; }
-@media (max-width: 760px) {
-  .work { grid-template-columns: 1fr; gap: 22px; padding: 38px 0; }
-  .work:hover { padding-left: 0; }
-  .work .arrow { display: none; }
-}
-.work .wnum {
-  font-family: var(--font-display);
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink-faint);
-  letter-spacing: 0.04em;
-}
-.work .icon {
-  width: 168px;
-  height: 168px;
-  border-radius: 32px;
-  overflow: hidden;
-  box-shadow: 0 18px 44px -20px rgba(27,34,45,0.45);
-  transition: transform .55s var(--ease), box-shadow .55s var(--ease);
-}
-body.night .work .icon { box-shadow: 0 18px 50px -20px rgba(0,0,0,0.7); }
-.work:hover .icon { transform: translateY(-6px) scale(1.02); box-shadow: 0 30px 60px -22px rgba(27,34,45,0.5); }
-.work .icon img { width: 100%; height: 100%; object-fit: cover; display: block; }
-
-.work .meta .title-row {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  flex-wrap: wrap;
-}
-.work .meta .name {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: 34px;
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-.work .meta .desc {
-  margin-top: 14px;
-  max-width: 46ch;
-  font-size: 16.5px;
-  line-height: 1.6;
-  color: var(--ink-soft);
-}
-.work .arrow {
-  font-family: var(--font-display);
-  font-size: 26px;
-  color: var(--ink-faint);
-  transition: transform .45s var(--ease), color .45s var(--ease);
-}
-.work:hover .arrow { transform: translateX(8px); color: var(--accent); }
-
 /* status pills */
 .status {
   display: inline-flex;
@@ -361,12 +189,6 @@ body.night .work .icon { box-shadow: 0 18px 50px -20px rgba(0,0,0,0.7); }
   background: rgba(74,106,150,0.08);
 }
 .status.live .pip { background: var(--accent); box-shadow: 0 0 0 0 rgba(74,106,150,0.5); animation: pulse 2.4s infinite; }
-.status.soon {
-  color: var(--ink-faint);
-  border: 1px solid var(--line);
-  background: transparent;
-}
-.status.soon .pip { background: var(--ink-faint); }
 @keyframes pulse {
   0% { box-shadow: 0 0 0 0 rgba(74,106,150,0.45); }
   70% { box-shadow: 0 0 0 7px rgba(74,106,150,0); }
@@ -704,57 +526,6 @@ footer .foot-contact a {
 footer .foot-contact a:hover { color: var(--accent); border-color: var(--accent); }
 
 /* ============================================================
-   Home (index) — serif type + neutral-gray palette
-   (scoped to .home so other pages are unaffected)
-   ============================================================ */
-body.home {
-  --font-display: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --font-body:    'Newsreader', Georgia, 'Times New Roman', serif;
-  letter-spacing: 0;
-
-  /* lighter, gently cool gray — a little blue back in the accent */
-  --paper:     #f8f8f9;   /* near-white, faintly cool */
-  --paper-2:   #fdfdfe;
-  --ink:       #22242b;   /* soft cool charcoal */
-  --ink-soft:  #565a63;
-  --ink-faint: #8d909a;
-  --line:      #dededf;
-  --line-soft: #e8e8ea;
-  --accent:    #6f7888;   /* light gray-slate — faint blue, brighter */
-  --accent-2:  #8b93a2;
-  background: var(--paper);
-}
-/* serif carries its own rhythm — ease the tight tracking a touch */
-body.home h1,
-body.home .manifesto,
-body.home .big { letter-spacing: -0.01em; }
-body.home .eyebrow,
-body.home .sec-label,
-body.home .status,
-body.home .mk { letter-spacing: 0.12em; }
-/* soften the leftover hardcoded blues to match the muted accent */
-body.home ::selection { background: rgba(111,120,136,0.20); color: var(--ink); }
-body.home::before {
-  background:
-    radial-gradient(120% 90% at 86% -20%, rgba(120,128,144,0.13), transparent 55%),
-    radial-gradient(90% 70% at -10% 110%, rgba(112,120,136,0.06), transparent 60%);
-}
-body.home .status.live {
-  color: var(--accent);
-  border-color: rgba(111,120,136,0.42);
-  background: rgba(111,120,136,0.09);
-}
-body.home .status.live .pip {
-  box-shadow: 0 0 0 0 rgba(111,120,136,0.5);
-  animation: pulse-slate 2.4s infinite;
-}
-@keyframes pulse-slate {
-  0%   { box-shadow: 0 0 0 0 rgba(111,120,136,0.45); }
-  70%  { box-shadow: 0 0 0 7px rgba(111,120,136,0); }
-  100% { box-shadow: 0 0 0 0 rgba(111,120,136,0); }
-}
-
-/* ============================================================
    App pages (Benedi, ErrorSpace) — wide frame, Pretendard,
    the same lowercase mark as the home page
    ============================================================ */
@@ -870,6 +641,11 @@ body.benedi .legal .highlight {
   background: rgba(111,120,136,0.08);
   border-color: rgba(111,120,136,0.22);
 }
+@keyframes pulse-slate {
+  0%   { box-shadow: 0 0 0 0 rgba(111,120,136,0.45); }
+  70%  { box-shadow: 0 0 0 7px rgba(111,120,136,0); }
+  100% { box-shadow: 0 0 0 0 rgba(111,120,136,0); }
+}
 
 /* ============================================================
    ErrorSpace — deep-space background
@@ -907,7 +683,6 @@ body.errorspace::after { opacity: 0.25; }
 /* neon glow on accent-colored emphasis + interactive links */
 body.errorspace ::selection { background: rgba(0,222,129,0.30); color: #04140c; }
 body.errorspace .app-body .lead em,
-body.errorspace nav .mark .dot,
 body.errorspace .contact-inner .big em {
   text-shadow: 0 0 10px rgba(0,222,129,0.55), 0 0 22px rgba(0,222,129,0.28);
 }
