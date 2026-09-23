@@ -119,9 +119,9 @@ h1 {
   font-weight: 500;
   font-size: clamp(20px, 4.2vw, 68px);
   line-height: 1;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.14em;
   /* tracking also trails the last letter; pull it back so it centres true */
-  margin-right: -0.06em;
+  margin-right: -0.14em;
 }
 
 /* works — just the names, small, under the title */
