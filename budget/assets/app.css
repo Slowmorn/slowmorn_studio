@@ -314,6 +314,27 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 .pick-count{flex:none;font-size:11.5px;line-height:18px;padding:0 6px;border-radius:999px;background:var(--hover);color:var(--muted);font-variant-numeric:tabular-nums}
 .pick.chosen .pick-count{background:var(--sheet)}
 
+/* 선택지 모두 보기: 후보를 세로로 늘어놓고 고른 것에 색을 둡니다 */
+.picks{display:flex;flex-direction:column;gap:4px;min-width:0;padding:2px 0}
+.pick-opt{
+  display:flex;align-items:center;gap:8px;width:100%;min-width:0;min-height:30px;padding:4px 10px;
+  border:1px solid var(--line);border-radius:6px;background:none;color:var(--muted);
+  font-size:13px;text-align:left;
+}
+.pick-opt:hover{background:color-mix(in srgb, var(--ink) 5%, transparent);color:var(--ink)}
+.pick-opt.on{border-color:color-mix(in srgb, var(--accent-fill) 40%, var(--line));background:var(--accent-soft);color:var(--ink);font-weight:600}
+.pick-opt.on::before{
+  content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--accent-fill);
+}
+.pick-opt-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pick-opt-price{flex:none;font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:400}
+.pick-opt.on .pick-opt-price{color:var(--ink)}
+.picks .pick-edit{
+  height:auto;border:0;padding:2px 2px 0;width:auto;align-self:flex-start;
+  font-size:12px;color:var(--muted);background:none;text-decoration:underline;text-underline-offset:2px;
+}
+.picks .pick-edit:hover{background:none;color:var(--ink)}
+
 /* 선택지 dialog */
 .opt-dialog{
   border:0;padding:0;border-radius:14px;background:var(--sheet);color:var(--ink);
@@ -460,6 +481,8 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   .row:not(.guest) .budget{grid-area:b}
   .row:not(.guest) .actual{grid-area:a}
   .row:not(.guest) .pick{grid-area:o;height:30px}
+  .row:not(.guest) .picks{grid-area:o}
+  .row:not(.guest) .picks .pick{height:auto}
   .row:not(.guest) .qty{grid-area:q}
   .row:not(.guest) .del-item{justify-self:end}
   body.no-actual .cols:not(.guest),body.no-actual .row:not(.guest){grid-template-columns:18px 28px 1fr 1fr 64px}
@@ -537,6 +560,12 @@ body:has(#planner) .toast{bottom:120px}
 }
 @keyframes cat-nav-in{from{opacity:0;transform:translateY(6px) scale(.97)}}
 .cat-nav-title{color:var(--muted);font-size:12px;font-weight:600;padding:8px 12px 6px}
+.cat-nav-opts{display:flex;flex-direction:column;padding:4px 0}
+.cat-nav-opts .opt-toggle{padding:8px 12px;border-radius:11px;color:var(--ink)}
+.cat-nav-opts .opt-toggle:hover{background:rgba(55,53,47,.06)}
+body.kind-guestbook .cat-nav-opts,body.kind-guestbook .cat-nav-sep{display:none}
+.cat-nav-cats[hidden]{display:none}
+.cat-nav-sep{border:0;border-top:1px solid rgba(55,53,47,.1);margin:4px 8px}
 .cat-nav-pop button{
   display:flex;align-items:center;gap:10px;width:100%;
   border:0;background:none;color:var(--ink);text-align:left;

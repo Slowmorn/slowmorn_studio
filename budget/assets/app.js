@@ -112,6 +112,16 @@
   const unitTitle = it => qtyOf(it) > 1 && it.budget ? ` title="개당 ${won(Math.round(unitOf(it)))}"` : "";
   function pickHTML(it){
     const n = (it.options || []).length, chosen = chosenOf(it);
+    // 선택지 모두 보기: 후보를 전부 늘어놓고 고른 것을 표시합니다. 칩을 누르면 바로 고르거나 풀어요.
+    if(showAllOpts && n) return `<div class="picks" role="group" aria-label="선택지">
+      ${it.options.map(o => {
+        const on = o.id === it.choiceId;
+        return `<button type="button" class="pick-opt${on ? " on" : ""}" data-oid="${esc(o.id)}" aria-pressed="${on}" title="${esc(o.name)}${o.price ? " · " + won(o.price) : ""}${on ? " · 다시 누르면 선택이 풀려요" : ""}">
+          <span class="pick-opt-name">${esc(o.name)}</span>${o.price ? `<span class="pick-opt-price">${won(o.price)}</span>` : ""}
+        </button>`;
+      }).join("")}
+      <button type="button" class="pick pick-edit" aria-haspopup="dialog">선택지 고치기</button>
+    </div>`;
     const cls = chosen ? " chosen" : n ? " has-options" : "";
     const label = chosen ? esc(chosen.name) : n ? `선택지 ${n}개` : "+ 선택지";
     const count = chosen && n > 1 ? `<span class="pick-count">${n}</span>` : "";
@@ -250,7 +260,8 @@
         </section>`).join("");
     }
     updateTotals();
-    catNav.hidden = state.categories.length < 2;
+    // 보기 설정은 늘 있고, 카테고리 목록은 둘 이상일 때만 씁니다. 방명록에는 보기 설정이 없어요.
+    catNav.hidden = guest && state.categories.length < 2;
   }
 
   // ---- 카테고리로 건너뛰기 ----
@@ -270,6 +281,7 @@
     return hit ? hit.dataset.cid : null;
   }
   function renderCatNav(){
+    document.getElementById("catNavCats").hidden = state.categories.length < 2;
     const here = currentCatId();
     const guest = isGuest(state);
     catNavList.innerHTML = state.categories.map(c => {
@@ -457,6 +469,16 @@
       t.setAttribute("aria-label", foldLabel(c));
       t.title = foldLabel(c);
       save();
+      return;
+    }
+    if(t.classList.contains("pick-opt")){
+      const it = findItem(t, c);
+      const o = (it.options || []).find(x => x.id === t.dataset.oid);
+      if(!o) return;
+      chooseOption(it, o);
+      // 다시 그리면 누른 칩이 새로 만들어지므로 같은 칩으로 초점을 돌려 둡니다
+      const again = catsEl.querySelector(`[data-iid="${it.id}"] .pick-opt[data-oid="${CSS.escape(o.id)}"]`);
+      if(again) again.focus();
       return;
     }
     if(t.classList.contains("pick")){
@@ -819,6 +841,20 @@
     render();
   });
 
+  // ---- view: 선택지 모두 보기 ----
+  const ALLOPTS_KEY = "prep-budget-all-options";
+  const allOptsToggle = document.getElementById("allOptsToggle");
+  let showAllOpts = false;
+  try{ showAllOpts = localStorage.getItem(ALLOPTS_KEY) === "on"; }catch(e){}
+  allOptsToggle.checked = showAllOpts;
+  document.body.classList.toggle("all-options", showAllOpts);
+  allOptsToggle.addEventListener("change", () => {
+    showAllOpts = allOptsToggle.checked;
+    document.body.classList.toggle("all-options", showAllOpts);
+    try{ localStorage.setItem(ALLOPTS_KEY, showAllOpts ? "on" : "off"); }catch(e){}
+    render();
+  });
+
   // ---- 선택지 (options per item: products, vendors, ...) ----
   const optDialog = document.getElementById("optDialog");
   const optList = document.getElementById("optList");
@@ -835,6 +871,22 @@
   const ICON_LINK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 3h4v4M13 3L7.5 8.5M11 9.5V12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const ICON_EDIT = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 3l2.5 2.5L6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   const ICON_DEL = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+
+  // 선택지를 고르거나(가격이 있으면 예산 = 가격 × 수량) 이미 고른 것을 다시 누르면 풉니다.
+  // 대화상자와 '선택지 모두 보기'의 칩이 함께 씁니다. 골랐으면 true.
+  function chooseOption(it, o){
+    if(it.choiceId === o.id){
+      it.choiceId = null; // keep the budget as it is
+      render(); save();
+      if(!optDialog.open) toast(`'${o.name}' 선택을 풀었어요`);
+      return false;
+    }
+    it.choiceId = o.id;
+    if(o.price) it.budget = o.price * qtyOf(it);
+    render(); save();
+    toast(!o.price ? `'${o.name}' 선택` : qtyOf(it) > 1 ? `'${o.name}' 선택 · 예산 ${won(it.budget)} (${qtyOf(it)}개)` : `'${o.name}' 선택 · 예산 ${won(it.budget)}`);
+    return true;
+  }
 
   function renderOptions(){
     const it = optItem();
@@ -892,16 +944,7 @@
       return;
     }
     if(e.target.closest(".opt-main")){
-      if(it.choiceId === o.id){
-        it.choiceId = null; // keep the budget as it is
-        render(); save(); renderOptions();
-        return;
-      }
-      it.choiceId = o.id;
-      if(o.price) it.budget = o.price * qtyOf(it);
-      render(); save();
-      optDialog.close();
-      toast(!o.price ? `'${o.name}' 선택` : qtyOf(it) > 1 ? `'${o.name}' 선택 · 예산 ${won(it.budget)} (${qtyOf(it)}개)` : `'${o.name}' 선택 · 예산 ${won(it.budget)}`);
+      if(chooseOption(it, o)) optDialog.close(); else renderOptions();
     } else if(e.target.closest(".opt-edit")){
       optCtx.editId = o.id;
       optForm.elements.name.value = o.name;
