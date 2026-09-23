@@ -755,66 +755,145 @@ body.home .status.live .pip {
 }
 
 /* ============================================================
-   Benedi — soft light-green palette
-   (scoped to .benedi so other pages are unaffected)
+   App pages (Benedi, ErrorSpace) — wide frame, Pretendard,
+   the same lowercase mark as the home page
    ============================================================ */
-body.benedi {
-  --paper:     #e6f0e6;   /* soft green-gray */
-  --paper-2:   #eef5ee;   /* elevated panel */
-  --ink:       #1c2a20;   /* green-charcoal */
-  --ink-soft:  #4f6554;
-  --ink-faint: #85a08c;
-  --line:      #d0e0d3;
-  --line-soft: #dbe8de;
-  --accent:    #4f9366;   /* leaf green */
-  --accent-2:  #6fb385;
-  background: var(--paper);
+body.benedi,
+body.errorspace {
+  --maxw: 1440px;
+  --font-display: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-body:    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
 }
-body.benedi ::selection { background: rgba(79,147,102,0.22); color: var(--ink); }
-body.benedi::before {
-  background:
-    radial-gradient(120% 90% at 86% -20%, rgba(120,180,130,0.16), transparent 55%),
-    radial-gradient(90% 70% at -10% 110%, rgba(90,150,100,0.09), transparent 60%);
+body.benedi .wrap,
+body.errorspace .wrap { padding: 0 clamp(20px, 4vw, 72px); }
+body.benedi nav .mark,
+body.errorspace nav .mark {
+  font-weight: 500;
+  font-size: 17px;
+  letter-spacing: 0.06em;
 }
-/* green "Available now" badge */
-body.benedi .status.live {
-  color: var(--accent);
-  border-color: rgba(79,147,102,0.4);
-  background: rgba(79,147,102,0.08);
+body.benedi footer .mark,
+body.errorspace footer .mark { letter-spacing: 0.06em; }
+
+/* a smaller hero — icon, name, and the lines that follow step down together */
+body.benedi .app-hero,
+body.errorspace .app-hero { grid-template-columns: 128px 1fr; gap: 40px; }
+body.benedi .app-hero .icon-lg,
+body.errorspace .app-hero .icon-lg { width: 128px; height: 128px; border-radius: 28px; }
+body.benedi .app-hero .app-name,
+body.errorspace .app-hero .app-name { font-size: clamp(36px, 4.4vw, 52px); letter-spacing: -0.035em; }
+body.benedi .app-hero .app-tagline,
+body.errorspace .app-hero .app-tagline { margin-top: 16px; font-size: clamp(16px, 1.5vw, 19px); }
+body.benedi .app-body .lead,
+body.errorspace .app-body .lead { font-size: clamp(21px, 2.2vw, 27px); }
+body.benedi .contact-inner .big,
+body.errorspace .contact-inner .big { font-size: clamp(24px, 2.6vw, 34px); letter-spacing: -0.03em; line-height: 1.25; }
+body.benedi .contact-links,
+body.errorspace .contact-links { margin-top: 32px; }
+@media (max-width: 760px) {
+  body.benedi .app-hero,
+  body.errorspace .app-hero { grid-template-columns: 1fr; gap: 28px; }
 }
-body.benedi .status.live .pip {
-  box-shadow: 0 0 0 0 rgba(79,147,102,0.5);
-  animation: pulse-green 2.4s infinite;
-}
-@keyframes pulse-green {
-  0%   { box-shadow: 0 0 0 0 rgba(79,147,102,0.45); }
-  70%  { box-shadow: 0 0 0 7px rgba(79,147,102,0); }
-  100% { box-shadow: 0 0 0 0 rgba(79,147,102,0); }
-}
-/* green privacy highlight box */
-body.benedi .legal .highlight {
-  background: rgba(79,147,102,0.08);
-  border-color: rgba(79,147,102,0.22);
+
+/* wide screens: two columns so the text fills the frame —
+   the lead (or the policy summary) holds the left while the rest reads on the right */
+@media (min-width: 1024px) {
+  body.benedi .app-body,
+  body.errorspace .app-body,
+  body.benedi .legal .prose,
+  body.errorspace .legal .prose {
+    max-width: none;
+    display: grid;
+    grid-template-columns: 5fr 7fr;
+    column-gap: clamp(56px, 7vw, 120px);
+    align-items: start;
+  }
+  body.benedi .app-body > *,
+  body.errorspace .app-body > *,
+  body.benedi .legal .prose > *,
+  body.errorspace .legal .prose > * { grid-column: 2; }
+
+  body.benedi .app-body .lead,
+  body.errorspace .app-body .lead {
+    grid-column: 1;
+    grid-row: 1 / span 20;
+    position: sticky;
+    top: 48px;
+    margin-bottom: 0;
+  }
+  body.benedi .legal .prose .updated,
+  body.errorspace .legal .prose .updated { grid-column: 1; grid-row: 1; }
+  body.benedi .legal .prose .highlight,
+  body.errorspace .legal .prose .highlight {
+    grid-column: 1;
+    grid-row: 2 / span 30;
+    position: sticky;
+    top: 48px;
+  }
+  /* the right column starts level with the top of the left */
+  body.benedi .legal .prose > h3:first-of-type,
+  body.errorspace .legal .prose > h3:first-of-type { grid-row: 1; margin-top: 0; }
 }
 
 /* ============================================================
-   ErrorSpace — mono type + deep-space background
+   Benedi — the Slowmorn home palette
+   (scoped to .benedi so other pages are unaffected)
+   ============================================================ */
+body.benedi {
+  --paper:     #f8f8f9;
+  --paper-2:   #fdfdfe;
+  --ink:       #22242b;
+  --ink-soft:  #565a63;
+  --ink-faint: #8d909a;
+  --line:      #dededf;
+  --line-soft: #e8e8ea;
+  --accent:    #6f7888;
+  --accent-2:  #8b93a2;
+  background: var(--paper);
+}
+body.benedi ::selection { background: rgba(111,120,136,0.20); color: var(--ink); }
+body.benedi::before {
+  background:
+    radial-gradient(120% 90% at 86% -20%, rgba(120,128,144,0.13), transparent 55%),
+    radial-gradient(90% 70% at -10% 110%, rgba(112,120,136,0.06), transparent 60%);
+}
+body.benedi .status.live {
+  color: var(--accent);
+  border-color: rgba(111,120,136,0.42);
+  background: rgba(111,120,136,0.09);
+}
+body.benedi .status.live .pip {
+  box-shadow: 0 0 0 0 rgba(111,120,136,0.5);
+  animation: pulse-slate 2.4s infinite;
+}
+body.benedi .legal .highlight {
+  background: rgba(111,120,136,0.08);
+  border-color: rgba(111,120,136,0.22);
+}
+
+/* ============================================================
+   ErrorSpace — deep-space background
    (scoped to .errorspace so other pages are unaffected)
    ============================================================ */
 body.errorspace {
-  --font-display: 'Red Hat Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
-  --font-body:    'Red Hat Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
   --paper:  #000005;   /* near-black space */
   --paper-2: #0a0d16;
   --accent:   #00de81;   /* neon emerald */
   --accent-2: #ff2ea6;   /* neon magenta */
-  letter-spacing: 0;
   background: #000005;
 }
 
-/* mono reads wide — trim size/spacing a touch so it stays composed */
-body.errorspace { font-size: 16px; letter-spacing: 0; }
-body.errorspace .app-name { letter-spacing: -0.01em; }
+/* emerald "Available now" badge */
+body.errorspace .status.live {
+  border-color: rgba(0,222,129,0.42);
+  background: rgba(0,222,129,0.08);
+}
+body.errorspace .status.live .pip { animation: pulse-emerald 2.4s infinite; }
+@keyframes pulse-emerald {
+  0%   { box-shadow: 0 0 0 0 rgba(0,222,129,0.45); }
+  70%  { box-shadow: 0 0 0 7px rgba(0,222,129,0); }
+  100% { box-shadow: 0 0 0 0 rgba(0,222,129,0); }
+}
 
 /* replace the light ambient glow with a neon cyberpunk wash —
    emerald up top, magenta down low; the stars are injected as #starfield */
