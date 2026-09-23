@@ -572,14 +572,16 @@ body:has(#planner) .toast{bottom:120px}
 
 /* 파일 줄 오른쪽의 남은 날. 눌러서 정하고 고칩니다. */
 .dday-chip{
-  flex:none;border:0;
+  flex:none;
   font-size:12.5px;font-weight:700;letter-spacing:-0.01em;
-  padding:5px 11px;border-radius:99px;
-  background:var(--ink);color:var(--sheet);white-space:nowrap;
+  padding:4px 10px;border-radius:99px;
+  /* 옆 색상 알약의 1px 점선과 맞춰, 색은 테두리 안쪽까지만 칠합니다 */
+  border:1px solid transparent;background-clip:padding-box;
+  background-color:var(--ink);color:var(--sheet);white-space:nowrap;
 }
 .dday-chip:hover{filter:brightness(1.35)}
-.dday-chip.soon{background:#C2603F}
-.dday-chip.past{background:color-mix(in srgb, var(--ink) 45%, transparent)}
+.dday-chip.soon{background-color:#C2603F}
+.dday-chip.past{background-color:color-mix(in srgb, var(--ink) 45%, transparent)}
 .dday-chip.empty{
   background:none;color:var(--muted);font-weight:400;
   border:1px dashed var(--line);padding:4px 10px;
