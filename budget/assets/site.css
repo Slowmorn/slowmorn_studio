@@ -47,6 +47,8 @@ footer a:hover{text-decoration:underline}
   margin:0 0 12px;max-width:22ch;
 }
 .hero-lead{color:var(--muted);margin:0;max-width:62ch;line-height:1.7}
+/* 한국어 제목·소개는 어절 단위로 줄을 바꿉니다 ("많으니 / 까" 처럼 끊기지 않게) */
+.hero h1,.hero-lead,.hero .lead{word-break:keep-all}
 .hero-points{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
 .hero-points li{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:var(--paper)}
 .hero-points b{display:block;font-size:14.5px;margin-bottom:4px}
