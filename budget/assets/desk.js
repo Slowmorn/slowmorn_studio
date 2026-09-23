@@ -115,16 +115,23 @@
       const x = Math.min(Math.max(p.pos.x, PAD), Math.max(PAD, width - W - PAD));
       return { x, y: Math.max(PAD, p.pos.y) };
     };
+    // 끌어다 놓은 파일이 차지한 자리를 먼저 잡아 두고, 새 파일은 그 자리와 겹치지 않는 칸에 놓습니다
+    const out = plans.map(p => p.pos ? { plan: p, ...place(p) } : { plan: p });
+    out.forEach(o => { if(o.plan.pos) taken.push(o); });
+    const clash = (x, y) => taken.some(t => x < t.x + W + GAP && t.x < x + W + GAP && y < t.y + H + GAP && t.y < y + H + GAP);
     let slot = 0;
-    return plans.map(p => {
-      if(p.pos) return { plan: p, ...place(p) };
-      const i = slot++;
-      return {
-        plan: p,
-        x: PAD + (i % perRow) * (W + GAP),
-        y: PAD + Math.floor(i / perRow) * (H + GAP)
-      };
+    out.forEach(o => {
+      if(o.plan.pos) return;
+      let x, y;
+      do {
+        x = PAD + (slot % perRow) * (W + GAP);
+        y = PAD + Math.floor(slot / perRow) * (H + GAP);
+        slot++;
+      } while(clash(x, y));
+      o.x = x; o.y = y;
+      taken.push(o);
     });
+    return out;
   }
 
   function ddayHTML(p){
