@@ -113,16 +113,62 @@
         "name": "가전",
         "items": [
           {
-            "name": "냉장고"
+            "name": "냉장고",
+            "options": [
+              {
+                "name": "LG 오브제컬렉션 냉장고",
+                "link": "https://link.coupang.com/a/hiLjSRIZ7k"
+              },
+              {
+                "name": "삼성 비스포크 냉장고",
+                "link": "https://link.coupang.com/a/hiLgzir2Iu"
+              }
+            ]
           },
           {
-            "name": "세탁기·건조기"
+            "name": "세탁기·건조기",
+            "options": [
+              {
+                "name": "삼성 비스포크 세탁기 건조기",
+                "link": "https://link.coupang.com/a/hiLqNEeYdE"
+              },
+              {
+                "name": "LG 오브제컬렉션 세탁기 건조기",
+                "link": "https://link.coupang.com/a/hiLujYz0AS"
+              }
+            ]
           },
           {
-            "name": "에어컨"
+            "name": "에어컨",
+            "options": [
+              {
+                "name": "LG 휘센 오브제컬렉션 에어컨",
+                "link": "https://link.coupang.com/a/hiLzaQUoua"
+              },
+              {
+                "name": "삼성 비스포크 무풍 에어컨",
+                "link": "https://link.coupang.com/a/hiLD9H3pAa"
+              }
+            ]
           },
           {
-            "name": "TV"
+            "name": "TV",
+            "options": [
+              {
+                "name": "삼성 The serif",
+                "link": "https://link.coupang.com/a/hiLItOxJiC"
+              },
+              {
+                "name": "LG 스탠바이미 2",
+                "link": "https://link.coupang.com/a/hiLLg40L8e"
+              }
+            ]
+          },
+          {
+            "name": "인덕션"
+          },
+          {
+            "name": "식기세척기"
           },
           {
             "name": "전자레인지"
