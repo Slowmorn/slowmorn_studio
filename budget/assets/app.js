@@ -50,7 +50,12 @@
   }
 
   const Auth = window.BudgetAuth;
-  const save = () => BS.save(state);
+  const save = () => { BS.save(state); showSaved(); };
+  const hhmm = t => new Date(t).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
+  function showSaved(){
+    const el = document.getElementById("savedAt");
+    el.textContent = state.updatedAt ? "자동 저장됨 · " + hhmm(state.updatedAt) : "";
+  }
   const saveToAccount = () => BS.saveToAccount();
 
   // 로그인 직후: 계정의 파일과 이 브라우저의 것을 합칩니다
@@ -325,6 +330,7 @@
     diffEl.textContent = won(Math.abs(diff));
     diffEl.classList.toggle("over", diff < 0);
     document.getElementById("tDone").textContent = guest ? `${count}명` : `${done} / ${count}`;
+    showSaved();
   }
 
   const findCat = el => state.categories.find(c => c.id === el.closest(".cat").dataset.cid);

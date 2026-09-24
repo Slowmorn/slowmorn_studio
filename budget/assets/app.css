@@ -454,7 +454,6 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 .t-main .t-man{font-size:13px;color:var(--muted)}
 .t-small .t-num{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
 .t-small .t-num.over{color:var(--warn)}
-.t-spacer{flex:1}
 .export{
   border:0;border-radius:var(--radius);padding:11px 18px;font-weight:600;
   background:var(--ink);color:var(--sheet);white-space:nowrap;
@@ -462,6 +461,9 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 .export{cursor:pointer;display:inline-block;text-align:center;user-select:none}
 .export:hover{filter:brightness(1.35)}
 .export[aria-disabled="true"]{opacity:.6;cursor:wait}
+.t-export{flex:1;display:flex;align-items:center;gap:14px}
+.saved-at{flex:1;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.saved-at:empty{display:none}
 
 
 /* Narrow category card (2/4 columns, or phone): item goes onto three lines */
@@ -506,8 +508,9 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   .file-switch-btn{max-width:56vw}
   .cat{padding:14px 14px 10px}
   .totals-inner{gap:14px 20px}
-  .t-spacer{display:none}
-  .export{display:block;width:100%}
+  .t-export{flex:none;width:100%}
+  .saved-at{flex:none;text-align:left}
+  .export{display:block;flex:1}
   body{padding-bottom:210px}
   .toast{bottom:190px}
 }
