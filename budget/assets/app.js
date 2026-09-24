@@ -85,6 +85,13 @@
 
   // ---- render ----
   const catsEl = document.getElementById("cats");
+  // 칸보다 긴 항목 이름은 커서를 올리면 툴팁으로 전체를 보여 줍니다
+  catsEl.addEventListener("mouseover", e => {
+    const t = e.target;
+    if(!t.classList || !t.classList.contains("name")) return;
+    if(t.scrollWidth > t.clientWidth) t.title = t.value;
+    else t.removeAttribute("title");
+  });
   const titleEl = document.getElementById("planTitle");
   const introEl = document.getElementById("planIntro");
   // The description box grows with its text instead of scrolling
