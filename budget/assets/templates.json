@@ -4,7 +4,7 @@
     "label": "결혼 준비",
     "desc": "결혼식·청첩장·예물·부모님 등 8개 카테고리",
     "title": "우리 결혼 준비",
-    "intro": "ver. 2026\n예식장부터 혼수까지, 결혼 준비 체크리스트예요. 견적을 받은 업체는 항목의 선택지에 가격과 함께 적어 두고 비교해 보세요.",
+    "intro": "예식장부터 혼수까지 준비해야 할 목록들을 한 번에 볼 수 있게 정리해 놓은 결혼 준비 체크리스트예요. 서치한 제품이나 업체에 대한 정보를 체크리스트에 함께 저장해놓고 비교해보세요!",
     "kind": "budget",
     "categories": [
       {
@@ -12,9 +12,6 @@
         "items": [
           {
             "name": "예식장"
-          },
-          {
-            "name": "버스 대절"
           },
           {
             "name": "플래너"
@@ -39,6 +36,9 @@
           },
           {
             "name": "부케"
+          },
+          {
+            "name": "버스 대절"
           }
         ]
       },
@@ -113,75 +113,31 @@
         "name": "가전",
         "items": [
           {
-            "name": "냉장고",
-            "options": [
-              {
-                "name": "삼성 키친핏 615L"
-              }
-            ]
+            "name": "냉장고"
           },
           {
-            "name": "세탁기·건조기",
-            "options": [
-              {
-                "name": "LG 워시타워",
-                "note": "로봇청소기·오븐과 묶음 구매"
-              }
-            ]
+            "name": "세탁기·건조기"
           },
           {
             "name": "에어컨"
           },
           {
-            "name": "TV",
-            "options": [
-              {
-                "name": "삼성 더 세리프 55인치"
-              }
-            ]
+            "name": "TV"
           },
           {
             "name": "전자레인지"
           },
           {
-            "name": "무선청소기",
-            "options": [
-              {
-                "name": "다이슨"
-              }
-            ]
+            "name": "무선청소기"
           },
           {
-            "name": "로봇청소기",
-            "options": [
-              {
-                "name": "LG"
-              }
-            ]
+            "name": "로봇청소기"
           },
           {
-            "name": "오븐",
-            "options": [
-              {
-                "name": "LG"
-              }
-            ]
+            "name": "밥솥"
           },
           {
-            "name": "밥솥",
-            "options": [
-              {
-                "name": "쿠쿠"
-              }
-            ]
-          },
-          {
-            "name": "음식물 처리기",
-            "options": [
-              {
-                "name": "린클"
-              }
-            ]
+            "name": "음식물 처리기"
           }
         ]
       },
@@ -189,7 +145,16 @@
         "name": "가구·인테리어",
         "items": [
           {
-            "name": "침대"
+            "name": "침대 프레임"
+          },
+          {
+            "name": "매트리스"
+          },
+          {
+            "name": "이불"
+          },
+          {
+            "name": "소파"
           },
           {
             "name": "식탁·식탁 의자"
@@ -204,7 +169,7 @@
             "name": "수납 선반"
           },
           {
-            "name": "침실 수납장·사이드 테이블"
+            "name": "침실 사이드 테이블"
           },
           {
             "name": "전신 거울"
@@ -235,19 +200,98 @@
   {
     "id": "baby",
     "label": "출산·육아 준비",
-    "desc": "아기옷·가구·위생·수유 등 6개 카테고리",
+    "desc": "산모·출산 가방·아기옷·수면 등 10개 카테고리",
     "title": "출산·육아 준비",
-    "intro": "ver. 2026\n쌍둥이 아빠가 직접 준비하면서 만든 체크리스트 겸 예산표예요. 여러 맘카페와 블로그 후기를 기반으로 평이 좋은 제품을 항목마다 선택지로 정리해 뒀어요. 구매의 편의성을 위해 쿠팡과 네이버스토어를 위주로 링크를 걸어뒀습니다. 조리원에서 주는 것, 물려받을 것은 지우고 우리 집 상황에 맞게 고쳐 쓰세요.",
+    "intro": "ver. 2026\n쌍둥이 아빠가 직접 준비하면서 만든 체크리스트 겸 예산표예요. 나름대로 열심히 찾아보고, 평이 좋은 제품을 항목마다 선택지로 정리해 뒀어요. 겪어본 후 업뎃할게요:) 예비 엄마아빠 화이팅!",
     "kind": "budget",
     "categories": [
       {
         "name": "산모",
         "items": [
           {
-            "name": "산후조리원"
+            "name": "산후조리원 (임신 확인하자마자 바로 예약합시다)"
           },
           {
-            "name": "산모 패드",
+            "name": "수유 브라 (임신 중기부터 편하게 입을 수 있어요)",
+            "options": [
+              {
+                "name": "에이투에프 수유브라",
+                "link": "https://brand.naver.com/atof/category/1c2b237a23d14a75a364a6bfb0164eb3"
+              },
+              {
+                "name": "하성민기업 수유브라",
+                "link": "https://brand.naver.com/hasungmin/search?q=%ED%95%98%EC%84%B1%EB%AF%BC%EA%B8%B0%EC%97%85%20%EC%88%98%EC%9C%A0%EB%B8%8C%EB%9D%BC"
+              },
+              {
+                "name": "Mothersbaby 수유브라",
+                "link": "https://mothersbaby.co.kr/category/%EC%88%98%EC%9C%A0%EB%B8%8C%EB%9D%BC/547/"
+              }
+            ]
+          },
+          {
+            "name": "임부 팬티",
+            "options": [
+              {
+                "name": "소임 임부팬티",
+                "link": "https://www.soim.co.kr/shop/shopbrand.html?xcode=021&mcode=002&srsltid=AU7gw4VYqnqlTxr-oBRozfLyw3odAjORWIAzHT8etlEsRfSiZUr25MRY"
+              },
+              {
+                "name": "네온벨로 임산부 팬티",
+                "link": "https://neonvelo.co.kr/category/%EC%9E%84%EC%82%B0%EB%B6%80-%ED%8C%AC%ED%8B%B0/57/"
+              }
+            ]
+          },
+          {
+            "name": "튼살 크림",
+            "options": [
+              {
+                "name": "일리윤 튼살크림",
+                "link": "https://link.coupang.com/a/hiFvN47x2i"
+              },
+              {
+                "name": "비오템 튼살크림",
+                "link": "https://link.coupang.com/a/hiFsthuuD6"
+              },
+              {
+                "name": "프라젠트라 임산부크림",
+                "link": "https://link.coupang.com/a/hiFBxNUIq4"
+              }
+            ]
+          },
+          {
+            "name": "임부복"
+          },
+          {
+            "name": "무압박 양말"
+          },
+          {
+            "name": "영양제 (엽산, 철분제, 유산균)"
+          },
+          {
+            "name": "입덧 캔디"
+          }
+        ]
+      },
+      {
+        "name": "출산 가방",
+        "items": [
+          {
+            "name": "수유 브라"
+          },
+          {
+            "name": "임부 팬티"
+          },
+          {
+            "name": "안심 팬티",
+            "options": [
+              {
+                "name": "맘스 안심팬티",
+                "link": "https://link.coupang.com/a/hiDx38WAeb"
+              }
+            ]
+          },
+          {
+            "name": "산모 패드 (병원 또는 조리원 무료 제공하는 경우 많음)",
             "options": [
               {
                 "name": "디펜드 맘스 안심패드",
@@ -264,19 +308,99 @@
             ]
           },
           {
-            "name": "수유 브라",
+            "name": "수유 패드",
             "options": [
               {
-                "name": "에이투에프 수유브라",
-                "link": "https://brand.naver.com/atof/category/1c2b237a23d14a75a364a6bfb0164eb3"
+                "name": "마더케이 수유패드"
               },
               {
-                "name": "하성민기업 수유브라",
-                "link": "https://brand.naver.com/hasungmin/search?q=%ED%95%98%EC%84%B1%EB%AF%BC%EA%B8%B0%EC%97%85%20%EC%88%98%EC%9C%A0%EB%B8%8C%EB%9D%BC"
+                "name": "더블하트 수유패드"
               },
               {
-                "name": "Mothersbaby 수유브라",
-                "link": "https://mothersbaby.co.kr/category/%EC%88%98%EC%9C%A0%EB%B8%8C%EB%9D%BC/547/"
+                "name": "란시노 수유패드"
+              }
+            ]
+          },
+          {
+            "name": "중,대형 생리대"
+          },
+          {
+            "name": "모유저장팩"
+          },
+          {
+            "name": "양배추팩 (젖몸살 대비)",
+            "options": [
+              {
+                "name": "카보크림 (양배추크림)",
+                "link": "https://link.coupang.com/a/hiE5JysWES"
+              },
+              {
+                "name": "튼튼맘스 양배추팩",
+                "link": "https://link.coupang.com/a/hiE9Qhe7Km"
+              }
+            ]
+          },
+          {
+            "name": "가슴 쿨링패치",
+            "options": [
+              {
+                "name": "모유사 와이즈맘픽 쿨링패치",
+                "link": "https://link.coupang.com/a/hiFfswrBvM"
+              }
+            ]
+          },
+          {
+            "name": "텀블러"
+          },
+          {
+            "name": "보습 크림"
+          },
+          {
+            "name": "무압박 양말"
+          },
+          {
+            "name": "압박스타킹"
+          },
+          {
+            "name": "손목보호대"
+          },
+          {
+            "name": "영양제 (철분제, 유산균)"
+          },
+          {
+            "name": "세면도구 (칫솔, 치약, 샴푸, 바디워시)"
+          },
+          {
+            "name": "기초화장품"
+          },
+          {
+            "name": "마스크"
+          },
+          {
+            "name": "푹신한 슬리퍼"
+          },
+          {
+            "name": "충전기"
+          },
+          {
+            "name": "립밤"
+          },
+          {
+            "name": "손톱깎이"
+          },
+          {
+            "name": "비판텐 (연고)"
+          },
+          {
+            "name": "아기 손수건",
+            "options": [
+              {
+                "name": "밤부베베 손수건",
+                "link": "https://brand.naver.com/bamboobebe/category/009025bfc22a449e82aea3410cb2a7bb?cp=1"
+              },
+              {
+                "name": "베베룬 손수건",
+                "link": "https://brand.naver.com/bebelune/category/26d569842d1b4b27b75a98f5ec7b3426?cp=1"
               }
             ]
           }
@@ -304,7 +428,6 @@
           },
           {
             "name": "바디수트",
-            "qty": 3,
             "options": [
               {
                 "name": "유니클로 쿨 코튼 메쉬 이너 바디수트",
@@ -321,12 +444,7 @@
             ]
           },
           {
-            "name": "겉싸개",
-            "options": [
-              {
-                "name": "조리원 증정"
-              }
-            ]
+            "name": "겉싸개 (조리원에서 제공하는 것으로 충분하다네요)"
           },
           {
             "name": "속싸개",
@@ -363,17 +481,13 @@
             ]
           },
           {
-            "name": "모자",
-            "options": [
-              {
-                "name": "오가닉붐 신생아 모자",
-                "link": "https://link.coupang.com/a/hbXFMYDwCP"
-              }
-            ]
+            "name": "손싸개"
+          },
+          {
+            "name": "모자"
           },
           {
             "name": "양말",
-            "qty": 3,
             "options": [
               {
                 "name": "유니클로 신생아 양말",
@@ -391,7 +505,6 @@
           },
           {
             "name": "내복",
-            "qty": 3,
             "options": [
               {
                 "name": "코코하니 내복",
@@ -408,7 +521,7 @@
             ]
           },
           {
-            "name": "손수건",
+            "name": "아기 손수건",
             "options": [
               {
                 "name": "밤부베베 손수건",
@@ -419,11 +532,14 @@
                 "link": "https://brand.naver.com/bebelune/category/26d569842d1b4b27b75a98f5ec7b3426?cp=1"
               }
             ]
+          },
+          {
+            "name": "외출복"
           }
         ]
       },
       {
-        "name": "가구",
+        "name": "수면",
         "items": [
           {
             "name": "아기 침대 (신생아용)",
@@ -460,36 +576,10 @@
             ]
           },
           {
-            "name": "바운서",
-            "options": [
-              {
-                "name": "베이비뵨 바운서",
-                "link": "https://www.babybjorn.kr/products/baby-bouncers/",
-                "note": "압도적 추천"
-              }
-            ]
+            "name": "침대 시트"
           },
           {
-            "name": "하이체어",
-            "qty": 2,
-            "options": [
-              {
-                "name": "스토케 트립트랩",
-                "link": "https://www.stokke.com/KOR/ko-kr/category/%ED%95%98%EC%9D%B4%EC%B2%B4%EC%96%B4/%ED%8A%B8%EB%A6%BD%ED%8A%B8%EB%9E%A9"
-              },
-              {
-                "name": "사이벡스 레모 하이체어",
-                "link": "https://www.cybex-shop.co.kr/goods/goods_view.php?goodsNo=1000000416"
-              },
-              {
-                "name": "아가드 하이체어",
-                "link": "https://link.coupang.com/a/hb4meaujqC"
-              }
-            ]
-          },
-          {
-            "name": "방수 패드",
-            "qty": 2,
+            "name": "방수 패드 (기저귀 갈이대에도 필요)",
             "options": [
               {
                 "name": "베이비앙 방수패드",
@@ -524,20 +614,37 @@
             ]
           },
           {
-            "name": "기저귀 갈이대",
+            "name": "아기 이불"
+          }
+        ]
+      },
+      {
+        "name": "생활",
+        "items": [
+          {
+            "name": "하이체어",
             "options": [
               {
-                "name": "소베맘 기저귀갈이대",
-                "link": "https://link.coupang.com/a/hb5CWW3Ipo",
-                "note": "국민템"
+                "name": "스토케 트립트랩",
+                "link": "https://www.stokke.com/KOR/ko-kr/category/%ED%95%98%EC%9D%B4%EC%B2%B4%EC%96%B4/%ED%8A%B8%EB%A6%BD%ED%8A%B8%EB%9E%A9"
               },
               {
-                "name": "도노도노 기저귀갈이대",
-                "link": "https://link.coupang.com/a/hb5FFozTSS"
+                "name": "사이벡스 레모 하이체어",
+                "link": "https://www.cybex-shop.co.kr/goods/goods_view.php?goodsNo=1000000416"
               },
               {
-                "name": "두리 기저귀갈이대",
-                "link": "https://durimall.co.kr/category/%EA%B8%B0%EC%A0%80%EA%B7%80-%EA%B0%88%EC%9D%B4%EB%8C%80/173/?srsltid=AU7gw4VrFyEYve8ICtbNcE_zcfyZD0YXcfd4E_NbVfPeH_eZbD8UokIN"
+                "name": "아가드 하이체어",
+                "link": "https://link.coupang.com/a/hb4meaujqC"
+              }
+            ]
+          },
+          {
+            "name": "바운서",
+            "options": [
+              {
+                "name": "베이비뵨 바운서",
+                "link": "https://www.babybjorn.kr/products/baby-bouncers/",
+                "note": "압도적 추천"
               }
             ]
           },
@@ -557,6 +664,9 @@
                 "link": "https://link.coupang.com/a/hb6iAbjD1U"
               }
             ]
+          },
+          {
+            "name": "타이니모빌 (대체 불가의 후기)"
           }
         ]
       },
@@ -578,6 +688,24 @@
                 "name": "닥터브라운 젖병",
                 "link": "https://link.coupang.com/a/hb0d9Gj4rQ",
                 "note": "배앓이 방지"
+              }
+            ]
+          },
+          {
+            "name": "쪽쪽이",
+            "qty": 3,
+            "options": [
+              {
+                "name": "모윰 소프트윙 쪽쪽이",
+                "link": "https://link.coupang.com/a/hccmFYFiRU"
+              },
+              {
+                "name": "더블하트 쪽쪽이",
+                "link": "https://brand.naver.com/doubleheart_official/category/fcc080cb6c6c4d0aa280b86c27bcefd8?cp=1"
+              },
+              {
+                "name": "누크 센서티브 올실리콘 쪽쪽이",
+                "link": "https://link.coupang.com/a/hccqtn5H5g"
               }
             ]
           },
@@ -611,6 +739,40 @@
             ]
           },
           {
+            "name": "분유포트",
+            "options": [
+              {
+                "name": "베이비브레짜 자동 분유제조기 (분유 쉐이커 필요 없음)",
+                "link": "https://link.coupang.com/a/himtoUalK8"
+              },
+              {
+                "name": "라비킷 분유포트",
+                "link": "https://lavikit.com/product/detail.html?product_no=287&cate_no=99&display_group=1"
+              },
+              {
+                "name": "나리몽 분유포트",
+                "link": "https://link.coupang.com/a/himHX8yHU4"
+              },
+              {
+                "name": "아이닉 올케어 분유포트",
+                "link": "https://link.coupang.com/a/himMm9uwkm"
+              }
+            ]
+          },
+          {
+            "name": "분유쉐이커",
+            "options": [
+              {
+                "name": "나리몽 무선 분유쉐이커",
+                "link": "https://link.coupang.com/a/hiHKL0kH4C"
+              },
+              {
+                "name": "꿈비 분유쉐이커",
+                "link": "https://link.coupang.com/a/hiHOYZNwf6"
+              }
+            ]
+          },
+          {
             "name": "분유",
             "options": [
               {
@@ -628,11 +790,8 @@
             ]
           },
           {
-            "name": "유축기",
+            "name": "유축기 (대여도 가능합니다)",
             "options": [
-              {
-                "name": "대여 가능"
-              },
               {
                 "name": "메델라 유축기",
                 "link": "https://smartstore.naver.com/momsdream/products/4008814821?n_media=27758&n_query=%EB%A9%94%EB%8D%B8%EB%9D%BC%EC%8A%A4%EC%9C%99&n_rank=1&n_ad_group=grp-a001-01-000000020161176&n_ad=nad-a001-01-000000187176112&n_campaign_type=1&n_ad_group_type=1&n_match=2&NaPm=ct%3Dmu9htx1n%7Cci%3DERadff8604%2Db4c4%2D11f1%2Dbbe2%2D5e28beaf1165%7Ctr%3Dsa%7Chk%3D7961e2cbded5f74da4997f035667991245e47b90%7Cnacn%3DJ1naBIBzQNr6"
@@ -642,6 +801,80 @@
                 "link": "https://link.coupang.com/a/hb7aYum3Pw"
               }
             ]
+          },
+          {
+            "name": "젖병솔"
+          },
+          {
+            "name": "젖병집게"
+          }
+        ]
+      },
+      {
+        "name": "기저귀",
+        "items": [
+          {
+            "name": "기저귀 갈이대",
+            "options": [
+              {
+                "name": "소베맘 기저귀갈이대",
+                "link": "https://link.coupang.com/a/hb5CWW3Ipo",
+                "note": "국민템"
+              },
+              {
+                "name": "도노도노 기저귀갈이대",
+                "link": "https://link.coupang.com/a/hb5FFozTSS"
+              },
+              {
+                "name": "두리 기저귀갈이대",
+                "link": "https://durimall.co.kr/category/%EA%B8%B0%EC%A0%80%EA%B7%80-%EA%B0%88%EC%9D%B4%EB%8C%80/173/?srsltid=AU7gw4VrFyEYve8ICtbNcE_zcfyZD0YXcfd4E_NbVfPeH_eZbD8UokIN"
+              }
+            ]
+          },
+          {
+            "name": "기저귀",
+            "options": [
+              {
+                "name": "하기스 네이처메이드 기저귀",
+                "link": "https://link.coupang.com/a/hb9HHzdto4"
+              },
+              {
+                "name": "킨도 베베가드 기저귀",
+                "link": "https://link.coupang.com/a/hb7TPODXHg"
+              },
+              {
+                "name": "팸퍼스 기저귀",
+                "link": "https://link.coupang.com/a/hb9KSkRAfA"
+              }
+            ]
+          },
+          {
+            "name": "방수 패드 (침대에도 필요)"
+          },
+          {
+            "name": "위생 패드 (방수패드 위에 일회용 위생패드 추천 많이들 하네요)",
+            "options": [
+              {
+                "name": "케라타 일회용 기저귀패드",
+                "link": "https://link.coupang.com/a/hiIfe1Be8W"
+              }
+            ]
+          },
+          {
+            "name": "기저귀 휴지통 (무조건 큰거)",
+            "options": [
+              {
+                "name": "매직캔 히포2 휴지통 (27L)",
+                "link": "https://link.coupang.com/a/hiG8W67QoS"
+              },
+              {
+                "name": "소베맘 자동센서 기저귀 휴지통",
+                "link": "https://link.coupang.com/a/hiHfNxbOLI"
+              }
+            ]
+          },
+          {
+            "name": "기저귀 가방"
           }
         ]
       },
@@ -686,6 +919,23 @@
             ]
           },
           {
+            "name": "샤워헤드",
+            "options": [
+              {
+                "name": "슬로운 샤워헤드",
+                "link": "https://brand.naver.com/slown/category/5686debaee2b4e30870249e700df8aea?cp=1"
+              },
+              {
+                "name": "퓨어닷 아기샤워기",
+                "link": "https://search.shopping.naver.com/ns/search?query=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%83%A4%EC%9B%8C%ED%97%A4%EB%93%9C"
+              },
+              {
+                "name": "소베맘 온오프 아기 필터 샤워기 헤드",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%86%8C%EB%B2%A0%EB%A7%98%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0"
+              }
+            ]
+          },
+          {
             "name": "아기 비데",
             "options": [
               {
@@ -702,23 +952,6 @@
                 "name": "코니스 이지워시",
                 "link": "https://brand.naver.com/conys/products/13441981574",
                 "note": "스탠딩형"
-              }
-            ]
-          },
-          {
-            "name": "기저귀",
-            "options": [
-              {
-                "name": "하기스 네이처메이드 기저귀",
-                "link": "https://link.coupang.com/a/hb9HHzdto4"
-              },
-              {
-                "name": "킨도 베베가드 기저귀",
-                "link": "https://link.coupang.com/a/hb7TPODXHg"
-              },
-              {
-                "name": "팸퍼스 기저귀",
-                "link": "https://link.coupang.com/a/hb9KSkRAfA"
               }
             ]
           },
@@ -757,41 +990,6 @@
             ]
           },
           {
-            "name": "쪽쪽이",
-            "qty": 3,
-            "options": [
-              {
-                "name": "모윰 소프트윙 쪽쪽이",
-                "link": "https://link.coupang.com/a/hccmFYFiRU"
-              },
-              {
-                "name": "더블하트 쪽쪽이",
-                "link": "https://brand.naver.com/doubleheart_official/category/fcc080cb6c6c4d0aa280b86c27bcefd8?cp=1"
-              },
-              {
-                "name": "누크 센서티브 올실리콘 쪽쪽이",
-                "link": "https://link.coupang.com/a/hccqtn5H5g"
-              }
-            ]
-          },
-          {
-            "name": "아기 샴푸·바디워시",
-            "options": [
-              {
-                "name": "맘뜨레 아기 샴푸앤바스 올인원",
-                "link": "https://link.coupang.com/a/hcakDDjKHk"
-              },
-              {
-                "name": "아토팜 탑투토 워시 올인원",
-                "link": "https://link.coupang.com/a/hcaqSOsLPo"
-              },
-              {
-                "name": "프랭클린 바스앤샴푸",
-                "link": "https://link.coupang.com/a/hcat5wiPNQ"
-              }
-            ]
-          },
-          {
             "name": "아기칫솔",
             "options": [
               {
@@ -822,6 +1020,53 @@
             ]
           },
           {
+            "name": "아기 샴푸·바디워시",
+            "options": [
+              {
+                "name": "맘뜨레 아기 샴푸앤바스 올인원",
+                "link": "https://link.coupang.com/a/hcakDDjKHk"
+              },
+              {
+                "name": "아토팜 탑투토 워시 올인원",
+                "link": "https://link.coupang.com/a/hcaqSOsLPo"
+              },
+              {
+                "name": "프랭클린 바스앤샴푸",
+                "link": "https://link.coupang.com/a/hcat5wiPNQ"
+              }
+            ]
+          },
+          {
+            "name": "아기 로션",
+            "options": [
+              {
+                "name": "아토팜 뉴본 스칼프 로션",
+                "link": "https://link.coupang.com/a/hiIU42SBDo"
+              },
+              {
+                "name": "클라리케 페이스 앤 바디 아기로션",
+                "link": "https://search.shopping.naver.com/ns/search?query=%ED%81%B4%EB%9D%BC%EB%A6%AC%EC%BC%80%20%EC%95%84%EA%B8%B0%EB%A1%9C%EC%85%98&prevQuery=%ED%81%B4%EB%9D%BC%EB%A6%AC%EC%BC%80%20%EC%95%84%EA%B8%B0%EB%A1%9C%EC%85%98"
+              },
+              {
+                "name": "수야무 오가닉 카밍 컴포트 로션",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%88%98%EC%95%BC%EB%AC%B4%20%EC%98%A4%EA%B0%80%EB%8B%89%20%EC%B9%B4%EB%B0%8D%20%EC%BB%B4%ED%8F%AC%ED%8A%B8%20%EB%A1%9C%EC%85%98&prevQuery=%ED%81%B4%EB%9D%BC%EB%A6%AC%EC%BC%80%20%EB%B3%B4%ED%83%80%EB%8B%88%EC%BB%AC%20%EC%88%98%EB%94%A9%EC%A0%A4"
+              }
+            ]
+          },
+          {
+            "name": "수딩젤",
+            "options": [
+              {
+                "name": "아토팜 수딩젤 로션",
+                "link": "https://link.coupang.com/a/hiIPdEDkmy"
+              },
+              {
+                "name": "클라리케 보타니컬 수딩젤",
+                "link": "https://search.shopping.naver.com/ns/search?query=%ED%81%B4%EB%9D%BC%EB%A6%AC%EC%BC%80%20%EB%B3%B4%ED%83%80%EB%8B%88%EC%BB%AC%20%EC%88%98%EB%94%A9%EC%A0%A4&prevQuery=%ED%81%B4%EB%9D%BC%EB%A6%AC%EC%BC%80%20%EC%95%84%EA%B8%B0%EB%A1%9C%EC%85%98"
+              }
+            ]
+          },
+          {
             "name": "체온계",
             "options": [
               {
@@ -840,23 +1085,6 @@
               {
                 "name": "휴비딕 온습도계",
                 "link": "https://link.coupang.com/a/hcc3ArE1ZY"
-              }
-            ]
-          },
-          {
-            "name": "샤워헤드",
-            "options": [
-              {
-                "name": "슬로운 샤워헤드",
-                "link": "https://brand.naver.com/slown/category/5686debaee2b4e30870249e700df8aea?cp=1"
-              },
-              {
-                "name": "퓨어닷 아기샤워기",
-                "link": "https://search.shopping.naver.com/ns/search?query=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%83%A4%EC%9B%8C%ED%97%A4%EB%93%9C"
-              },
-              {
-                "name": "소베맘 온오프 아기 필터 샤워기 헤드",
-                "link": "https://search.shopping.naver.com/ns/search?query=%EC%86%8C%EB%B2%A0%EB%A7%98%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0"
               }
             ]
           },
@@ -885,24 +1113,12 @@
                 "link": "https://link.coupang.com/a/hccbjrYRBQ"
               }
             ]
-          },
-          {
-            "name": "주방 세제",
-            "options": [
-              {
-                "name": "토루토루 주방세제",
-                "link": "https://smartstore.naver.com/torutoru/products/296483246"
-              },
-              {
-                "name": "프랭클린 주방세제",
-                "link": "https://link.coupang.com/a/hcaD4Q3sFo"
-              },
-              {
-                "name": "마더케이 주방세제",
-                "link": "https://link.coupang.com/a/hcaG9CzVO9"
-              }
-            ]
-          },
+          }
+        ]
+      },
+      {
+        "name": "세제",
+        "items": [
           {
             "name": "세탁 세제",
             "options": [
@@ -936,6 +1152,23 @@
               {
                 "name": "뽀숑하우스 올인원 파우더",
                 "link": "https://link.coupang.com/a/hca4E3Hc7g"
+              }
+            ]
+          },
+          {
+            "name": "주방 세제 (젖병 세정제)",
+            "options": [
+              {
+                "name": "토루토루 주방세제",
+                "link": "https://smartstore.naver.com/torutoru/products/296483246"
+              },
+              {
+                "name": "프랭클린 주방세제",
+                "link": "https://link.coupang.com/a/hcaD4Q3sFo"
+              },
+              {
+                "name": "마더케이 주방세제",
+                "link": "https://link.coupang.com/a/hcaG9CzVO9"
               }
             ]
           }
