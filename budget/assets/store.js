@@ -43,10 +43,19 @@
     return templates;
   })();
 
+  // 새 파일의 색은 여섯 가지 중 하나를 고릅니다. 바로 전에 만든 파일과는 겹치지 않게 해요.
+  const ACCENTS = ["navy", "lime", "yellow", "purple", "orange", "green"];
+  function randomAccent(){
+    const last = data.plans[data.plans.length - 1]; // 새 파일은 늘 끝에 붙어요
+    const pool = ACCENTS.filter(k => !last || k !== last.accent);
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
   function fromTemplate(key){
     const t = byKey[key] || BLANK;
     return {
       title: t.title,
+      accent: randomAccent(),
       intro: t.intro || "",
       kind: t.kind === "guestbook" ? "guestbook" : undefined,
       template: byKey[key] ? key : undefined,
