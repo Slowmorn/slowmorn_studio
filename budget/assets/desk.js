@@ -9,7 +9,6 @@
   const board = document.getElementById("deskBoard");
   const noteEl = document.querySelector(".desk-note");
   const newMenu = document.getElementById("newMenu");
-  const summaryEl = document.querySelector(".desk-summary");
   const trashBtn = document.getElementById("trashBtn");
   if(!BS || !board) return;
 
@@ -216,7 +215,6 @@
       board.style.height = "";
     }
 
-    renderSummary(plans);
     renderTrashBtn();
     if(!noteEl) return;
     noteEl.textContent = (Auth && Auth.enabled && Auth.user)
@@ -224,11 +222,6 @@
       : (Auth && Auth.enabled
         ? "지금은 이 브라우저에만 저장돼요. 로그인하면 다른 기기에서도 이어서 쓸 수 있어요."
         : "이 브라우저에 저장돼요.");
-  }
-
-  function renderSummary(plans){
-    if(!summaryEl) return;
-    summaryEl.textContent = plans.length ? `파일 ${plans.length}개` : "";
   }
 
   function renderTrashBtn(){
