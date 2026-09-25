@@ -44,7 +44,10 @@
   })();
 
   // 새 파일의 색은 여섯 가지 중 하나를 고릅니다. 바로 전에 만든 파일과는 겹치지 않게 해요.
-  const ACCENTS = ["navy", "lime", "yellow", "purple", "orange", "green"];
+  const ACCENTS = ["orange", "navy", "green", "pink", "purple", "teal"];
+  // 예전 팔레트의 키를 지금 색으로 옮깁니다
+  const OLD_ACCENT = { yellow: "orange", lime: "green" };
+  const accentKey = k => OLD_ACCENT[k] || (ACCENTS.includes(k) ? k : "green");
   function randomAccent(){
     const last = data.plans[data.plans.length - 1]; // 새 파일은 늘 끝에 붙어요
     const pool = ACCENTS.filter(k => !last || k !== last.accent);
@@ -95,7 +98,7 @@
       if(raw){
         const s = JSON.parse(raw);
         if(s && Array.isArray(s.plans) && s.plans.length){
-          s.plans.forEach(p => { if(p.accent === "pink") p.accent = "lime"; }); // 분홍은 연두로 바뀌었어요
+          s.plans.forEach(p => { if(p.accent) p.accent = accentKey(p.accent); });
           return s;
         }
       }
@@ -309,7 +312,7 @@
     data,
     get live(){ return live(); },
     get trashed(){ return trashed(); },
-    nid, newPlan, fromTemplate, safeLink, planLabel, isGuest, summary, progress, daysLeft,
+    nid, newPlan, fromTemplate, accentKey, safeLink, planLabel, isGuest, summary, progress, daysLeft,
     find, indexOf,
     save, saveLocalNow, saveToAccount,
     addPlan, addExisting, removePlan, restorePlan, purge, purgeExpired,

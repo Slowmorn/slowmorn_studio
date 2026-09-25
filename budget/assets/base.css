@@ -11,9 +11,9 @@
   --hover:rgba(55,53,47,.06);      /* 테두리 대신 쓰는 배경 */
   --hover-strong:rgba(55,53,47,.11);
   --link:#37352F;
-  --accent:#0A7F52;
-  --accent-soft:#DDF8EC;
-  --accent-fill:#0ACE82;
+  --accent:#00804A;
+  --accent-soft:#D9F9EB;
+  --accent-fill:#00DF82;
   --on-accent:#FFFFFF;
   --warn:#B4423A;
   --bar:#37352F;
@@ -29,39 +29,39 @@
   :root:not([data-theme="light"]){
     --page:#141413; --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
     --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
-    --accent:#4FDDA4; --accent-soft:#173A2C; --accent-fill:#4FDDA4; --on-accent:#191918; --warn:#EE8B82;
+    --accent:#4FEBA8; --accent-soft:#103A28; --accent-fill:#4FEBA8; --on-accent:#191918; --warn:#EE8B82;
     --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
   }
 }
 :root[data-theme="dark"]{
   --page:#141413; --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
   --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
-  --accent:#4FDDA4; --accent-soft:#173A2C; --accent-fill:#4FDDA4; --on-accent:#191918; --warn:#EE8B82;
+  --accent:#4FEBA8; --accent-soft:#103A28; --accent-fill:#4FEBA8; --on-accent:#191918; --warn:#EE8B82;
   --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
 }
 /* --swatch: brighter display color for the picker and tab dots only. */
 /* Per-tab theme colors. Scoped by [data-accent] so each tab chip can show its own color too. */
-/* BUDGET 글자 아이콘과 같은 색. 예전 분홍(pink) 파일은 연두(lime)로 보여요. */
-[data-accent="navy"]{--accent:#3550D8;--accent-soft:#E4E9FC;--accent-fill:#3E5CEA;--on-accent:#FFFFFF;--swatch:#3E5CEA}
-[data-accent="lime"],[data-accent="pink"]{--accent:#3F7F12;--accent-soft:#EAF8DF;--accent-fill:#79DD3D;--on-accent:#1B2230;--swatch:#79DD3D}
-[data-accent="yellow"]{--accent:#8F6A00;--accent-soft:#FFF4D1;--accent-fill:#FFD133;--on-accent:#1B2230;--swatch:#FFD133}
-[data-accent="purple"]{--accent:#7D3FD9;--accent-soft:#F1E7FF;--accent-fill:#A259FF;--on-accent:#FFFFFF;--swatch:#A259FF}
-[data-accent="orange"]{--accent:#C23A17;--accent-soft:#FDE6DF;--accent-fill:#F3512A;--on-accent:#FFFFFF;--swatch:#F3512A}
-[data-accent="green"]{--accent:#0A7F52;--accent-soft:#DDF8EC;--accent-fill:#0ACE82;--on-accent:#FFFFFF;--swatch:#0ACE82}
+/* 파일 색 여섯 가지 (아이콘 icon_1~6 과 같은 색). 예전 키 yellow 는 주황, lime 은 초록으로 봅니다. */
+[data-accent="orange"],[data-accent="yellow"]{--accent:#C83A0A;--accent-soft:#FFE7DD;--accent-fill:#FF5B23;--on-accent:#FFFFFF;--swatch:#FF5B23}
+[data-accent="navy"]{--accent:#3A39FF;--accent-soft:#E6E6FF;--accent-fill:#3A39FF;--on-accent:#FFFFFF;--swatch:#3A39FF}
+[data-accent="green"],[data-accent="lime"]{--accent:#00804A;--accent-soft:#D9F9EB;--accent-fill:#00DF82;--on-accent:#1B2230;--swatch:#00DF82}
+[data-accent="pink"]{--accent:#C2386B;--accent-soft:#FFEAF2;--accent-fill:#FFB3CF;--on-accent:#1B2230;--swatch:#FFB3CF}
+[data-accent="purple"]{--accent:#B01F7E;--accent-soft:#FBE3F2;--accent-fill:#CF2C95;--on-accent:#FFFFFF;--swatch:#CF2C95}
+[data-accent="teal"]{--accent:#007A7A;--accent-soft:#D9F5F5;--accent-fill:#00B9B9;--on-accent:#1B2230;--swatch:#00B9B9}
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) [data-accent="navy"]{--accent:#8FA2F5;--accent-soft:#1E2440;--accent-fill:#8FA2F5;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="lime"],:root:not([data-theme="light"]) [data-accent="pink"]{--accent:#A3E77A;--accent-soft:#243A18;--accent-fill:#A3E77A;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="yellow"]{--accent:#FFD95C;--accent-soft:#3A3118;--accent-fill:#FFD95C;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="purple"]{--accent:#C39BFF;--accent-soft:#2C2140;--accent-fill:#C39BFF;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="orange"]{--accent:#F7876A;--accent-soft:#3F2119;--accent-fill:#F7876A;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="green"]{--accent:#4FDDA4;--accent-soft:#173A2C;--accent-fill:#4FDDA4;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="orange"],:root:not([data-theme="light"]) [data-accent="yellow"]{--accent:#FF9166;--accent-soft:#40200F;--accent-fill:#FF9166;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="navy"]{--accent:#9D9CFF;--accent-soft:#1F1F47;--accent-fill:#9D9CFF;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="green"],:root:not([data-theme="light"]) [data-accent="lime"]{--accent:#4FEBA8;--accent-soft:#103A28;--accent-fill:#4FEBA8;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="pink"]{--accent:#FFB3CF;--accent-soft:#3F2330;--accent-fill:#FFB3CF;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="purple"]{--accent:#F08BCB;--accent-soft:#3C1830;--accent-fill:#F08BCB;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="teal"]{--accent:#4FD6D6;--accent-soft:#0F3535;--accent-fill:#4FD6D6;--on-accent:#191918}
 }
-:root[data-theme="dark"] [data-accent="navy"]{--accent:#8FA2F5;--accent-soft:#1E2440;--accent-fill:#8FA2F5;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="lime"],:root[data-theme="dark"] [data-accent="pink"]{--accent:#A3E77A;--accent-soft:#243A18;--accent-fill:#A3E77A;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="yellow"]{--accent:#FFD95C;--accent-soft:#3A3118;--accent-fill:#FFD95C;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="purple"]{--accent:#C39BFF;--accent-soft:#2C2140;--accent-fill:#C39BFF;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="orange"]{--accent:#F7876A;--accent-soft:#3F2119;--accent-fill:#F7876A;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="green"]{--accent:#4FDDA4;--accent-soft:#173A2C;--accent-fill:#4FDDA4;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="orange"],:root[data-theme="dark"] [data-accent="yellow"]{--accent:#FF9166;--accent-soft:#40200F;--accent-fill:#FF9166;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="navy"]{--accent:#9D9CFF;--accent-soft:#1F1F47;--accent-fill:#9D9CFF;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="green"],:root[data-theme="dark"] [data-accent="lime"]{--accent:#4FEBA8;--accent-soft:#103A28;--accent-fill:#4FEBA8;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="pink"]{--accent:#FFB3CF;--accent-soft:#3F2330;--accent-fill:#FFB3CF;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="purple"]{--accent:#F08BCB;--accent-soft:#3C1830;--accent-fill:#F08BCB;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="teal"]{--accent:#4FD6D6;--accent-soft:#0F3535;--accent-fill:#4FD6D6;--on-accent:#191918}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{

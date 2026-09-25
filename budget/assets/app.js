@@ -205,7 +205,7 @@
   const swatchEls = document.querySelectorAll(".swatch");
   const colorBtn = document.getElementById("colorBtn");
   function applyAccent(){
-    const key = state.accent === "pink" ? "lime" : state.accent || "green";
+    const key = BS.accentKey(state.accent);
     document.body.dataset.accent = key;
     swatchEls.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.accent === key)));
     const on = [...swatchEls].find(b => b.dataset.accent === key);
@@ -1062,14 +1062,14 @@
 
   // Tab theme colors in the workbook: fill (header, sheet tab), text on fill, soft tint, readable text color
   const ACCENT_XL = {
-    navy:   { fill: "FF3E5CEA", on: "FFFFFFFF", soft: "FFE4E9FC", text: "FF3550D8" },
-    lime:   { fill: "FF79DD3D", on: "FF1B2230", soft: "FFEAF8DF", text: "FF3F7F12" },
-    yellow: { fill: "FFFFD133", on: "FF1B2230", soft: "FFFFF4D1", text: "FF8F6A00" },
-    purple: { fill: "FFA259FF", on: "FFFFFFFF", soft: "FFF1E7FF", text: "FF7D3FD9" },
-    orange: { fill: "FFF3512A", on: "FFFFFFFF", soft: "FFFDE6DF", text: "FFC23A17" },
-    green:  { fill: "FF0ACE82", on: "FFFFFFFF", soft: "FFDDF8EC", text: "FF0A7F52" }
+    orange: { fill: "FFFF5B23", on: "FFFFFFFF", soft: "FFFFE7DD", text: "FFC83A0A" },
+    navy:   { fill: "FF3A39FF", on: "FFFFFFFF", soft: "FFE6E6FF", text: "FF3A39FF" },
+    green:  { fill: "FF00DF82", on: "FF1B2230", soft: "FFD9F9EB", text: "FF00804A" },
+    pink:   { fill: "FFFFB3CF", on: "FF1B2230", soft: "FFFFEAF2", text: "FFC2386B" },
+    purple: { fill: "FFCF2C95", on: "FFFFFFFF", soft: "FFFBE3F2", text: "FFB01F7E" },
+    teal:   { fill: "FF00B9B9", on: "FF1B2230", soft: "FFD9F5F5", text: "FF007A7A" }
   };
-  const accentXL = key => ACCENT_XL[key === "pink" ? "lime" : key] || ACCENT_XL.green;
+  const accentXL = key => ACCENT_XL[BS.accentKey(key)];
 
   const moneyFmt = '#,##0"원";[Red]-#,##0"원"';
   const solid = argb => ({ type: "pattern", pattern: "solid", fgColor: { argb } });
@@ -1626,10 +1626,12 @@
     return null; // summary sheets and anything else
   }
 
-  // colors used by earlier exports (two older palettes; 분홍 → 연두)
+  // colors used by earlier exports (older palettes; keys go through BS.accentKey)
   const OLD_FILLS = [
-    { green: "2E6F6B", navy: "3A5A94", lime: "B83D6E", yellow: "F2C230", purple: "6B4FA0", orange: "C2571A" },
-    { green: "26A392", navy: "4176E0", lime: "E0508A", yellow: "FFC933", purple: "8E63E6", orange: "E2661C" }
+    { yellow: "A01937", green: "225266", lime: "B7E255", purple: "831EFE", orange: "FB3F33", navy: "2254D7" },
+    { green: "0ACE82", navy: "3E5CEA", lime: "79DD3D", yellow: "FFD133", purple: "A259FF", orange: "F3512A" },
+    { green: "2E6F6B", navy: "3A5A94", pink: "B83D6E", yellow: "F2C230", purple: "6B4FA0", orange: "C2571A" },
+    { green: "26A392", navy: "4176E0", pink: "E0508A", yellow: "FFC933", purple: "8E63E6", orange: "E2661C" }
   ];
   function accentFromSheet(ws, headRow){
     const rgb = a => a ? String(a).slice(-6).toUpperCase() : "";
@@ -1637,7 +1639,7 @@
                         (ws.getRow(headRow).getCell(1).fill || {}).fgColor && ws.getRow(headRow).getCell(1).fill.fgColor.argb].map(rgb);
     for(const c of candidates){
       const key = c && (Object.keys(ACCENT_XL).find(k => rgb(ACCENT_XL[k].fill) === c) || OLD_FILLS.map(f => Object.keys(f).find(k => f[k] === c)).find(Boolean));
-      if(key) return key;
+      if(key) return BS.accentKey(key);
     }
     return undefined;
   }
