@@ -1154,11 +1154,6 @@
         const range = links && links.ranges.get(it);
         if(range){
           links.itemRows.set(it, r);
-          // The item name jumps to its 선택지 block; the text still reads as the plain name on import
-          row.getCell(XC.name).value = {
-            formula: `HYPERLINK("#'${links.sheet.replace(/'/g, "''")}'!A${range.band}","${String(it.name).replace(/"/g, '""')}")`,
-            result: it.name
-          };
           const names = sheetRef(links.sheet, `$${XL2(OPT_C.name)}$${range.first}:$${XL2(OPT_C.name)}$${range.last}`);
           const prices = sheetRef(links.sheet, `$${XL2(OPT_C.price)}$${range.first}:$${XL2(OPT_C.price)}$${range.last}`);
           const P = `${XL("pick")}${r}`, Q = `${XL("qty")}${r}`;
@@ -1466,18 +1461,13 @@
     }
 
     blocks.forEach(b => {
-      // Title row: 카테고리 › 항목, with a jump back to the item on the plan sheet
+      // Title row: 카테고리 › 항목 (시트 사이 링크는 구글 시트에서 제대로 안 움직여서 두지 않아요)
       const band = ws.getRow(b.band);
-      ws.mergeCells(b.band, 1, b.band, NC - 1);
+      ws.mergeCells(b.band, 1, b.band, NC);
       band.getCell(1).value = (b.multi ? `${b.sheet} › ` : "") + `${b.cat} › ${b.item.name}`;
       band.getCell(1).font = { bold: true, size: 12, color: { argb: b.t.text } };
       band.getCell(1).alignment = { vertical: "middle", indent: 1 };
       const itemRow = itemRows.get(b.item);
-      if(itemRow){
-        band.getCell(NC).value = { formula: `HYPERLINK("#'${b.sheet.replace(/'/g, "''")}'!A${itemRow}","예산표로 ↗")`, result: "예산표로 ↗" };
-        band.getCell(NC).font = { size: 11, color: { argb: b.t.text }, underline: true };
-        band.getCell(NC).alignment = { vertical: "middle", horizontal: "right" };
-      }
       band.height = 24;
       for(let n = 1; n <= NC; n++){
         band.getCell(n).fill = solid(b.t.soft);
