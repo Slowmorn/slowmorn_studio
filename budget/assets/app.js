@@ -879,6 +879,8 @@
     return c ? c.items.find(i => i.id === optCtx.iid) || null : null;
   }
   const hostOf = link => { try{ return new URL(link).hostname.replace(/^www\./, ""); }catch(e){ return ""; } };
+  const isCoupang = link => /(^|\.)(coupang\.com|coupa\.ng)$/.test(hostOf(link));
+  const affNote = document.getElementById("affNote");
 
   const ICON_LINK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 3h4v4M13 3L7.5 8.5M11 9.5V12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   const ICON_EDIT = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 3l2.5 2.5L6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
@@ -908,6 +910,8 @@
     document.getElementById("optSub").textContent = opts.length
       ? "하나를 고르면 이 항목의 선택지와 예산(가격 × 수량)에 들어가요. 다시 누르면 선택이 풀려요."
       : "비교할 제품이나 업체를 추가해 보세요.";
+    // 쿠팡 파트너스 고지는 이 항목에 쿠팡 링크가 있을 때만 보여요
+    affNote.hidden = !opts.some(o => o.link && isCoupang(o.link));
     optList.innerHTML = opts.length ? opts.map(o => {
       const sel = o.id === it.choiceId;
       const host = o.link ? hostOf(o.link) : "";

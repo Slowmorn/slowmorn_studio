@@ -429,6 +429,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 /* 쿠팡 파트너스 고지 (링크가 보이는 곳마다 표시) */
 .aff-note{color:var(--muted);font-size:12px;line-height:1.6;margin:8px 0 0;word-break:keep-all}
 .opt-inner .aff-note{margin:2px 0 0;padding:0 20px 2px}
+.aff-note[hidden]{display:none}
 .foot-actions{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:8px;font-size:13.5px}
 .foot-actions button{border:0;background:none;color:var(--muted);text-decoration:underline;padding:0;font-size:inherit}
 .foot-actions button:hover{color:var(--warn)}
