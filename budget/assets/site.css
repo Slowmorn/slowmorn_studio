@@ -8,11 +8,11 @@
   display:flex;align-items:center;gap:10px 20px;
 }
 .brand{
-  display:inline-flex;align-items:center;gap:8px;
+  display:inline-flex;align-items:center;gap:4px;
   font-weight:700;font-size:16px;letter-spacing:-0.02em;
   color:var(--ink);text-decoration:none;flex:none;
 }
-.brand svg{width:20px;height:20px;flex:none}
+.brand svg{width:24px;height:24px;flex:none}
 .topbar nav{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px}
 .topbar nav a{color:var(--muted);text-decoration:none;padding:4px 2px}
 .topbar nav a:hover{color:var(--ink)}
