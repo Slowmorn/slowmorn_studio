@@ -199,7 +199,7 @@
           <span class="file-dot" aria-hidden="true"></span>${esc(planLabel(p))}
         </button>`).join("") + "<hr>"
         : `<div class="menu-note">열어 둔 파일이 이것뿐이에요</div>`)
-      + `<button type="button" data-open="__desk">내 책상으로</button>`;
+      + `<button type="button" data-open="__desk">버짓보드로</button>`;
   }
 
   const swatchEls = document.querySelectorAll(".swatch");

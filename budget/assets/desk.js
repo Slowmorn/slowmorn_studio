@@ -181,7 +181,7 @@
   function startHTML(){
     const picks = BS.templates.slice(0, 3);
     return `<div class="desk-empty">
-      <p>책상이 비어 있어요. 무엇부터 준비하세요?</p>
+      <p>버짓보드가 비어 있어요. 무엇부터 준비하세요?</p>
       <div class="start-cards">
         ${picks.map(t => `<button type="button" class="start-card" data-new="${esc(t.id)}">
           <b>${esc(t.label)}</b><span>${esc(t.desc)}</span>
@@ -372,7 +372,7 @@
         if(e.target.closest("[data-restore]")){
           BS.restorePlan(id);
           fillTrash(dlg); render();
-          toast("책상으로 되돌렸어요");
+          toast("버짓보드로 되돌렸어요");
         } else if(e.target.closest("[data-purge]")){
           BS.purge([id]);
           fillTrash(dlg); render();
