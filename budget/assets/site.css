@@ -217,7 +217,7 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
   box-shadow:0 18px 38px rgba(70,64,80,.26);transition:none;
 }
 .file.dragging{z-index:5}
-.file-ico{grid-row:1 / span 2;width:32px;height:39px}
+.file-ico{grid-row:1 / span 2;width:40px;height:40px}
 .file-name{grid-column:2 / span 2;font-weight:600;font-size:14.5px;align-self:end;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .file-meta{grid-column:2 / span 2;color:var(--muted);font-size:12px;align-self:start}

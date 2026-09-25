@@ -11,9 +11,9 @@
   --hover:rgba(55,53,47,.06);      /* 테두리 대신 쓰는 배경 */
   --hover-strong:rgba(55,53,47,.11);
   --link:#37352F;
-  --accent:#1A766B;
-  --accent-soft:#DDF3EF;
-  --accent-fill:#26A392;
+  --accent:#0A7F52;
+  --accent-soft:#DDF8EC;
+  --accent-fill:#0ACE82;
   --on-accent:#FFFFFF;
   --warn:#B4423A;
   --bar:#37352F;
@@ -29,38 +29,39 @@
   :root:not([data-theme="light"]){
     --page:#141413; --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
     --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
-    --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#191918; --warn:#EE8B82;
+    --accent:#4FDDA4; --accent-soft:#173A2C; --accent-fill:#4FDDA4; --on-accent:#191918; --warn:#EE8B82;
     --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
   }
 }
 :root[data-theme="dark"]{
   --page:#141413; --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --muted:#989690; --line:#2E2E2C;
   --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
-  --accent:#6FB7B1; --accent-soft:#1F3534; --accent-fill:#6FB7B1; --on-accent:#191918; --warn:#EE8B82;
+  --accent:#4FDDA4; --accent-soft:#173A2C; --accent-fill:#4FDDA4; --on-accent:#191918; --warn:#EE8B82;
   --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
 }
 /* --swatch: brighter display color for the picker and tab dots only. */
 /* Per-tab theme colors. Scoped by [data-accent] so each tab chip can show its own color too. */
-[data-accent="green"]{--accent:#1A766B;--accent-soft:#DDF3EF;--accent-fill:#26A392;--on-accent:#FFFFFF;--swatch:#2FB5A0}
-[data-accent="navy"]{--accent:#3264C8;--accent-soft:#E3ECFB;--accent-fill:#4176E0;--on-accent:#FFFFFF;--swatch:#4B7BE0}
-[data-accent="pink"]{--accent:#C9336F;--accent-soft:#FCE6EF;--accent-fill:#E0508A;--on-accent:#FFFFFF;--swatch:#F0649A}
-[data-accent="yellow"]{--accent:#8F6A00;--accent-soft:#FFF4D1;--accent-fill:#FFC933;--on-accent:#1B2230;--swatch:#FFCC33}
-[data-accent="purple"]{--accent:#7A4FD0;--accent-soft:#F0E9FC;--accent-fill:#8E63E6;--on-accent:#FFFFFF;--swatch:#9B72E8}
-[data-accent="orange"]{--accent:#B24A0B;--accent-soft:#FDEBDD;--accent-fill:#E2661C;--on-accent:#FFFFFF;--swatch:#FF8A3D}
+/* BUDGET 글자 아이콘과 같은 색. 예전 분홍(pink) 파일은 연두(lime)로 보여요. */
+[data-accent="navy"]{--accent:#3550D8;--accent-soft:#E4E9FC;--accent-fill:#3E5CEA;--on-accent:#FFFFFF;--swatch:#3E5CEA}
+[data-accent="lime"],[data-accent="pink"]{--accent:#3F7F12;--accent-soft:#EAF8DF;--accent-fill:#79DD3D;--on-accent:#1B2230;--swatch:#79DD3D}
+[data-accent="yellow"]{--accent:#8F6A00;--accent-soft:#FFF4D1;--accent-fill:#FFD133;--on-accent:#1B2230;--swatch:#FFD133}
+[data-accent="purple"]{--accent:#7D3FD9;--accent-soft:#F1E7FF;--accent-fill:#A259FF;--on-accent:#FFFFFF;--swatch:#A259FF}
+[data-accent="orange"]{--accent:#C23A17;--accent-soft:#FDE6DF;--accent-fill:#F3512A;--on-accent:#FFFFFF;--swatch:#F3512A}
+[data-accent="green"]{--accent:#0A7F52;--accent-soft:#DDF8EC;--accent-fill:#0ACE82;--on-accent:#FFFFFF;--swatch:#0ACE82}
 @media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#191918}
-  :root:not([data-theme="light"]) [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="navy"]{--accent:#8FA2F5;--accent-soft:#1E2440;--accent-fill:#8FA2F5;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="lime"],:root:not([data-theme="light"]) [data-accent="pink"]{--accent:#A3E77A;--accent-soft:#243A18;--accent-fill:#A3E77A;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="yellow"]{--accent:#FFD95C;--accent-soft:#3A3118;--accent-fill:#FFD95C;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="purple"]{--accent:#C39BFF;--accent-soft:#2C2140;--accent-fill:#C39BFF;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="orange"]{--accent:#F7876A;--accent-soft:#3F2119;--accent-fill:#F7876A;--on-accent:#191918}
+  :root:not([data-theme="light"]) [data-accent="green"]{--accent:#4FDDA4;--accent-soft:#173A2C;--accent-fill:#4FDDA4;--on-accent:#191918}
 }
-:root[data-theme="dark"] [data-accent="green"]{--accent:#6FB7B1;--accent-soft:#1F3534;--accent-fill:#6FB7B1;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="navy"]{--accent:#94ADDA;--accent-soft:#1E2A3F;--accent-fill:#94ADDA;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="pink"]{--accent:#F08DB4;--accent-soft:#3A1E2A;--accent-fill:#F08DB4;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="yellow"]{--accent:#F2C94C;--accent-soft:#3A3118;--accent-fill:#F2C94C;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="purple"]{--accent:#B9A3E0;--accent-soft:#2A2238;--accent-fill:#B9A3E0;--on-accent:#191918}
-:root[data-theme="dark"] [data-accent="orange"]{--accent:#F4A06B;--accent-soft:#3A2618;--accent-fill:#F4A06B;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="navy"]{--accent:#8FA2F5;--accent-soft:#1E2440;--accent-fill:#8FA2F5;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="lime"],:root[data-theme="dark"] [data-accent="pink"]{--accent:#A3E77A;--accent-soft:#243A18;--accent-fill:#A3E77A;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="yellow"]{--accent:#FFD95C;--accent-soft:#3A3118;--accent-fill:#FFD95C;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="purple"]{--accent:#C39BFF;--accent-soft:#2C2140;--accent-fill:#C39BFF;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="orange"]{--accent:#F7876A;--accent-soft:#3F2119;--accent-fill:#F7876A;--on-accent:#191918}
+:root[data-theme="dark"] [data-accent="green"]{--accent:#4FDDA4;--accent-soft:#173A2C;--accent-fill:#4FDDA4;--on-accent:#191918}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{

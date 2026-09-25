@@ -85,7 +85,10 @@
       const raw = localStorage.getItem(STORE_KEY);
       if(raw){
         const s = JSON.parse(raw);
-        if(s && Array.isArray(s.plans) && s.plans.length) return s;
+        if(s && Array.isArray(s.plans) && s.plans.length){
+          s.plans.forEach(p => { if(p.accent === "pink") p.accent = "lime"; }); // 분홍은 연두로 바뀌었어요
+          return s;
+        }
       }
       const legacy = localStorage.getItem(LEGACY_KEY);
       if(legacy){

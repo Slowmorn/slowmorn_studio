@@ -26,28 +26,25 @@
     return man.toLocaleString("ko-KR") + "만원";
   };
 
+  // B·U·D·G·E·T 순서. 색마다 글자 아이콘이 하나씩 있어요 (예전 분홍은 연두로 봅니다).
   const COLORS = [
-    ["green", "초록"], ["navy", "파랑"], ["pink", "분홍"],
-    ["yellow", "노랑"], ["purple", "보라"], ["orange", "주황"]
+    ["navy", "파랑"], ["lime", "연두"], ["yellow", "노랑"],
+    ["purple", "보라"], ["orange", "주황"], ["green", "초록"]
   ];
 
   // 자석 크기. 자리를 잡을 때도 이 값을 씁니다.
   const W = 208, H = 108, GAP = 16, PAD = 26;
   const FREE = () => board.clientWidth >= 760;   // 좁으면 자유 배치를 끕니다
 
-  const ICON_BUDGET = `<svg class="file-ico" viewBox="0 0 40 48" aria-hidden="true">
-    <path d="M4.8 5a4 4 0 0 1 4-4H24l11.2 11.2V43a4 4 0 0 1-4 4H8.8a4 4 0 0 1-4-4z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
-    <path d="M24 1v7.2a4 4 0 0 0 4 4h7.2" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
-    <path d="M12 22.5h10M12 29h10" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" opacity=".5"/>
-    <path d="M12 35.5h5.5" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round" opacity=".3"/>
-    <path d="M23 34.8l2.6 2.6 5.4-6" fill="none" stroke="var(--accent)" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-  </svg>`;
-  const ICON_GUEST = `<svg class="file-ico" viewBox="0 0 40 48" aria-hidden="true">
-    <path d="M4.8 5a4 4 0 0 1 4-4H24l11.2 11.2V43a4 4 0 0 1-4 4H8.8a4 4 0 0 1-4-4z" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.5"/>
-    <path d="M24 1v7.2a4 4 0 0 0 4 4h7.2" fill="none" stroke="var(--accent)" stroke-width="1.5" stroke-linejoin="round"/>
-    <circle cx="20" cy="25" r="4.2" fill="none" stroke="var(--accent)" stroke-width="1.8"/>
-    <path d="M12.5 38c0-4.1 3.4-7.4 7.5-7.4s7.5 3.3 7.5 7.4" fill="none" stroke="var(--accent)" stroke-width="1.8" stroke-linecap="round"/>
-  </svg>`;
+  const LETTER = {
+    navy:   "M23.9375 6C27.907 6 31.125 9.27646 31.125 13.3182C31.125 15.9861 29.7228 18.3204 27.6279 19.5992C30.7185 20.4181 33 23.2787 33 26.6818C33 30.7235 29.782 34 25.8125 34H14.25C10.7982 34 8 31.1509 8 27.6364V12.3636C8 8.8491 10.7982 6 14.25 6H23.9375Z",
+    lime:   "M8.5 12.3636C8.5 8.8491 11.3604 6 14.8889 6H25.1111C28.6396 6 31.5 8.8491 31.5 12.3636V22.5455C31.5 28.8716 26.3513 34 20 34C13.6487 34 8.5 28.8716 8.5 22.5455V12.3636Z",
+    yellow: "M8.5 12.3636C8.5 8.8491 11.3604 6 14.8889 6H17.4444C25.2071 6 31.5 12.268 31.5 20C31.5 27.732 25.2071 34 17.4444 34H14.8889C11.3604 34 8.5 31.1509 8.5 27.6364V12.3636Z",
+    purple: "M7.5 18.7273C7.5 11.6982 13.0964 6 20 6C26.9036 6 32.5 11.6982 32.5 18.7273V27.6364C32.5 31.1509 29.7018 34 26.25 34H21.25C13.6561 34 7.5 27.732 7.5 20V18.7273Z",
+    orange: "M26.3889 6C29.2117 6 31.5 8.27928 31.5 11.0909C31.5 13.0077 30.4364 14.677 28.8651 15.5455C30.4364 16.4139 31.5 18.0832 31.5 20C31.5 21.9168 30.4364 23.5861 28.8651 24.4545C30.4364 25.323 31.5 26.9923 31.5 28.9091C31.5 31.7207 29.2117 34 26.3889 34H14.8889C11.3604 34 8.5 31.1509 8.5 27.6364V12.3636C8.5 8.8491 11.3604 6 14.8889 6H26.3889Z",
+    green:  "M25.3125 6C29.282 6 32.5 9.27646 32.5 13.3182C32.5 16.6994 30.2478 19.5451 27.1875 20.3848V26.6818C27.1875 30.7235 23.9695 34 20 34C16.0305 34 12.8125 30.7235 12.8125 26.6818V20.3848C9.75221 19.5451 7.5 16.6994 7.5 13.3182C7.5 9.27646 10.718 6 14.6875 6H25.3125Z"
+  };
+  const fileIcon = accent => `<svg class="file-ico" viewBox="0 0 40 40" aria-hidden="true"><path d="${LETTER[accent === "pink" ? "lime" : accent] || LETTER.green}" fill="var(--swatch)"/></svg>`;
   const ICON_MORE = `<svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="3.5" cy="8" r="1.3"/><circle cx="8" cy="8" r="1.3"/><circle cx="12.5" cy="8" r="1.3"/></svg>`;
 
   // 자석처럼 보이도록 파일마다 아주 살짝 기울입니다. id 에서 뽑으니 늘 같은 각도예요.
@@ -155,7 +152,7 @@
     const style = `--tilt:${tilt(p.id)}deg` + (at ? `;left:${at.x}px;top:${at.y}px` : "");
     return `<div class="file" data-id="${esc(p.id)}" data-accent="${esc(p.accent || "green")}" style="${style}">
       <a class="file-open" href="planner/?id=${encodeURIComponent(p.id)}">
-        ${guest ? ICON_GUEST : ICON_BUDGET}
+        ${fileIcon(p.accent)}
         <span class="file-name">${esc(title)}</span>
         <span class="file-meta">${esc(meta)}</span>
         ${guest || !pr.total ? "" : `<span class="file-progress" aria-label="${pr.done}/${pr.total} 완료">
