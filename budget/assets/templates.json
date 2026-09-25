@@ -248,7 +248,7 @@
     "label": "출산·육아 준비",
     "desc": "산모·출산 가방·아기옷·수면 등 10개 카테고리",
     "title": "출산·육아 준비",
-    "intro": "ver. 2026\n쌍둥이 아빠가 직접 준비하면서 만든 체크리스트 겸 예산표예요. 나름대로 열심히 찾아보고, 평이 좋은 제품을 항목마다 선택지로 정리해 뒀어요. 겪어본 후 업뎃할게요:) 예비 엄마아빠 화이팅!",
+    "intro": "ver. 2026\n쌍둥이 아빠가 직접 준비하면서 만든 체크리스트 겸 예산표예요. 나름대로 열심히 찾아보고, 평이 좋은 제품을 항목마다 선택지로 정리해 뒀어요. 겪어본 후 추가 업뎃할게요:) 예비 엄마아빠 화이팅!",
     "kind": "budget",
     "categories": [
       {
@@ -275,15 +275,19 @@
             ]
           },
           {
-            "name": "임부 팬티",
+            "name": "임산부 팬티",
             "options": [
               {
-                "name": "소임 임부팬티",
-                "link": "https://www.soim.co.kr/shop/shopbrand.html?xcode=021&mcode=002&srsltid=AU7gw4VYqnqlTxr-oBRozfLyw3odAjORWIAzHT8etlEsRfSiZUr25MRY"
+                "name": "에이투에프 임산부 팬티",
+                "link": "https://brand.naver.com/atof/category/97c353f3877648f492485f3675b31f8f?cp=1"
               },
               {
-                "name": "네온벨로 임산부 팬티",
-                "link": "https://neonvelo.co.kr/category/%EC%9E%84%EC%82%B0%EB%B6%80-%ED%8C%AC%ED%8B%B0/57/"
+                "name": "맘스데이 임산부 요일 팬티",
+                "link": "https://link.coupang.com/a/hj078JBX4u"
+              },
+              {
+                "name": "모엔츠 프리 임산부 팬티",
+                "link": "https://shop-mms.com/category/%ED%8C%AC%ED%8B%B0/47/"
               }
             ]
           },
@@ -295,12 +299,21 @@
                 "link": "https://link.coupang.com/a/hiFvN47x2i"
               },
               {
-                "name": "비오템 튼살크림",
-                "link": "https://link.coupang.com/a/hiFsthuuD6"
+                "name": "아토팜 스트레치 마크 크림",
+                "link": "https://link.coupang.com/a/hj0Ix1Kx5g"
               },
               {
-                "name": "프라젠트라 임산부크림",
-                "link": "https://link.coupang.com/a/hiFBxNUIq4"
+                "name": "클라랑스 예비맘크림",
+                "link": "https://link.coupang.com/a/hj0C5ocFlQ"
+              }
+            ]
+          },
+          {
+            "name": "튼살 오일 (크림이랑 같이 쓰면 좋아요)",
+            "options": [
+              {
+                "name": "프라이웰 바디오일",
+                "link": "https://link.coupang.com/a/hj0Ns0d6Zw"
               }
             ]
           },
@@ -308,13 +321,25 @@
             "name": "임부복"
           },
           {
-            "name": "무압박 양말"
+            "name": "무압박 양말",
+            "options": [
+              {
+                "name": "모엔츠 무압박 링클 삭스",
+                "link": "https://shop-mms.com/category/%EC%96%91%EB%A7%90/82/"
+              }
+            ]
           },
           {
-            "name": "영양제 (엽산, 철분제, 유산균)"
+            "name": "영양제 (엽산,비타민D, 철분제, 칼슘, 유산균)"
           },
           {
-            "name": "입덧 캔디"
+            "name": "입덧 캔디",
+            "options": [
+              {
+                "name": "포지타노 레몬캔디",
+                "link": "https://link.coupang.com/a/hj0Se5AlBk"
+              }
+            ]
           }
         ]
       },
@@ -399,6 +424,9 @@
             "name": "텀블러"
           },
           {
+            "name": "주름 빨대"
+          },
+          {
             "name": "보습 크림"
           },
           {
@@ -423,7 +451,17 @@
             "name": "마스크"
           },
           {
-            "name": "푹신한 슬리퍼"
+            "name": "푹신한 슬리퍼",
+            "options": [
+              {
+                "name": "구름 슬리퍼",
+                "link": "https://link.coupang.com/a/hj0b37BMnk"
+              },
+              {
+                "name": "BARC 슬리퍼",
+                "link": "https://barc.co.kr/product/list.html?cate_no=44"
+              }
+            ]
           },
           {
             "name": "충전기"
@@ -713,6 +751,15 @@
           },
           {
             "name": "타이니모빌 (대체 불가의 후기)"
+          },
+          {
+            "name": "아기체육관",
+            "options": [
+              {
+                "name": "하베브릭스 아기체육관",
+                "link": "https://link.coupang.com/a/hjZpH9s7ps"
+              }
+            ]
           }
         ]
       },
@@ -815,6 +862,10 @@
               {
                 "name": "꿈비 분유쉐이커",
                 "link": "https://link.coupang.com/a/hiHOYZNwf6"
+              },
+              {
+                "name": "폴레드 픽셀 이지 휴대용 분유쉐이커",
+                "link": "https://link.coupang.com/a/hjZhMZL5JA"
               }
             ]
           },
@@ -1034,6 +1085,9 @@
                 "link": "https://link.coupang.com/a/hb99Q11E7w"
               }
             ]
+          },
+          {
+            "name": "아기 면봉"
           },
           {
             "name": "아기칫솔",
