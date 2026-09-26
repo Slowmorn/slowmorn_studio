@@ -107,7 +107,11 @@
     if(!btn) return;
     document.querySelectorAll("details.auth-menu[open]").forEach(d => d.open = false);
     if(btn.dataset.auth === "in") openLogin();
-    if(btn.dataset.auth === "out") Auth.signOut();
+    if(btn.dataset.auth === "out"){
+      // 아직 안 올린 변경을 올린 뒤 나갑니다. 나가면 이 브라우저의 계정 사본은 지워져요.
+      const BS = window.BudgetStore;
+      Promise.resolve(BS && BS.flushAccount && BS.flushAccount()).catch(() => {}).then(() => Auth.signOut());
+    }
     if(btn.dataset.auth === "delete") openDelete();
   });
 

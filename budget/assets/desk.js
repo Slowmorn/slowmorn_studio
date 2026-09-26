@@ -72,20 +72,22 @@
   // ---- 알림 한 줄 ----
   const toastEl = document.getElementById("toast");
   let toastTimer = null;
-  function toast(msg, undo){
+  // undo 대신 action({ label, run, done })을 넘기면 다른 버튼을 붙여요
+  function toast(msg, undo, action){
     if(!toastEl) return;
     clearTimeout(toastTimer);
     toastEl.innerHTML = `<span>${esc(msg)}</span>`;
-    toastEl.classList.toggle("has-action", !!undo);
-    if(undo){
+    const act = action || (undo && { label: "되돌리기", run: undo, done: "되돌렸어요" });
+    toastEl.classList.toggle("has-action", !!act);
+    if(act){
       const b = document.createElement("button");
       b.type = "button";
-      b.textContent = "되돌리기";
-      b.addEventListener("click", () => { undo(); toast("되돌렸어요"); });
+      b.textContent = act.label;
+      b.addEventListener("click", () => { act.run(); toast(act.done || "완료했어요"); });
       toastEl.appendChild(b);
     }
     toastEl.classList.add("show");
-    toastTimer = setTimeout(hide, undo ? 7000 : 2600);
+    toastTimer = setTimeout(hide, act ? 7000 : 2600);
     function hide(){ toastEl.classList.remove("show"); }
   }
 
@@ -424,7 +426,12 @@
   render();
   if(Auth && Auth.enabled){
     Auth.onChange(async () => {
-      if(Auth.user) await BS.mergeWithAccount();
+      if(Auth.user){
+        await BS.mergeWithAccount();
+        const n = BS.offerImport();
+        if(n) toast(`로그인 전에 만든 파일 ${n}개가 이 브라우저에 있어요`, null,
+          { label: "가져오기", run: () => { BS.importGuest(); render(); }, done: "계정으로 가져왔어요" });
+      } else BS.leaveAccount();
       render();
     });
   }

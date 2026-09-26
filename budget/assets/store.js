@@ -2,12 +2,15 @@
    예산표 하나가 파일 하나입니다. 책상(홈)과 체크리스트 화면이 같은 이 모듈을 씁니다.
    브라우저 저장이 먼저고, 로그인했을 때만 계정에도 같이 올립니다.
 
-   저장 형태는 예전 그대로입니다: { activeId, plans: [plan, …] }
+   보드는 두 개예요. 로그인 전 보드(STORE_KEY)와 계정 보드의 사본(ACCT_KEY).
+   로그인하면 계정 보드로 바꿔 끼우고, 로그아웃하면 사본을 지우고 로그인 전 보드로 돌아갑니다.
+   저장 형태: { activeId, plans: [plan, …] } (계정 사본은 uid 가 더 붙어요)
    다른 스크립트는 window.BudgetStore 로 접근합니다. assets/auth.js 다음에 읽습니다. */
 (function(){
   const HERE = (document.currentScript && document.currentScript.src) || location.href;
   const STORE_KEY = "prep-budget-v2";
   const LEGACY_KEY = "prep-budget-v1";   // 예산표 하나만 담던 옛 형식. 처음 열 때 한 번 옮깁니다.
+  const ACCT_KEY = "prep-budget-account"; // 로그인한 계정 보드의 사본
   const Auth = window.BudgetAuth;
 
   let uid = Date.now();
@@ -91,17 +94,35 @@
     return { budget, count };
   }
 
+  // 이름도 내용도 그대로인 새 파일인지 (저절로 생긴 빈 파일은 계정으로 옮기지 않아요)
+  const hasContent = i => i.name || i.budget || i.actual || (i.options && i.options.length);
+  const isTouched = p => (p.title || "") !== "새 예산표"
+    || (p.categories || []).some(c => (c.items || []).some(hasContent))
+    || !(p.categories || []).every(c => !c.name || c.name === "첫 번째 카테고리");
+
   // ---- 불러오기 ----
+  const readJSON = k => { try{ const r = localStorage.getItem(k); return r ? JSON.parse(r) : null; }catch(e){ return null; } };
+  const tidy = s => { s.plans.forEach(p => { if(p.accent) p.accent = accentKey(p.accent); }); return s; };
+
+  let mode = "guest", acctUid = null;   // 지금 보고 있는 보드
+
   function load(){
-    try{
-      const raw = localStorage.getItem(STORE_KEY);
-      if(raw){
-        const s = JSON.parse(raw);
-        if(s && Array.isArray(s.plans) && s.plans.length){
-          s.plans.forEach(p => { if(p.accent) p.accent = accentKey(p.accent); });
-          return s;
-        }
+    // 로그인한 채로 떠났으면 계정 보드의 사본부터 보여 줍니다 (세션이 없으면 사본을 버려요)
+    const acct = readJSON(ACCT_KEY);
+    if(acct && Array.isArray(acct.plans)){
+      if(Auth && Auth.enabled && Auth.hasStoredSession && Auth.hasStoredSession()){
+        mode = "account"; acctUid = acct.uid || null;
+        return tidy({ activeId: acct.activeId || null, plans: acct.plans });
       }
+      try{ localStorage.removeItem(ACCT_KEY); }catch(e){}
+    }
+    return loadGuest();
+  }
+
+  function loadGuest(){
+    try{
+      const s = readJSON(STORE_KEY);
+      if(s && Array.isArray(s.plans) && s.plans.length) return tidy(s);
       const legacy = localStorage.getItem(LEGACY_KEY);
       if(legacy){
         const old = JSON.parse(legacy);
@@ -123,7 +144,10 @@
   let localTimer = null, cloudTimer = null;
 
   function saveLocalNow(){
-    try{ localStorage.setItem(STORE_KEY, JSON.stringify(data)); }catch(e){}
+    try{
+      if(mode === "account") localStorage.setItem(ACCT_KEY, JSON.stringify({ uid: acctUid, activeId: data.activeId, plans: data.plans }));
+      else localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    }catch(e){}
   }
 
   function save(plan){
@@ -135,7 +159,7 @@
 
   // 로그인했을 때만 계정에도 올립니다. 실패해도 브라우저 저장은 그대로예요.
   function saveToAccount(){
-    if(!(Auth && Auth.enabled && Auth.user)) return;
+    if(mode !== "account" || !(Auth && Auth.enabled && Auth.user)) return;
     clearTimeout(cloudTimer);
     cloudTimer = setTimeout(() => { Auth.savePlans(data.plans); }, 1500);
   }
@@ -286,21 +310,85 @@
     return p;
   }
 
-  // 로그인 직후: 계정의 파일과 이 브라우저의 파일을 합칩니다.
-  // 화면 갱신은 부르는 쪽에서 합니다. 바뀐 게 있으면 true 를 돌려줍니다.
+  // 로그인했을 때: 계정 보드로 바꿔 끼웁니다.
+  // 계정이 비어 있으면(첫 로그인) 로그인 전에 만든 파일을 계정으로 옮기고,
+  // 계정에 파일이 있으면 로그인 전 보드는 그대로 두었다가 로그아웃하면 다시 보여 줘요.
+  // 화면 갱신은 부르는 쪽에서 합니다. 보드를 바꿨으면 true 를 돌려줍니다.
   async function mergeWithAccount(){
     if(!(Auth && Auth.enabled && Auth.user)) return false;
     const mine = await Auth.listPlans();
     if(!mine) return false;
+    const u = Auth.user.id;
     const byId = new Map(mine.map(p => [p.id, p]));
-    let changed = false;
-    data.plans.forEach(p => { if(!byId.has(p.id)){ byId.set(p.id, p); changed = true; } }); // 이 브라우저에만 있던 것
-    const merged = [...byId.values()];
-    if(merged.length !== data.plans.length) changed = true;
-    data.plans = merged;
-    if(!data.plans.some(p => p.id === data.activeId)) data.activeId = (live()[0] || {}).id || null;
+    let plans = mine, upload = false;
+    if(mode === "account" && acctUid === u){
+      // 같은 계정: 계정이 기준이고, 이 기기에서 아직 못 올린 파일만 더합니다
+      const localOnly = data.plans.filter(p => !byId.has(p.id));
+      if(localOnly.length){ plans = mine.concat(localOnly); upload = true; }
+    } else {
+      if(mode === "guest"){ clearTimeout(localTimer); saveLocalNow(); }   // 로그인 전 보드를 마저 저장
+      // 예전 방식으로 합쳐졌던 계정 파일은 로그인 전 보드에서 뺍니다
+      const guest = (loadGuest().plans || []).filter(p => !byId.has(p.id));
+      const moving = mine.length ? [] : guest.filter(p => !p.deletedAt && isTouched(p));
+      writeGuest(guest.filter(p => !moving.includes(p)));
+      if(moving.length){ plans = moving; upload = true; }
+    }
+    const active = plans.some(p => p.id === data.activeId && !p.deletedAt) ? data.activeId
+      : ((plans.find(p => !p.deletedAt) || {}).id || null);
+    mode = "account"; acctUid = u;
+    data.plans = plans; data.activeId = active;
     saveLocalNow();
-    if(changed) Auth.savePlans(data.plans);
+    if(upload) Auth.savePlans(data.plans);
+    return true;
+  }
+
+  function writeGuest(plans){
+    try{
+      if(plans.length) localStorage.setItem(STORE_KEY, JSON.stringify({ activeId: (plans.find(p => !p.deletedAt) || plans[0]).id, plans }));
+      else localStorage.removeItem(STORE_KEY);
+    }catch(e){}
+  }
+
+  // 로그인 전 보드에 남은 파일 (계정 보드를 보는 동안에만 의미가 있어요)
+  function guestPlans(){
+    if(mode !== "account") return [];
+    return (loadGuest().plans || []).filter(p => !p.deletedAt && isTouched(p));
+  }
+
+  // 로그인 전 파일이 남아 있으면 한 번만(탭마다) 가져올지 물어봐요. 물어볼 개수를 돌려줍니다.
+  function offerImport(){
+    const n = guestPlans().filter(p => !find(p.id)).length;
+    if(!n) return 0;
+    try{ if(sessionStorage.getItem("prep-budget-import-asked")) return 0; sessionStorage.setItem("prep-budget-import-asked", "1"); }catch(e){}
+    return n;
+  }
+
+  // 로그인 전 파일을 계정 보드로 옮깁니다
+  function importGuest(){
+    const moving = guestPlans().filter(p => !find(p.id));
+    if(!moving.length) return 0;
+    data.plans.push(...moving);
+    writeGuest([]);
+    saveLocalNow();
+    if(Auth && Auth.user) Auth.savePlans(data.plans);
+    return moving.length;
+  }
+
+  // 로그아웃하기 전에 아직 안 올린 변경을 올립니다
+  async function flushAccount(){
+    if(mode !== "account" || !(Auth && Auth.user)) return;
+    clearTimeout(cloudTimer);
+    await Auth.savePlans(data.plans);
+  }
+
+  // 로그아웃했을 때: 계정 사본을 지우고 로그인 전 보드로 돌아갑니다
+  function leaveAccount(){
+    if(mode !== "account") return false;
+    clearTimeout(localTimer); clearTimeout(cloudTimer);
+    try{ localStorage.removeItem(ACCT_KEY); }catch(e){}
+    mode = "guest"; acctUid = null;
+    const g = loadGuest();
+    data.plans = g.plans; data.activeId = g.activeId || null;
     return true;
   }
 
@@ -317,7 +405,8 @@
     save, saveLocalNow, saveToAccount,
     addPlan, addExisting, removePlan, restorePlan, purge, purgeExpired,
     duplicate, rename, setAccent, setPos, setDday,
-    mergeWithAccount
+    isTouched, mergeWithAccount, leaveAccount, flushAccount, guestPlans, importGuest, offerImport,
+    get signedInBoard(){ return mode === "account"; }
   };
   window.BudgetStore = API;
 })();

@@ -156,6 +156,7 @@
     get session(){ return session; },
     get user(){ return session && session.user; },
     onChange(fn){ listeners.add(fn); return () => listeners.delete(fn); },
+    hasStoredSession,
     getClient, signIn, signOut, deleteAccount,
     listPlans, savePlans, removePlans, createInvite, acceptInvite, watchPlans,
     // 페이지가 열릴 때: 이미 로그인한 흔적이 있으면 세션을 복구합니다

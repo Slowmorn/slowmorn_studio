@@ -58,11 +58,27 @@
   }
   const saveToAccount = () => BS.saveToAccount();
 
-  // 로그인 직후: 계정의 파일과 이 브라우저의 것을 합칩니다
+  // 로그인했을 때: 계정 보드로 바꿔 끼웁니다 (첫 로그인이면 로그인 전 파일을 옮겨요)
   async function mergeWithAccount(){
     if(!await BS.mergeWithAccount()) return;
+    if(!BS.live.length) BS.addPlan("blank");
     syncActive();
     render();
+    markUrl();
+    const n = BS.offerImport();
+    if(n) toast(`로그인 전에 만든 파일 ${n}개가 이 브라우저에 있어요`, null, { label: "가져오기", run: () => {
+      BS.importGuest(); render(); toast("계정으로 가져왔어요");
+    } });
+  }
+
+  // 로그아웃했을 때: 로그인 전 보드로 돌아갑니다
+  function leaveAccount(){
+    if(!BS.leaveAccount()) return;
+    if(stopWatch){ stopWatch(); stopWatch = null; }
+    if(!BS.live.length) BS.addPlan("blank");
+    syncActive();
+    render();
+    markUrl();
   }
 
   // ---- formatting ----
@@ -1872,13 +1888,13 @@
       return; // 로그인하면 아래 onChange에서 다시 처리합니다
     }
     const res = await Auth.acceptInvite(token);
-    try{ history.replaceState(null, "", location.pathname); }catch(e){}
     if(!res || res.error){ toast("초대가 만료됐거나 잘못된 링크예요"); return; }
     await mergeWithAccount();
     const joined = store.plans.find(p => p.id === res.planId);
     if(joined){ store.activeId = joined.id; syncActive(); render(); save(); }
     toast("예산표를 함께 쓰게 됐어요");
   }
+
 
   // ---- 상대가 고쳤을 때 ----
   let lastTyped = 0, stopWatch = null;
@@ -1916,6 +1932,7 @@
     Auth.onChange(async user => {
       showShare();
       if(user){ await mergeWithAccount(); handleJoin(); watchRemote(); }
+      else leaveAccount();
     });
     Auth.init().then(() => { showShare(); handleJoin(); });
   }
