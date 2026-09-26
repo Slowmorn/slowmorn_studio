@@ -403,7 +403,7 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.show.has-action{pointer-events:auto}
-.toast button{border:0;background:none;color:var(--sheet);font-weight:600;text-decoration:underline;padding:0}
+.toast button{border:0;background:none;color:var(--sheet);font-weight:600;text-decoration:underline;padding:0;white-space:nowrap;flex:none}
 
 /* 손가락으로 쓰는 기기에는 호버가 없으니 파일 메뉴를 늘 보여 줍니다 */
 @media (hover:none){
