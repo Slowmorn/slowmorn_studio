@@ -509,11 +509,12 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   .file-switch-btn{max-width:56vw}
   .cat{padding:14px 14px 10px}
   .totals-inner{gap:14px 20px}
-  .t-export{flex:none;width:100%}
-  .saved-at{flex:none;text-align:left}
-  .export{display:block;flex:1}
-  body{padding-bottom:210px}
-  .toast{bottom:190px}
+  /* 좁은 화면에서는 엑셀 내보내기를 빼고, 저장 시각만 오른쪽에 둡니다 */
+  .t-export{flex:none;margin-left:auto}
+  .saved-at{flex:none;text-align:right}
+  .export{display:none}
+  body{padding-bottom:150px}
+  .toast{bottom:130px}
 }
 @media (prefers-reduced-motion:reduce){.toast,.tpl-btn,.tool-btn,.tpl-btn .chev{transition:none}}
 
