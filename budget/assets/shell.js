@@ -39,18 +39,21 @@
     }
   }
 
-  function openLogin(){
+  // opts.title / opts.text 로 제목과 안내를 바꿀 수 있어요 (초대 링크로 들어왔을 때)
+  const LOGIN_TITLE = "로그인";
+  const LOGIN_TEXT = "로그인하면 만든 예산표가 계정에 저장돼서, 휴대폰이나 다른 기기에서도 이어서 쓸 수 있어요.";
+  function openLogin(opts){
     let dlg = document.getElementById("loginDialog");
     if(!dlg){
       dlg = document.createElement("dialog");
       dlg.id = "loginDialog";
       dlg.className = "login-dialog";
       dlg.innerHTML = `<div class="login-inner">
-        <h2>로그인</h2>
-        <p>로그인하면 만든 예산표가 계정에 저장돼서, 휴대폰이나 다른 기기에서도 이어서 쓸 수 있어요.</p>
+        <h2 data-login-title></h2>
+        <p data-login-text></p>
         ${(window.BUDGET_CONFIG || {}).kakao ? `<button type="button" class="login-kakao" data-provider="kakao">카카오로 시작하기</button>` : ""}
         <button type="button" class="login-google" data-provider="google">구글로 시작하기</button>
-        <p class="login-note">로그인 전에 만든 예산표는 로그인할 때 계정으로 함께 옮겨져요.</p>
+        <p class="login-note">처음 로그인할 때는 로그인 전에 만든 예산표가 계정으로 옮겨져요.</p>
         <p class="login-note">로그인하면 <a href="${root}budget/terms/">이용약관</a>과 <a href="${root}budget/privacy/">개인정보 처리방침</a>에 동의하는 것으로 봅니다.</p>
         <button type="button" class="login-close" data-close>닫기</button>
       </div>`;
@@ -61,7 +64,10 @@
         if(btn) Auth.signIn(btn.dataset.provider);
       });
     }
-    dlg.showModal();
+    const o = (opts && typeof opts === "object" && !(opts instanceof Event)) ? opts : {};
+    dlg.querySelector("[data-login-title]").textContent = o.title || LOGIN_TITLE;
+    dlg.querySelector("[data-login-text]").textContent = o.text || LOGIN_TEXT;
+    if(!dlg.open) dlg.showModal();
   }
 
   function openDelete(){

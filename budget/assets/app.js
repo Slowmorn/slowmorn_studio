@@ -1893,7 +1893,9 @@
     if(!(Auth && Auth.enabled)) return;
     if(!Auth.user){
       const login = window.BudgetShell && window.BudgetShell.openLogin;
-      toast("초대받은 예산표를 보려면 먼저 로그인해 주세요", null, login ? { label: "로그인", run: login } : undefined);
+      const invite = { title: "초대받은 예산표가 있어요", text: "로그인하면 함께 쓰자고 보낸 예산표가 바로 열려요. 같이 고치려면 계정이 있어야 해요." };
+      if(login) login(invite);
+      toast("초대받은 예산표를 보려면 먼저 로그인해 주세요", null, login ? { label: "로그인", run: () => login(invite) } : undefined);
       return; // 로그인하면 아래 onChange에서 다시 처리합니다
     }
     try{ sessionStorage.removeItem(JOIN_KEY); }catch(e){}
