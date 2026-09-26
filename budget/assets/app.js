@@ -1894,7 +1894,10 @@
     if(!Auth.user){
       const login = window.BudgetShell && window.BudgetShell.openLogin;
       const invite = { title: "초대받은 예산표가 있어요", text: "로그인하면 함께 쓰자고 보낸 예산표가 바로 열려요. 같이 고치려면 계정이 있어야 해요." };
-      if(login) login(invite);
+      // 로그인 창은 초대마다 한 번만 저절로 열어요. 닫은 뒤로는 아래 알림의 버튼으로 열 수 있어요.
+      let asked = false;
+      try{ asked = sessionStorage.getItem(JOIN_KEY + "-asked") === token; sessionStorage.setItem(JOIN_KEY + "-asked", token); }catch(e){}
+      if(login && !asked) login(invite);
       toast("초대받은 예산표를 보려면 먼저 로그인해 주세요", null, login ? { label: "로그인", run: () => login(invite) } : undefined);
       return; // 로그인하면 아래 onChange에서 다시 처리합니다
     }
