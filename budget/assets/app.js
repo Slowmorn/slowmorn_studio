@@ -37,10 +37,13 @@
   BS.purgeExpired();
   if(!BS.live.length) BS.addPlan("blank");
   let state;
+  // 실시간 반영은 같이 쓰는 예산표를 열어 둘 때만 연결합니다 (무료 플랜의 동시 연결 수를 아끼려고)
+  let watching = null, stopWatch = null, sharedIds = new Set();
   function syncActive(){
     // 휴지통에 든 파일은 건너뜁니다
     state = BS.live.find(p => p.id === store.activeId) || BS.live[0] || store.plans[0];
     store.activeId = state.id;
+    ensureWatch();
   }
   syncActive();
   function replaceActive(data){
@@ -74,7 +77,7 @@
   // 로그아웃했을 때: 로그인 전 보드로 돌아갑니다
   function leaveAccount(){
     if(!BS.leaveAccount()) return;
-    if(stopWatch){ stopWatch(); stopWatch = null; }
+    sharedIds = new Set();
     if(!BS.live.length) BS.addPlan("blank");
     syncActive();
     render();
@@ -1838,6 +1841,7 @@
       if(saved && saved.error) throw new Error("저장 단계: " + saved.error);
       const res = await Auth.createInvite(state.id);
       if(!res || res.error) throw new Error("초대 단계: " + ((res && res.error) || "알 수 없는 오류"));
+      state.shared = true; save(); ensureWatch();
       showShareLink(`${location.origin}${location.pathname}?join=${res.token}`);
     }catch(err){
       showShareLink(null, err && err.message ? err.message : String(err));
@@ -1919,7 +1923,7 @@
 
 
   // ---- 상대가 고쳤을 때 ----
-  let lastTyped = 0, stopWatch = null;
+  let lastTyped = 0;
   document.addEventListener("input", () => { lastTyped = Date.now(); }, true);
 
   async function pullRemote(){
@@ -1933,27 +1937,46 @@
     BS.saveLocalNow();
   }
 
-  async function watchRemote(){
-    if(stopWatch) return;
-    stopWatch = await Auth.watchPlans(payload => {
-      const row = payload.new || payload.old;
-      if(!row) return;
-      const mine = store.plans.find(p => p.id === row.id);
-      const editing = Date.now() - lastTyped < 8000;
-      // 내가 방금 저장한 것과 같은 내용이면 무시
-      if(payload.eventType !== "DELETE" && mine && JSON.stringify(row.data) === JSON.stringify(mine)) return;
-      if(editing){
-        toast("같이 쓰는 사람이 이 예산표를 고쳤어요", null, { label: "불러오기", run: pullRemote });
-      } else {
-        pullRemote();
-      }
-    });
+  function onRemote(payload){
+    const row = payload.new || payload.old;
+    if(!row) return;
+    const mine = store.plans.find(p => p.id === row.id);
+    const editing = Date.now() - lastTyped < 8000;
+    // 내가 방금 저장한 것과 같은 내용이면 무시
+    if(payload.eventType !== "DELETE" && mine && JSON.stringify(row.data) === JSON.stringify(mine)) return;
+    if(editing){
+      toast("같이 쓰는 사람이 이 예산표를 고쳤어요", null, { label: "불러오기", run: pullRemote });
+    } else {
+      pullRemote();
+    }
+  }
+
+  // 공유받은 것(주인이 따로 있음)이거나 내가 초대 링크를 만든 것
+  function isShared(p){
+    const A = window.BudgetAuth, me = A && A.user && A.user.id;
+    return !!(p && me && ((p.owner && p.owner !== me) || p.shared || sharedIds.has(p.id)));
+  }
+
+  // 지금 연 파일에 맞춰 실시간 연결을 켜고 끕니다. 파일을 바꿀 때마다 불러요.
+  async function ensureWatch(){
+    const A = window.BudgetAuth;
+    const want = A && A.enabled && BS.signedInBoard && isShared(state) ? state.id : null;
+    if(want === watching) return;
+    if(stopWatch){ stopWatch(); stopWatch = null; }
+    watching = want;
+    if(!want) return;
+    const stop = await A.watchPlans(onRemote, want);
+    if(watching !== want){ stop(); return; }   // 연결하는 사이 다른 파일로 옮겨 갔으면
+    stopWatch = stop;
   }
 
   if(Auth && Auth.enabled){
     Auth.onChange(async user => {
       showShare();
-      if(user){ await mergeWithAccount(); handleJoin(); watchRemote(); }
+      if(user){
+        await mergeWithAccount(); handleJoin();
+        Auth.sharedPlanIds().then(ids => { sharedIds = new Set(ids); ensureWatch(); });
+      }
       else leaveAccount();
     });
     Auth.init().then(() => { showShare(); handleJoin(); });

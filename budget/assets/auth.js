@@ -139,12 +139,21 @@
     return { planId: data };
   }
 
-  // 다른 사람이 저장하면 알려 줍니다 (같은 예산표를 함께 쓸 때)
-  async function watchPlans(onChange){
+  // 내가 초대 링크를 만든 예산표 (같이 쓰는 중일 수 있는 것)
+  async function sharedPlanIds(){
     const sb = await getClient();
-    if(!sb || !session) return () => {};
-    const channel = sb.channel("plans-watch")
-      .on("postgres_changes", { event: "*", schema: "public", table: "plans" }, payload => {
+    if(!sb || !session) return [];
+    const { data, error } = await sb.from("plan_invites").select("plan_id");
+    if(error){ console.warn("초대 목록을 불러오지 못했어요:", error.message); return []; }
+    return [...new Set(data.map(r => r.plan_id))];
+  }
+
+  // 다른 사람이 이 예산표를 저장하면 알려 줍니다 (같은 예산표를 함께 쓸 때만 부릅니다)
+  async function watchPlans(onChange, planId){
+    const sb = await getClient();
+    if(!sb || !session || !planId) return () => {};
+    const channel = sb.channel("plan-" + planId)
+      .on("postgres_changes", { event: "*", schema: "public", table: "plans", filter: "id=eq." + planId }, payload => {
         try{ onChange(payload); }catch(e){}
       })
       .subscribe();
@@ -158,7 +167,7 @@
     onChange(fn){ listeners.add(fn); return () => listeners.delete(fn); },
     hasStoredSession,
     getClient, signIn, signOut, deleteAccount,
-    listPlans, savePlans, removePlans, createInvite, acceptInvite, watchPlans,
+    listPlans, savePlans, removePlans, createInvite, acceptInvite, watchPlans, sharedPlanIds,
     // 페이지가 열릴 때: 이미 로그인한 흔적이 있으면 세션을 복구합니다
     async init(){
       if(!ENABLED || !hasStoredSession()) return null;
