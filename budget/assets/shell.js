@@ -161,7 +161,7 @@
     dlg.querySelector("[data-clear]").hidden = !plan.dday;
     dlg.showModal();
   }
-  window.BudgetShell = { openDday };
+  window.BudgetShell = { openDday, openLogin };
 
   // 홈의 파일 목록은 assets/desk.js 가 그립니다.
   renderAuth();

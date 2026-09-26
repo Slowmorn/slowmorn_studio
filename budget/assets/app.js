@@ -1777,6 +1777,14 @@
       : `엑셀 내용으로 바꿨어요 · ${planLabel(state)}`, snap);
   });
 
+  // ---- 초대 링크(?join=)는 주소가 ?id= 로 바뀌기 전에 받아 둡니다 ----
+  // 로그인하러 구글에 다녀와도 같은 탭이면 sessionStorage 에 남아 있어요.
+  const JOIN_KEY = "prep-budget-join";
+  try{
+    const t = new URLSearchParams(location.search).get("join");
+    if(t) sessionStorage.setItem(JOIN_KEY, t);
+  }catch(e){}
+
   // ---- ?tpl=wedding 처럼 주소로 템플릿 열기 (소개 페이지에서 넘어올 때) ----
   (function openFromUrl(){
     let key = "", id = "";
@@ -1880,18 +1888,27 @@
   // 초대 링크로 들어왔을 때
   async function handleJoin(){
     let token = "";
-    try{ token = new URLSearchParams(location.search).get("join") || ""; }catch(e){}
+    try{ token = sessionStorage.getItem(JOIN_KEY) || ""; }catch(e){}
     if(!token) return;
     if(!(Auth && Auth.enabled)) return;
     if(!Auth.user){
-      toast("초대를 받으려면 먼저 로그인해 주세요");
+      const login = window.BudgetShell && window.BudgetShell.openLogin;
+      toast("초대받은 예산표를 보려면 먼저 로그인해 주세요", null, login ? { label: "로그인", run: login } : undefined);
       return; // 로그인하면 아래 onChange에서 다시 처리합니다
     }
+    try{ sessionStorage.removeItem(JOIN_KEY); }catch(e){}
+    // 초대를 받으러 오면서 저절로 생긴 빈 파일은 초대받은 예산표로 바꿉니다
+    const blank = store.plans.length === 1 && !BS.isTouched(store.plans[0]) ? store.plans[0] : null;
     const res = await Auth.acceptInvite(token);
     if(!res || res.error){ toast("초대가 만료됐거나 잘못된 링크예요"); return; }
     await mergeWithAccount();
     const joined = store.plans.find(p => p.id === res.planId);
-    if(joined){ store.activeId = joined.id; syncActive(); render(); save(); }
+    if(!joined){ toast("초대받은 예산표를 불러오지 못했어요. 새로고침해 주세요"); return; }
+    if(blank && blank.id !== joined.id){
+      store.plans = store.plans.filter(p => p !== blank);
+      if(Auth.removePlans) Auth.removePlans([blank.id]);
+    }
+    store.activeId = joined.id; syncActive(); render(); save(); markUrl();
     toast("예산표를 함께 쓰게 됐어요");
   }
 
