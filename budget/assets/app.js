@@ -124,13 +124,14 @@
 
   const isGuest = p => p && p.kind === "guestbook";
   const guestCount = c => c.items.filter(i => i.name || i.budget).length;
+  // 예산표는 빈 항목도 한 칸으로 셉니다 (방명록은 이름이나 금액이 있는 사람만)
+  const itemCount = c => isGuest(state) ? guestCount(c) : c.items.length;
 
   function catSumHTML(c){
     const b = catSum(c);
     if(isGuest(state)) return `축의금 <b>${won(b)}</b>&nbsp;&nbsp;<b>${guestCount(c)}</b>명`;
-    const items = c.items.filter(i => i.name || i.budget);
-    const done = items.filter(i => i.done).length;
-    return `예산 <b>${won(b)}</b><span class="cat-done">완료 <b>${done}</b> / ${items.length}</span>`;
+    const done = c.items.filter(i => i.done).length;
+    return `예산 <b>${won(b)}</b><span class="cat-done">완료 <b>${done}</b> / ${c.items.length}</span>`;
   }
 
   const chosenOf = it => (it.options || []).find(o => o.id === it.choiceId);
@@ -241,7 +242,7 @@
   }));
 
   function foldLabel(c){
-    const n = c.items.filter(i => i.name || i.budget).length;
+    const n = itemCount(c);
     return c.collapsed ? `항목 펼치기 (${n}${isGuest(state) ? "명" : "개"})` : "항목 접기";
   }
   // Icon only; the label (with the hidden item count) goes to the tooltip and screen readers
@@ -312,7 +313,7 @@
     const here = currentCatId();
     const guest = isGuest(state);
     catNavList.innerHTML = state.categories.map(c => {
-      const n = c.items.filter(i => i.name || i.budget).length;
+      const n = itemCount(c);
       return `<button type="button" data-go="${esc(c.id)}"${c.id === here ? ` aria-current="true"` : ""}>
         <span class="cat-nav-name">${esc(catLabel(c))}</span>
         <span class="cat-nav-meta">${n}${guest ? "명" : "개"}</span>
@@ -342,7 +343,7 @@
     state.categories.forEach(c => c.items.forEach(i => {
       b += i.budget || 0;
       if(i.done) spent += i.budget || 0;
-      if(i.name || i.budget){ count++; if(i.done) done++; }
+      if(!isGuest(state) || i.name || i.budget){ count++; if(i.done) done++; }
     }));
     const guest = isGuest(state);
     document.getElementById("tBudgetLabel").textContent = guest ? "축의금 합계" : "예산 합계";

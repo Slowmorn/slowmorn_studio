@@ -271,7 +271,7 @@
   function progress(p){
     let total = 0, done = 0;
     ((p && p.categories) || []).forEach(c => (c.items || []).forEach(i => {
-      if(!(i.name || i.budget || i.actual)) return;
+      if(isGuest(p) && !(i.name || i.budget)) return; // 예산표는 빈 항목도 셉니다
       total++;
       if(i.done) done++;
     }));
