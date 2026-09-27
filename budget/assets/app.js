@@ -263,6 +263,8 @@
   function render(){
     const guest = isGuest(state);
     syncAllSpend();
+    // 목록을 통째로 다시 그려도 보던 자리가 움직이지 않게 스크롤 위치를 붙잡아 둡니다
+    const keepY = window.scrollY;
     document.body.classList.toggle("kind-guestbook", guest);
     applyAccent();
     renderFileBar();
@@ -301,6 +303,7 @@
           <button type="button" class="add-item">+ 항목 추가</button>`}
         </section>`).join("");
     }
+    if(Math.abs(window.scrollY - keepY) > 1) window.scrollTo(0, keepY);
     updateTotals();
     // 카테고리로 건너뛰기는 카테고리가 둘 이상일 때만 띄웁니다
     catNav.hidden = state.categories.length < 2;
@@ -995,7 +998,7 @@
 
   function openOptions(c, it){
     closeMenus();
-    optCtx = { cid: c.id, iid: it.id, editId: null };
+    optCtx = { cid: c.id, iid: it.id, editId: null, scrollY: window.scrollY };
     resetOptForm();
     renderOptions();
     optDialog.showModal();
@@ -1078,8 +1081,14 @@
   optDialog.addEventListener("close", () => {
     const toastEl = document.getElementById("toast");
     if(toastEl.parentNode === optDialog) document.body.appendChild(toastEl);
+    // 창을 닫아도 보던 자리 그대로: 초점은 옮기되 화면은 움직이지 않게 합니다
     const pick = optCtx && catsEl.querySelector(`[data-iid="${optCtx.iid}"] .pick`);
-    if(pick) pick.focus();
+    if(pick) pick.focus({ preventScroll: true });
+    if(optCtx && optCtx.scrollY != null){
+      const y = optCtx.scrollY;
+      window.scrollTo(0, y);
+      requestAnimationFrame(() => { if(Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y); });
+    }
   });
 
   // ---- toast (with optional undo) ----
