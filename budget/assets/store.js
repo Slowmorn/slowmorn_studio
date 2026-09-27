@@ -153,7 +153,7 @@
   function save(plan){
     if(plan) plan.updatedAt = Date.now();
     clearTimeout(localTimer);
-    localTimer = setTimeout(saveLocalNow, 250);
+    localTimer = setTimeout(() => { localTimer = null; saveLocalNow(); }, 250);
     saveToAccount();
   }
 
@@ -161,8 +161,16 @@
   function saveToAccount(){
     if(mode !== "account" || !(Auth && Auth.enabled && Auth.user)) return;
     clearTimeout(cloudTimer);
-    cloudTimer = setTimeout(() => { Auth.savePlans(data.plans); }, 1500);
+    cloudTimer = setTimeout(() => { cloudTimer = null; Auth.savePlans(data.plans); }, 1500);
   }
+
+  // 탭을 닫거나 다른 앱으로 넘어갈 때: 기다리던 저장을 바로 합니다
+  function flushPending(){
+    if(localTimer){ clearTimeout(localTimer); localTimer = null; saveLocalNow(); }
+    if(cloudTimer){ clearTimeout(cloudTimer); cloudTimer = null; if(Auth && Auth.user) Auth.savePlans(data.plans); }
+  }
+  document.addEventListener("visibilitychange", () => { if(document.visibilityState === "hidden") flushPending(); });
+  window.addEventListener("pagehide", flushPending);
 
   // ---- 파일 다루기 ----
   function addPlan(tplKey){
@@ -326,7 +334,7 @@
       const localOnly = data.plans.filter(p => !byId.has(p.id));
       if(localOnly.length){ plans = mine.concat(localOnly); upload = true; }
     } else {
-      if(mode === "guest"){ clearTimeout(localTimer); saveLocalNow(); }   // 로그인 전 보드를 마저 저장
+      if(mode === "guest"){ clearTimeout(localTimer); localTimer = null; saveLocalNow(); }   // 로그인 전 보드를 마저 저장
       // 예전 방식으로 합쳐졌던 계정 파일은 로그인 전 보드에서 뺍니다
       const guest = (loadGuest().plans || []).filter(p => !byId.has(p.id));
       const moving = mine.length ? [] : guest.filter(p => !p.deletedAt && isTouched(p));
@@ -377,14 +385,14 @@
   // 로그아웃하기 전에 아직 안 올린 변경을 올립니다
   async function flushAccount(){
     if(mode !== "account" || !(Auth && Auth.user)) return;
-    clearTimeout(cloudTimer);
+    clearTimeout(cloudTimer); cloudTimer = null;
     await Auth.savePlans(data.plans);
   }
 
   // 로그아웃했을 때: 계정 사본을 지우고 로그인 전 보드로 돌아갑니다
   function leaveAccount(){
     if(mode !== "account") return false;
-    clearTimeout(localTimer); clearTimeout(cloudTimer);
+    clearTimeout(localTimer); clearTimeout(cloudTimer); localTimer = cloudTimer = null;
     try{ localStorage.removeItem(ACCT_KEY); }catch(e){}
     mode = "guest"; acctUid = null;
     const g = loadGuest();
