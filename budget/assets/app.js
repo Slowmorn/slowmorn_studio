@@ -120,31 +120,31 @@
     introEl.style.height = introEl.scrollHeight + (introEl.offsetHeight - introEl.clientHeight) + "px";
   }
 
-  function catSums(c){
-    let b = 0, a = 0;
-    c.items.forEach(i => { b += i.budget || 0; a += i.actual || 0; });
-    return { b, a };
-  }
+  const catSum = c => c.items.reduce((s, i) => s + (i.budget || 0), 0);
 
   const isGuest = p => p && p.kind === "guestbook";
   const guestCount = c => c.items.filter(i => i.name || i.budget).length;
 
   function catSumHTML(c){
-    const { b, a } = catSums(c);
+    const b = catSum(c);
     if(isGuest(state)) return `축의금 <b>${won(b)}</b>&nbsp;&nbsp;<b>${guestCount(c)}</b>명`;
-    if(!showActual) return `예산 <b>${won(b)}</b>`;
-    return `예산 <b>${won(b)}</b>&nbsp;&nbsp;지출 <b class="${a > b && b > 0 ? "over" : ""}">${won(a)}</b>`;
+    const items = c.items.filter(i => i.name || i.budget);
+    const done = items.filter(i => i.done).length;
+    return `예산 <b>${won(b)}</b><span class="cat-done">완료 <b>${done}</b> / ${items.length}</span>`;
   }
 
   const chosenOf = it => (it.options || []).find(o => o.id === it.choiceId);
   const qtyOf = it => Math.max(1, parseInt(it.qty, 10) || 1);
-  // 예산 is the item total; one unit = the chosen option's price, else 예산 ÷ 수량
+  // 가격 is the item total; one unit = the chosen option's price, else 가격 ÷ 수량
   const unitOf = it => { const o = chosenOf(it); return o && o.price ? o.price : (it.budget || 0) / qtyOf(it); };
   const unitTitle = it => qtyOf(it) > 1 && it.budget ? ` title="개당 ${won(Math.round(unitOf(it)))}"` : "";
   function pickHTML(it){
     const n = (it.options || []).length, chosen = chosenOf(it);
     // 선택지 모두 보기: 후보를 전부 늘어놓고 고른 것을 표시합니다. 칩을 누르면 바로 고르거나 풀어요.
     if(showAllOpts && n) return `<div class="picks" role="group" aria-label="선택지">
+      <button type="button" class="pick-opt pick-none${chosen ? "" : " on"}" data-none="1" aria-pressed="${!chosen}" title="선택 안 함 · 가격 0원">
+        <span class="pick-opt-name">선택 안 함</span>
+      </button>
       ${it.options.map(o => {
         const on = o.id === it.choiceId;
         return `<button type="button" class="pick-opt${on ? " on" : ""}" data-oid="${esc(o.id)}" aria-pressed="${on}" title="${esc(o.name)}${o.price ? " · " + won(o.price) : ""}${on ? " · 다시 누르면 선택이 풀려요" : ""}">
@@ -169,15 +169,13 @@
   }
 
   function rowHTML(it){
-    const over = it.budget > 0 && it.actual > it.budget;
     return `<div class="row${it.done ? " done" : ""}" data-iid="${it.id}">
       <button type="button" class="item-grip" aria-label="순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg></button>
       <label class="check"><input type="checkbox" class="done-box" ${it.done ? "checked" : ""} aria-label="완료 표시"></label>
       <input type="text" class="name" value="${esc(it.name)}" placeholder="항목 이름" aria-label="항목 이름">
       ${pickHTML(it)}
       <label class="qty"><input type="text" class="qty-in" inputmode="numeric" value="${qtyOf(it)}" aria-label="수량"><span aria-hidden="true">개</span></label>
-      <input type="text" class="money budget" inputmode="numeric" value="${plain(it.budget)}" aria-label="예산"${unitTitle(it)}>
-      <input type="text" class="money actual${over ? " over" : ""}" inputmode="numeric" value="${plain(it.actual)}" aria-label="실제 지출">
+      <input type="text" class="money budget price" value="${plain(it.budget)}" aria-label="가격 (고른 선택지의 가격 × 수량)" readonly tabindex="-1"${unitTitle(it)}>
       <button type="button" class="del-item" aria-label="항목 삭제">×</button>
     </div>`;
   }
@@ -243,7 +241,7 @@
   }));
 
   function foldLabel(c){
-    const n = c.items.filter(i => i.name || i.budget || i.actual).length;
+    const n = c.items.filter(i => i.name || i.budget).length;
     return c.collapsed ? `항목 펼치기 (${n}${isGuest(state) ? "명" : "개"})` : "항목 접기";
   }
   // Icon only; the label (with the hidden item count) goes to the tooltip and screen readers
@@ -256,6 +254,7 @@
     renderFileBar();
     renderDday();
     titleEl.value = state.title || "";
+    fitTitle();
     introEl.value = state.intro || "";
     fitIntro();
     if(!state.categories.length){
@@ -283,14 +282,14 @@
             ? `<div class="cols guest" aria-hidden="true"><span></span><span>이름</span><span class="r">축의금</span><span></span></div>
           <div class="rows">${c.items.map(guestRowHTML).join("")}</div>
           <button type="button" class="add-item">+ 이름 추가</button>`
-            : `<div class="cols" aria-hidden="true"><span></span><span></span><span>항목</span><span>선택지</span><span class="r">수량</span><span class="r">예산</span><span class="r">실제 지출</span><span></span></div>
+            : `<div class="cols" aria-hidden="true"><span></span><span></span><span>항목</span><span>선택지</span><span class="r">수량</span><span class="r">가격</span><span></span></div>
           <div class="rows">${c.items.map(rowHTML).join("")}</div>
           <button type="button" class="add-item">+ 항목 추가</button>`}
         </section>`).join("");
     }
     updateTotals();
-    // 보기 설정은 늘 있고, 카테고리 목록은 둘 이상일 때만 씁니다. 방명록에는 보기 설정이 없어요.
-    catNav.hidden = guest && state.categories.length < 2;
+    // 카테고리로 건너뛰기는 카테고리가 둘 이상일 때만 띄웁니다
+    catNav.hidden = state.categories.length < 2;
   }
 
   // ---- 카테고리로 건너뛰기 ----
@@ -310,11 +309,10 @@
     return hit ? hit.dataset.cid : null;
   }
   function renderCatNav(){
-    document.getElementById("catNavCats").hidden = state.categories.length < 2;
     const here = currentCatId();
     const guest = isGuest(state);
     catNavList.innerHTML = state.categories.map(c => {
-      const n = c.items.filter(i => i.name || i.budget || i.actual).length;
+      const n = c.items.filter(i => i.name || i.budget).length;
       return `<button type="button" data-go="${esc(c.id)}"${c.id === here ? ` aria-current="true"` : ""}>
         <span class="cat-nav-name">${esc(catLabel(c))}</span>
         <span class="cat-nav-meta">${n}${guest ? "명" : "개"}</span>
@@ -338,24 +336,22 @@
     track("category_jump", { count: state.categories.length });
   });
 
+  // 예산 합계 = 모든 항목의 가격, 지출 합계 = 체크한 항목의 가격
   function updateTotals(){
-    let b = 0, a = 0, done = 0, count = 0;
+    let b = 0, spent = 0, done = 0, count = 0;
     state.categories.forEach(c => c.items.forEach(i => {
-      b += i.budget || 0; a += i.actual || 0;
-      if(i.name || i.budget || i.actual){ count++; if(i.done) done++; }
+      b += i.budget || 0;
+      if(i.done) spent += i.budget || 0;
+      if(i.name || i.budget){ count++; if(i.done) done++; }
     }));
     const guest = isGuest(state);
     document.getElementById("tBudgetLabel").textContent = guest ? "축의금 합계" : "예산 합계";
-    document.getElementById("tDoneLabel").textContent = guest ? "인원" : "완료";
     document.getElementById("tBudget").textContent = won(b);
     document.getElementById("tBudgetMan").textContent = manwon(b);
-    document.getElementById("tActual").textContent = won(a);
-    const diff = b - a;
-    const diffEl = document.getElementById("tDiff");
-    document.getElementById("tDiffLabel").textContent = diff < 0 ? "예산 초과" : "남은 예산";
-    diffEl.textContent = won(Math.abs(diff));
-    diffEl.classList.toggle("over", diff < 0);
-    document.getElementById("tDone").textContent = guest ? `${count}명` : `${done} / ${count}`;
+    document.getElementById("tSpend").textContent = won(spent);
+    document.getElementById("tSpendMan").innerHTML = manwon(spent) || "&nbsp;";
+    document.getElementById("tPeople").textContent = `${count}명`;
+    document.getElementById("titleDone").innerHTML = guest ? "" : `완료 <b>${done}</b> / ${count}`;
     showSaved();
   }
 
@@ -363,7 +359,16 @@
   const findItem = (el, c) => c.items.find(i => i.id === el.closest(".row").dataset.iid);
 
   // ---- events ----
+  // 제목 칸은 글자만큼만 넓어지고, 완료 개수가 바로 옆에 붙어요
+  function fitTitle(){
+    const probe = fitTitle.probe || (fitTitle.probe = Object.assign(document.createElement("span"), { className: "plan-title-probe" }));
+    if(!probe.isConnected) titleEl.parentNode.appendChild(probe);
+    probe.textContent = titleEl.value || titleEl.placeholder || " ";
+    titleEl.style.width = Math.ceil(probe.getBoundingClientRect().width) + 4 + "px";
+  }
+  window.addEventListener("resize", () => fitTitle());
   titleEl.addEventListener("input", () => {
+    fitTitle();
     state.title = titleEl.value;
     fileNameEl.textContent = planLabel(state);
     save();
@@ -420,9 +425,7 @@
       t.value = plain(v);
       const pos = Math.max(0, t.value.length - fromEnd);
       try{ t.setSelectionRange(pos, pos); }catch(_){}
-      if(t.classList.contains("budget")) it.budget = v; else it.actual = v;
-      const actualEl = t.closest(".row").querySelector(".actual");
-      if(actualEl) actualEl.classList.toggle("over", it.budget > 0 && it.actual > it.budget);
+      it.budget = v; // 축의금 (예산표의 가격 칸은 읽기 전용이에요)
       t.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
     }
     updateTotals(); save();
@@ -444,7 +447,6 @@
       const b = rowEl.querySelector(".budget");
       b.value = plain(it.budget);
       if(q > 1 && it.budget) b.title = `개당 ${won(Math.round(unit || unitOf(it)))}`; else b.removeAttribute("title");
-      rowEl.querySelector(".actual").classList.toggle("over", it.budget > 0 && it.actual > it.budget);
       rowEl.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
     }
     updateTotals(); save();
@@ -460,11 +462,12 @@
     const c = findCat(t), it = findItem(t, c);
     it.done = t.checked;
     t.closest(".row").classList.toggle("done", it.done);
-    updateTotals(); save();
+    t.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
+    updateTotals(); save();   // 지출 합계는 체크한 항목의 가격이에요
   });
 
-  const newItem = () => ({ id: nid(), name: "", budget: 0, actual: 0, done: false });
-  const hasContent = i => i.name || i.budget || i.actual || (i.options && i.options.length);
+  const newItem = () => ({ id: nid(), name: "", budget: 0, done: false });
+  const hasContent = i => i.name || i.budget || (i.options && i.options.length);
   const snapshot = () => JSON.stringify(store);
   const catLabel = c => c.name || "이름 없는 카테고리";
 
@@ -503,6 +506,12 @@
     }
     if(t.classList.contains("pick-opt")){
       const it = findItem(t, c);
+      if(t.dataset.none){
+        clearChoice(it);
+        const again = catsEl.querySelector(`[data-iid="${it.id}"] .pick-none`);
+        if(again) again.focus();
+        return;
+      }
       const o = (it.options || []).find(x => x.id === t.dataset.oid);
       if(!o) return;
       chooseOption(it, o);
@@ -532,7 +541,7 @@
     }
     if(t.classList.contains("clear-money")){
       const snap = snapshot();
-      c.items.forEach(i => { i.budget = 0; i.actual = 0; i.done = false; i.choiceId = null; });
+      c.items.forEach(i => { i.budget = 0; i.done = false; i.choiceId = null; });
       render(); save();
       toast(`'${catLabel(c)}'의 금액을 지웠어요`, snap);
     }
@@ -558,7 +567,7 @@
       const c = findCat(e.target);
       const cur = findItem(e.target, c);
       const idx = c.items.indexOf(cur);
-      const it = { id: nid(), name: "", budget: 0, actual: 0, done: false };
+      const it = { id: nid(), name: "", budget: 0, done: false };
       c.items.splice(idx + 1, 0, it);
       render(); save();
       const input = catsEl.querySelector(`[data-iid="${it.id}"] .name`);
@@ -800,7 +809,7 @@
   });
 
   document.getElementById("addCat").addEventListener("click", () => {
-    const c = { id: nid(), name: "", items: [{ id: nid(), name: "", budget: 0, actual: 0, done: false }] };
+    const c = { id: nid(), name: "", items: [{ id: nid(), name: "", budget: 0, done: false }] };
     state.categories.push(c);
     render(); save();
     const input = catsEl.querySelector(`[data-cid="${c.id}"] .cat-name`);
@@ -853,25 +862,6 @@
     try{ localStorage.setItem(VIEW_KEY, b.dataset.cols); }catch(e){}
   }));
 
-  // ---- view: 실제 지출 칸 켜기/끄기 ----
-  const ACTUAL_KEY = "prep-budget-actual";
-  const actualToggle = document.getElementById("actualToggle");
-  let showActual = false;
-  function setActual(on){
-    showActual = on;
-    document.body.classList.toggle("no-actual", !on);
-    actualToggle.checked = on;
-  }
-  // 처음엔 꺼 둡니다. 한 번이라도 켰던 브라우저("on")만 켜진 채로 엽니다.
-  let startActual = false;
-  try{ startActual = localStorage.getItem(ACTUAL_KEY) === "on"; }catch(e){}
-  setActual(startActual);
-  actualToggle.addEventListener("change", () => {
-    setActual(actualToggle.checked);
-    try{ localStorage.setItem(ACTUAL_KEY, showActual ? "on" : "off"); }catch(e){}
-    render();
-  });
-
   // ---- view: 선택지 모두 보기 ----
   const ALLOPTS_KEY = "prep-budget-all-options";
   const allOptsToggle = document.getElementById("allOptsToggle");
@@ -905,19 +895,31 @@
   const ICON_EDIT = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 3l2.5 2.5L6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   const ICON_DEL = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
 
-  // 선택지를 고르거나(가격이 있으면 예산 = 가격 × 수량) 이미 고른 것을 다시 누르면 풉니다.
+  // 선택지를 고르거나(항목 가격 = 선택지 가격 × 수량) 이미 고른 것을 다시 누르면 풉니다.
+  // 항목 가격은 직접 고칠 수 없어서, 고른 선택지가 없으면 0원이에요.
   // 대화상자와 '선택지 모두 보기'의 칩이 함께 씁니다. 골랐으면 true.
+  // '선택 안 함': 고른 선택지를 풀고 가격을 0원으로
+  function clearChoice(it){
+    if(!it.choiceId) return;
+    const prev = chosenOf(it);
+    it.choiceId = null;
+    it.budget = 0;
+    render(); save();
+    toast(prev ? `'${prev.name}' 선택을 풀었어요` : "선택을 풀었어요");
+  }
+
   function chooseOption(it, o){
     if(it.choiceId === o.id){
-      it.choiceId = null; // keep the budget as it is
+      it.choiceId = null;
+      it.budget = 0;
       render(); save();
       if(!optDialog.open) toast(`'${o.name}' 선택을 풀었어요`);
       return false;
     }
     it.choiceId = o.id;
-    if(o.price) it.budget = o.price * qtyOf(it);
+    it.budget = (o.price || 0) * qtyOf(it);
     render(); save();
-    toast(!o.price ? `'${o.name}' 선택` : qtyOf(it) > 1 ? `'${o.name}' 선택 · 예산 ${won(it.budget)} (${qtyOf(it)}개)` : `'${o.name}' 선택 · 예산 ${won(it.budget)}`);
+    toast(!o.price ? `'${o.name}' 선택 · 가격이 없어서 0원이에요` : qtyOf(it) > 1 ? `'${o.name}' 선택 · 가격 ${won(it.budget)} (${qtyOf(it)}개)` : `'${o.name}' 선택 · 가격 ${won(it.budget)}`);
     return true;
   }
 
@@ -927,11 +929,19 @@
     const opts = it.options || [];
     document.getElementById("optTitle").textContent = `${it.name || "이름 없는 항목"} 선택지`;
     document.getElementById("optSub").textContent = opts.length
-      ? "하나를 고르면 이 항목의 선택지와 예산(가격 × 수량)에 들어가요. 다시 누르면 선택이 풀려요."
+      ? "하나를 고르면 이 항목의 가격(선택지 가격 × 수량)이 돼요. '선택 안 함'을 고르면 0원이에요."
       : "비교할 제품이나 업체를 추가해 보세요.";
     // 쿠팡 파트너스 고지는 이 항목에 쿠팡 링크가 있을 때만 보여요
     affNote.hidden = !opts.some(o => o.link && isCoupang(o.link));
-    optList.innerHTML = opts.length ? opts.map(o => {
+    const none = !opts.some(o => o.id === it.choiceId);
+    const noneRow = `<div class="opt opt-none${none ? " selected" : ""}" data-none="1">
+        <button type="button" class="opt-main" aria-pressed="${none}">
+          <span class="opt-radio" aria-hidden="true"></span>
+          <span class="opt-name">선택 안 함</span>
+          <span class="opt-price none">0원</span>
+        </button>
+      </div>`;
+    optList.innerHTML = opts.length ? noneRow + opts.map(o => {
       const sel = o.id === it.choiceId;
       const host = o.link ? hostOf(o.link) : "";
       return `<div class="opt${sel ? " selected" : ""}" data-oid="${o.id}">
@@ -971,6 +981,10 @@
     const row = e.target.closest(".opt");
     if(!row) return;
     const it = optItem();
+    if(row.dataset.none){
+      if(e.target.closest(".opt-main")){ clearChoice(it); optDialog.close(); }
+      return;
+    }
     const o = (it.options || []).find(x => x.id === row.dataset.oid);
     if(!o) return;
     if(e.target.closest("a.opt-tool")){ // 참고·제휴 링크를 열었을 때
@@ -993,7 +1007,7 @@
     } else if(e.target.closest(".opt-del")){
       const snap = snapshot();
       it.options = it.options.filter(x => x !== o);
-      if(it.choiceId === o.id) it.choiceId = null;
+      if(it.choiceId === o.id){ it.choiceId = null; it.budget = 0; }
       if(optCtx.editId === o.id) resetOptForm();
       render(); save(); renderOptions();
       toast(`'${o.name}' 선택지를 지웠어요`, snap);
@@ -1021,9 +1035,13 @@
     const editing = optCtx.editId && it.options.find(x => x.id === optCtx.editId);
     if(editing){
       Object.assign(editing, { name, link, price, note });
-      if(it.choiceId === editing.id && price) it.budget = price * qtyOf(it); // keep the chosen price and budget in sync
+      if(it.choiceId === editing.id) it.budget = price * qtyOf(it); // keep the chosen price and the item price in sync
     } else {
-      it.options.push({ id: nid(), name, link, price, note });
+      const first = !it.options.length;
+      const o = { id: nid(), name, link, price, note };
+      it.options.push(o);
+      // 첫 선택지는 바로 골라 둡니다. 이미 선택지가 있으면 지금 고른 것(또는 선택 안 함)을 그대로 둬요.
+      if(first){ it.choiceId = o.id; it.budget = price * qtyOf(it); }
     }
     render(); save();
     resetOptForm(); renderOptions();
@@ -1100,18 +1118,19 @@
   const XL2 = n => String.fromCharCode(64 + n); // column letter by index
 
   // Plan sheet columns, in the same order as the screen
-  const XC = { name: 1, pick: 2, qty: 3, budget: 4, actual: 5, diff: 6, done: 7, link: 8 };
-  const XHEAD = ["항목", "선택지", "수량", "예산", "실제 지출", "차액", "완료", "링크"];
+  // 지출 = 완료(✓)한 항목의 가격. 엑셀에서 체크를 바꿔도 따라 바뀌어요.
+  const XC = { name: 1, pick: 2, qty: 3, budget: 4, spend: 5, done: 6, link: 7 };
+  const XHEAD = ["항목", "선택지", "수량", "가격", "지출", "완료", "링크"];
   const XL = key => String.fromCharCode(64 + XC[key]); // column letter
-  const isMoneyCol = n => n === XC.budget || n === XC.actual || n === XC.diff;
+  const isMoneyCol = n => n === XC.budget || n === XC.spend;
 
   // One budget → one sheet. Grand total sits in row 4.
   // links (optional): { sheet, ranges: Map(item → { first, last }), itemRows: Map(item → row) }
-  // Items with options get a 선택지 dropdown and a 예산 formula (price of the picked option × 수량).
+  // Items with options get a 선택지 dropdown and a 가격 formula (price of the picked option × 수량).
   function addPlanSheet(wb, plan, sheetName, links){
     const ws = wb.addWorksheet(sheetName, { views: [{ state: "frozen", ySplit: 4, showGridLines: false }] });
     const NC = XHEAD.length;
-    ws.columns = [{ width: 28 }, { width: 22 }, { width: 8 }, { width: 16 }, { width: 16 }, { width: 16 }, { width: 8 }, { width: 26 }];
+    ws.columns = [{ width: 28 }, { width: 22 }, { width: 8 }, { width: 16 }, { width: 16 }, { width: 8 }, { width: 26 }];
     ws.pageSetup = { paperSize: 9, orientation: "portrait", fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
     const eachCol = (row, fn) => { for(let n = 1; n <= NC; n++) fn(row.getCell(n), n); };
     const theme = accentXL(plan.accent);
@@ -1166,8 +1185,7 @@
         if(chosen) row.getCell(XC.pick).value = chosen.name;
         row.getCell(XC.qty).value = qtyOf(it);
         row.getCell(XC.budget).value = it.budget || 0;
-        row.getCell(XC.actual).value = it.actual || 0;
-        row.getCell(XC.diff).value = { formula: `${XL("budget")}${r}-${XL("actual")}${r}` };
+        row.getCell(XC.spend).value = { formula: `IF(${XL("done")}${r}="✓",${XL("budget")}${r},0)`, result: it.done ? (it.budget || 0) : 0 };
         row.getCell(XC.done).value = it.done ? "✓" : "";
         if(chosen && chosen.link) row.getCell(XC.link).value = { text: hostOf(chosen.link) || chosen.link, hyperlink: chosen.link };
         const range = links && links.ranges.get(it);
@@ -1180,7 +1198,7 @@
             type: "list", allowBlank: true, formulae: [names],
             showErrorMessage: true, errorStyle: "warning", errorTitle: "선택지", error: "선택지 시트의 이 항목 칸에 있는 이름을 골라 주세요. 새로 적으면 목록에 바로 나타나요."
           };
-          // A budget typed by hand (not price × 수량) stays as typed; otherwise it follows the dropdown.
+          // A price that isn't price × 수량 (older files) stays as it is; otherwise it follows the dropdown.
           const followsPick = !chosen || !chosen.price || it.budget === chosen.price * qtyOf(it);
           if(followsPick){
             const keep = it.budget || 0; // used when the dropdown is emptied or the name isn't found
@@ -1212,11 +1230,10 @@
       sub.getCell(1).value = `${c.name} 소계`;
       if(end >= start){
         sub.getCell(XC.budget).value = { formula: `SUM(${XL("budget")}${start}:${XL("budget")}${end})` };
-        sub.getCell(XC.actual).value = { formula: `SUM(${XL("actual")}${start}:${XL("actual")}${end})` };
+        sub.getCell(XC.spend).value = { formula: `SUM(${XL("spend")}${start}:${XL("spend")}${end})` };
       } else {
-        sub.getCell(XC.budget).value = 0; sub.getCell(XC.actual).value = 0;
+        sub.getCell(XC.budget).value = 0; sub.getCell(XC.spend).value = 0;
       }
-      sub.getCell(XC.diff).value = { formula: `${XL("budget")}${r}-${XL("actual")}${r}` };
       sub.height = 22;
       eachCol(sub, (cell, n) => {
         cell.fill = solid(soft);
@@ -1237,8 +1254,7 @@
     total.getCell(1).value = "전체 합계";
     const sumOf = col => subRows.length ? { formula: subRows.map(s => `${col}${s.row}`).join("+") } : 0;
     total.getCell(XC.budget).value = sumOf(XL("budget"));
-    total.getCell(XC.actual).value = sumOf(XL("actual"));
-    total.getCell(XC.diff).value = { formula: `${XL("budget")}4-${XL("actual")}4` };
+    total.getCell(XC.spend).value = sumOf(XL("spend"));
     total.height = 26;
     eachCol(total, (cell, n) => {
       cell.fill = solid(theme.soft);
@@ -1252,13 +1268,13 @@
   }
 
   // Summary table: one colored line per entry, amounts live-linked to other sheets
-  // rows: [{ name, count, budgetRef, actualRef, strong, soft, text? }]
+  // rows: [{ name, count, budgetRef, spendRef, strong, soft, text? }]
   const addSummarySheet = (wb, sheetName) => wb.addWorksheet(sheetName, { views: [{ showGridLines: false }] });
   function fillSummarySheet(ss, firstCol, rows, theme){
     if(theme) ss.properties.tabColor = { argb: theme.fill };
     ss.columns = [{ width: 26 }, { width: 10 }, { width: 16 }, { width: 16 }, { width: 16 }, { width: 10 }];
     const sh = ss.getRow(1);
-    sh.values = [firstCol, "항목 수", "예산", "실제 지출", "차액", "사용률"];
+    sh.values = [firstCol, "항목 수", "가격", "지출", "남은 금액", "지출 비율"];
     sh.height = 24;
     sh.eachCell(cell => {
       cell.font = { bold: true, color: { argb: theme ? theme.on : "FFFFFFFF" } };
@@ -1271,7 +1287,7 @@
       row.getCell(1).value = s.name;
       row.getCell(2).value = s.count;
       row.getCell(3).value = { formula: s.budgetRef };
-      row.getCell(4).value = { formula: s.actualRef };
+      row.getCell(4).value = { formula: s.spendRef };
       row.getCell(5).value = { formula: `C${n}-D${n}` };
       row.getCell(6).value = { formula: `IF(C${n}=0,"",D${n}/C${n})` };
       row.height = 22;
@@ -1544,7 +1560,7 @@
       const { subRows } = addPlanSheet(wb, state, sheet, links);
       fillSummarySheet(addSummarySheet(wb, "요약"), "카테고리", subRows.map(s => ({
         name: s.name, count: s.count, strong: s.strong, soft: s.soft, text: s.text,
-        budgetRef: sheetRef(sheet, `${XL("budget")}${s.row}`), actualRef: sheetRef(sheet, `${XL("actual")}${s.row}`)
+        budgetRef: sheetRef(sheet, `${XL("budget")}${s.row}`), spendRef: sheetRef(sheet, `${XL("spend")}${s.row}`)
       })), accentXL(state.accent));
       addOptionSheet(wb, "선택지", layout, links.itemRows, accentXL(state.accent));
     }
@@ -1616,7 +1632,7 @@
 
   // Columns are found by header name, so every export version (with or without 선택지/수량) reads the same way.
   // "old" = first version, where 카테고리 had its own column instead of band rows.
-  const HEAD_KEYS = { "이름": "name", "축의금": "budget", "카테고리": "cat", "항목": "name", "선택지": "pick", "수량": "qty", "예산": "budget", "실제 지출": "actual", "완료": "done", "링크": "link" };
+  const HEAD_KEYS = { "이름": "name", "축의금": "budget", "카테고리": "cat", "항목": "name", "선택지": "pick", "수량": "qty", "예산": "budget", "가격": "budget", "실제 지출": "actual", "지출": "spend", "완료": "done", "링크": "link" };
 
   function parsePlanSheet(ws){
     for(let h = 1; h <= 10; h++){
@@ -1628,7 +1644,7 @@
       }
       const guestHead = cellText(row.getCell(1).value) === "이름" && cellText(row.getCell(2).value) === "축의금";
       if(guestHead) return Object.assign(readRows(ws, h, "now", { name: 1, budget: 2 }), { kind: "guestbook" });
-      if(!(col.name && col.budget && col.actual)) continue;
+      if(!(col.name && col.budget && (col.actual || col.spend || col.done))) continue;
       if(col.cat === 1 && col.name === 2) return readRows(ws, h, "old", col);
       if(col.name === 1) return readRows(ws, h, "now", col);
     }
@@ -1662,7 +1678,7 @@
       const row = ws.getRow(r);
       const v = n => n ? row.getCell(n).value : null;
       const name = cellText(v(col.name));
-      const budget = cellMoney(v(col.budget)), actual = cellMoney(v(col.actual));
+      const budget = cellMoney(v(col.budget)), actual = col.actual ? cellMoney(v(col.actual)) : 0;
 
       if(format === "now"){
         if(name === "전체 합계") continue;
@@ -1681,7 +1697,7 @@
 
       if(!name && !budget && !actual) continue;
       if(!cur) openCat("기타");
-      const item = { id: nid(), name, budget, actual, done: col.done ? cellDone(v(col.done)) : false };
+      const item = { id: nid(), name, budget, done: col.done ? cellDone(v(col.done)) : false };
       const qty = col.qty ? parseInt(cellText(v(col.qty)).replace(/[^\d]/g, ""), 10) : 0;
       if(qty > 1) item.qty = Math.min(qty, 9999);
       const pickName = col.pick ? cellText(v(col.pick)) : "";

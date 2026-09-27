@@ -35,6 +35,17 @@ body[data-cols="4"]{--wrap:1640px}
   border-bottom:1px dashed transparent;
 }
 .plan-title:hover{border-bottom-color:var(--line)}
+/* 제목 줄: 이름 오른쪽에 완료 개수 */
+.title-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 14px;position:relative}
+.title-row .plan-title{flex:0 1 auto;width:auto;max-width:100%;min-width:2ch}
+/* 제목 글자 폭을 재는 보이지 않는 자 (plan-title 과 같은 글꼴) */
+.plan-title-probe{
+  position:absolute;visibility:hidden;white-space:pre;left:0;top:0;pointer-events:none;
+  font-weight:700;letter-spacing:-0.02em;font-size:clamp(28px,5vw,40px);line-height:1.2;
+}
+.title-done{flex:none;color:var(--muted);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.title-done:empty{display:none}
+.title-done b{color:var(--ink);font-weight:700}
 .plan-title:focus{outline:none;border-bottom-color:var(--accent)}
 /* 설명: 제목과 같은 방식으로 그 자리에서 고쳐 쓰는 칸 */
 .intro{
@@ -231,6 +242,7 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 .cat-name:focus{outline:none;border-bottom-color:var(--accent)}
 .cat-sum{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .cat-sum b{color:var(--ink);font-weight:600}
+.cat-done{margin-left:12px}
 .cat-sum .over{color:var(--warn)}
 
 /* Category menu */
@@ -246,7 +258,7 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 
 .cols,.row{
   display:grid;
-  grid-template-columns:18px 28px minmax(0,1.2fr) minmax(0,1fr) 72px 128px 128px 32px;
+  grid-template-columns:18px 28px minmax(0,1.2fr) minmax(0,1fr) 72px 128px 32px;
   gap:8px;align-items:center;
 }
 .cols{font-size:12.5px;color:var(--muted);padding:6px 0 4px;border-bottom:1px solid var(--line)}
@@ -263,7 +275,9 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 .row .money{text-align:right;font-variant-numeric:tabular-nums}
 /* 끝낸 항목: 빗금 대신 이름을 더 진하고 굵게 */
 .row.done .name{color:var(--ink-strong, var(--ink));font-weight:600}
-.row .actual.over{color:var(--warn)}
+/* 가격: 고른 선택지 가격 × 수량. 직접 고치지 않아요 */
+.row input.price{cursor:default;color:var(--ink)}
+.row input.price:hover,.row input.price:focus{border-color:transparent;background:transparent}
 
 /* 수량 */
 .qty{display:flex;align-items:center;min-width:0;border:1px solid transparent;border-radius:6px;padding-right:8px;cursor:text}
@@ -277,15 +291,10 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 .cols.guest,.row.guest{grid-template-columns:18px minmax(0,1fr) 160px 32px}
 .row.guest .name{padding-left:10px}
 .cols.guest span:nth-child(2){padding-left:10px}
-body.kind-guestbook .t-actual,body.kind-guestbook .t-diff{display:none}
+/* 합계 바: 예산표는 예산·지출 합계, 방명록은 축의금 합계와 인원 */
+body.kind-guestbook .t-spend{display:none}
+body:not(.kind-guestbook) .t-people{display:none}
 
-/* 실제 지출 칸을 끈 상태: 예산만 적는 모드 */
-body.no-actual .cols:not(.guest),body.no-actual .row:not(.guest){
-  grid-template-columns:18px 28px minmax(0,1.2fr) minmax(0,1fr) 72px 128px 32px;
-}
-body.no-actual .row:not(.guest) .actual,
-body.no-actual .cols:not(.guest) span:nth-child(7){display:none}
-body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 
 /* Fold a category's items */
 .fold-btn{
@@ -353,6 +362,8 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
 }
 .opt-x:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
 .opt-list{overflow-y:auto;padding:4px 20px 8px;display:flex;flex-direction:column;gap:8px;min-height:0}
+/* '선택 안 함': 늘 맨 위에 있는 빈 선택 */
+.opt-none:not(.selected) .opt-name,.pick-none:not(.on) .pick-opt-name{color:var(--muted)}
 .opt-empty{color:var(--muted);font-size:14px;text-align:center;padding:22px 12px;border:1.5px dashed var(--line);border-radius:10px}
 .opt{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:10px;padding:4px}
 .opt.selected{border-color:var(--accent-fill);background:var(--accent-soft)}
@@ -475,7 +486,7 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   .cols.guest,.row.guest{grid-template-columns:18px minmax(0,1fr) 120px 32px}
   .row:not(.guest){
     grid-template-columns:18px 28px 1fr 1fr 64px;
-    grid-template-areas:"g c n n d" ". . o o q" ". . b a .";
+    grid-template-areas:"g c n n d" ". . o o q" ". . b b .";
     row-gap:2px;
   }
   .row:not(.guest) .item-grip{grid-area:g}
@@ -483,14 +494,11 @@ body.no-actual .t-actual,body.no-actual .t-diff{display:none}
   .row:not(.guest) .name{grid-area:n}
   .row:not(.guest) .del-item{grid-area:d}
   .row:not(.guest) .budget{grid-area:b}
-  .row:not(.guest) .actual{grid-area:a}
   .row:not(.guest) .pick{grid-area:o;height:30px}
   .row:not(.guest) .picks{grid-area:o}
   .row:not(.guest) .picks .pick{height:auto}
   .row:not(.guest) .qty{grid-area:q}
   .row:not(.guest) .del-item{justify-self:end}
-  body.no-actual .cols:not(.guest),body.no-actual .row:not(.guest){grid-template-columns:18px 28px 1fr 1fr 64px}
-  body.no-actual .row:not(.guest){grid-template-areas:"g c n n d" ". . o o q" ". . b b .";}
   .row{padding:4px 0}
   .row input[type="text"]{padding:5px 8px}
 }
@@ -566,12 +574,6 @@ body:has(#planner) .toast{bottom:120px}
 }
 @keyframes cat-nav-in{from{opacity:0;transform:translateY(6px) scale(.97)}}
 .cat-nav-title{color:var(--muted);font-size:12px;font-weight:600;padding:8px 12px 6px}
-.cat-nav-opts{display:flex;flex-direction:column;padding:4px 0}
-.cat-nav-opts .opt-toggle{padding:8px 12px;border-radius:11px;color:var(--ink)}
-.cat-nav-opts .opt-toggle:hover{background:rgba(55,53,47,.06)}
-body.kind-guestbook .cat-nav-opts,body.kind-guestbook .cat-nav-sep{display:none}
-.cat-nav-cats[hidden]{display:none}
-.cat-nav-sep{border:0;border-top:1px solid rgba(55,53,47,.1);margin:4px 8px}
 .cat-nav-pop button{
   display:flex;align-items:center;gap:10px;width:100%;
   border:0;background:none;color:var(--ink);text-align:left;
