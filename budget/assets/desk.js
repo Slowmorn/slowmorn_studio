@@ -57,18 +57,6 @@
     return ((h / 1000) * 3.4 - 1.7).toFixed(2);
   }
 
-  function when(ts){
-    if(!ts) return "";
-    const day = 86400000;
-    const d0 = new Date(ts); d0.setHours(0, 0, 0, 0);
-    const now = new Date(); now.setHours(0, 0, 0, 0);
-    const gap = Math.round((now - d0) / day);
-    if(gap <= 0) return "오늘";
-    if(gap === 1) return "어제";
-    if(gap < 7) return gap + "일 전";
-    return new Date(ts).toLocaleDateString("ko-KR", { month: "long", day: "numeric" });
-  }
-
   // ---- 알림 한 줄 ----
   const toastEl = document.getElementById("toast");
   let toastTimer = null;
@@ -151,9 +139,7 @@
     const { budget, count } = BS.summary(p);
     const pr = BS.progress(p);
     const title = BS.planLabel(p);
-    const meta = guest
-      ? `${count}명 · ${when(p.updatedAt)}`
-      : `${manwon(budget)} · ${when(p.updatedAt)}`;
+    const meta = guest ? `${count}명` : `예산 ${manwon(budget)}`;
     const style = `--tilt:${tilt(p.id)}deg` + (at ? `;left:${at.x}px;top:${at.y}px` : "");
     return `<div class="file" data-id="${esc(p.id)}" data-accent="${esc(p.accent || "green")}" style="${style}">
       <a class="file-open" href="planner/?id=${encodeURIComponent(p.id)}">
