@@ -261,7 +261,8 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 .row input[type="text"]:hover{border-color:var(--line)}
 .row input[type="text"]:focus{outline:none;border-color:var(--muted);background:var(--paper)}
 .row .money{text-align:right;font-variant-numeric:tabular-nums}
-.row.done .name{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--muted)}
+/* 끝낸 항목: 빗금 대신 이름을 더 진하고 굵게 */
+.row.done .name{color:var(--ink-strong, var(--ink));font-weight:600}
 .row .actual.over{color:var(--warn)}
 
 /* 수량 */
