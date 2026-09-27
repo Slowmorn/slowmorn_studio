@@ -258,7 +258,7 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 
 .cols,.row{
   display:grid;
-  grid-template-columns:18px 28px minmax(0,1.2fr) minmax(0,1fr) 72px 128px 32px;
+  grid-template-columns:18px 28px minmax(0,1.2fr) minmax(0,1fr) 72px 118px 118px 32px;
   gap:8px;align-items:center;
 }
 .cols{font-size:12.5px;color:var(--muted);padding:6px 0 4px;border-bottom:1px solid var(--line)}
@@ -461,7 +461,7 @@ body:not(.kind-guestbook) .t-people{display:none}
 .t-main .t-label,.t-small .t-label{font-size:12.5px;color:var(--muted)}
 .t-main .t-num{
   font-weight:700;
-  font-size:clamp(24px,4vw,31px);line-height:1.15;
+  font-size:clamp(20px,3.2vw,25px);line-height:1.15;   /* 1억 단위(123,456,789원)까지 두 개가 나란히 들어가게 */
   font-variant-numeric:tabular-nums;letter-spacing:-0.025em;
 }
 .t-main .t-man{font-size:13px;color:var(--muted)}
@@ -486,7 +486,7 @@ body:not(.kind-guestbook) .t-people{display:none}
   .cols.guest,.row.guest{grid-template-columns:18px minmax(0,1fr) 120px 32px}
   .row:not(.guest){
     grid-template-columns:18px 28px 1fr 1fr 64px;
-    grid-template-areas:"g c n n d" ". . o o q" ". . b b .";
+    grid-template-areas:"g c n n d" ". . o o q" ". . b a .";
     row-gap:2px;
   }
   .row:not(.guest) .item-grip{grid-area:g}
@@ -494,6 +494,7 @@ body:not(.kind-guestbook) .t-people{display:none}
   .row:not(.guest) .name{grid-area:n}
   .row:not(.guest) .del-item{grid-area:d}
   .row:not(.guest) .budget{grid-area:b}
+  .row:not(.guest) .actual{grid-area:a}
   .row:not(.guest) .pick{grid-area:o;height:30px}
   .row:not(.guest) .picks{grid-area:o}
   .row:not(.guest) .picks .pick{height:auto}
