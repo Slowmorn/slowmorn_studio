@@ -216,6 +216,11 @@ main ol,main ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-heig
 }
 .file.dragging{z-index:5}
 .file-ico{grid-row:1 / span 2;width:40px;height:40px}
+/* 제목 이모지가 있으면 색 모양 위에 얹습니다 */
+.file-ico-emoji{display:grid;place-items:center}
+.file-ico-emoji > *{grid-area:1 / 1}
+.file-ico-emoji .file-ico{width:40px;height:40px}
+.file-emoji{font-size:22px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
 .file-name{grid-column:2 / span 2;font-weight:600;font-size:14.5px;align-self:end;
   overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .file-meta{grid-column:2 / span 2;color:var(--muted);font-size:12px;align-self:start}

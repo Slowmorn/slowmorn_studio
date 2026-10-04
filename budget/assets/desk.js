@@ -143,7 +143,7 @@
     const style = `--tilt:${tilt(p.id)}deg` + (at ? `;left:${at.x}px;top:${at.y}px` : "");
     return `<div class="file" data-id="${esc(p.id)}" data-accent="${esc(p.accent || "green")}" style="${style}">
       <a class="file-open" href="planner/?id=${encodeURIComponent(p.id)}">
-        ${fileIcon(p.accent)}
+        ${p.icon ? `<span class="file-ico file-ico-emoji">${fileIcon(p.accent)}<span class="file-emoji" aria-hidden="true">${esc(p.icon)}</span></span>` : fileIcon(p.accent)}
         <span class="file-name">${esc(title)}</span>
         <span class="file-meta">${esc(meta)}</span>
         ${guest || !pr.total ? "" : `<span class="file-progress" aria-label="${pr.done}/${pr.total} 완료">
