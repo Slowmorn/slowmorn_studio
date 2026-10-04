@@ -113,13 +113,6 @@
     else t.removeAttribute("title");
   });
   const titleEl = document.getElementById("planTitle");
-  const introEl = document.getElementById("planIntro");
-  // The description box grows with its text instead of scrolling
-  function fitIntro(){
-    introEl.style.height = "auto";
-    // scrollHeight excludes the borders, so add whatever they take up
-    introEl.style.height = introEl.scrollHeight + (introEl.offsetHeight - introEl.clientHeight) + "px";
-  }
 
   const catSum = c => c.items.reduce((s, i) => s + (i.budget || 0), 0);
 
@@ -275,8 +268,6 @@
     titleEl.value = state.title || "";
     renderEmoji();
     fitTitle();
-    introEl.value = state.intro || "";
-    fitIntro();
     if(!state.categories.length){
       catsEl.innerHTML = `<div class="empty">카테고리가 없어요. 오른쪽 아래의 '카테고리 추가'를 누르거나 위의 템플릿을 불러오세요.</div>`;
     } else {
@@ -309,7 +300,22 @@
     if(Math.abs(window.scrollY - keepY) > 1) window.scrollTo(0, keepY);
     updateTotals();
     if(navOpen) renderCatNav();
+    renderHello();
   }
+
+  // ---- 설명 말풍선 ----
+  // 템플릿에서 들어온 설명글(state.intro)을 제목 오른쪽의 캐릭터가 말풍선으로 보여 줘요 (닫으면 helloSeen)
+  function renderHello(){
+    const el = document.getElementById("hello");
+    const msg = state.helloSeen ? "" : (state.intro || "").trim();
+    el.hidden = !msg;
+    if(msg) document.getElementById("helloText").textContent = msg;
+  }
+  document.getElementById("helloClose").addEventListener("click", () => {
+    state.helloSeen = true;
+    save();
+    renderHello();
+  });
 
   // ---- 카테고리 내비게이션 ----
   // 합계 바 위에 떠 있습니다. 동그란 단추로만 열고 닫아요 (다른 곳을 눌러도 닫히지 않습니다).
@@ -634,14 +640,6 @@
     fileNameEl.textContent = planLabel(state);
     save();
   });
-  introEl.addEventListener("input", () => {
-    state.intro = introEl.value;
-    fitIntro();
-    save();
-  });
-  window.addEventListener("resize", fitIntro);
-  // The webfont lands after the first render and rewraps the text, so measure again
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitIntro);
 
   // ---- 파일 바꾸기 ----
   // 주소에 어떤 파일인지 남겨 둡니다. 새로고침하거나 링크를 저장해도 같은 파일이 열려요.
