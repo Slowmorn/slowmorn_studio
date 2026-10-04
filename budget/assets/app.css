@@ -1,12 +1,11 @@
 /* 예산표 앱 스타일 — assets/base.css 다음에 읽습니다 */
-body{padding-bottom:150px} /* 화면 아래 고정된 합계 바 자리 */
-body{--wrap:860px}
-body[data-cols="2"]{--wrap:1240px}
+body{padding-bottom:calc(var(--totals-h, 88px) + 116px)} /* 합계 바와 그 위에 뜬 카테고리 단추 자리 */
+body{--wrap:1240px}  /* 1열도 2열과 같은 폭 */
 body[data-cols="4"]{--wrap:1640px}
 .wrap{max-width:var(--wrap);margin:0 auto;padding:20px 20px 0;scroll-margin-top:12px}
 
 /* 파일 줄 — 내 책상 / 파일이름 ∨ */
-.file-bar{display:flex;align-items:center;gap:6px;margin-bottom:22px;font-size:14px}
+.file-bar{display:flex;align-items:center;gap:6px;margin-bottom:14px;font-size:14px}
 .back-desk{
   display:inline-flex;align-items:center;gap:3px;color:var(--muted);text-decoration:none;
   padding:5px 9px 5px 5px;border-radius:var(--radius);flex:none;
@@ -43,6 +42,34 @@ body[data-cols="4"]{--wrap:1640px}
   position:absolute;visibility:hidden;white-space:pre;left:0;top:0;pointer-events:none;
   font-weight:700;letter-spacing:-0.02em;font-size:clamp(28px,5vw,40px);line-height:1.2;
 }
+/* 제목 왼쪽 이모지. 없을 때는 흐린 웃는 얼굴 단추만 */
+.emoji-menu{position:relative;flex:none;align-self:center}
+.emoji-btn{
+  list-style:none;cursor:pointer;user-select:none;
+  display:grid;place-items:center;min-width:44px;height:48px;padding:0 2px;border-radius:10px;
+  color:var(--muted);
+}
+.emoji-btn::-webkit-details-marker{display:none}
+.emoji-btn:hover,.emoji-menu[open] .emoji-btn{background:var(--hover)}
+.emoji-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.emoji-ph{width:26px;height:26px;opacity:.45}
+.emoji-btn:hover .emoji-ph{opacity:.8}
+.emoji-val{font-size:clamp(28px,4.6vw,38px);line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+.emoji-menu.has-emoji .emoji-ph{display:none}
+.emoji-menu:not(.has-emoji) .emoji-val{display:none}
+.title-row:has(.emoji-menu){gap:0 10px}
+.title-row:has(.emoji-menu[open]){z-index:8}
+.emoji-pop{left:0;right:auto;width:min(316px, calc(100vw - 32px));padding:8px}
+.emoji-grid{display:grid;grid-template-columns:repeat(8, 1fr);gap:2px}
+.menu-pop .emoji-opt{
+  aspect-ratio:1;width:auto;border:0;border-radius:8px;background:none;padding:0;
+  font-size:22px;line-height:1;display:grid;place-items:center;
+  font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+}
+.menu-pop .emoji-opt:hover{background:var(--hover)}
+.menu-pop .emoji-opt[aria-pressed="true"]{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent-fill)}
+.menu-pop .emoji-clear{margin-top:6px;width:100%;color:var(--muted);font-size:13px;text-align:center}
+.emoji-clear[hidden]{display:none}
 .title-done{flex:none;color:var(--muted);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .title-done:empty{display:none}
 .title-done b{color:var(--ink);font-weight:700}
@@ -57,9 +84,9 @@ body[data-cols="4"]{--wrap:1640px}
 .intro:hover{border-bottom-color:var(--line)}
 .intro:focus{outline:none;border-bottom-color:var(--muted)}
 .intro::placeholder{color:var(--muted)}
-.intro{margin-bottom:22px}
+.intro{margin-bottom:14px}
 
-.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;margin-bottom:28px}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 24px;margin-bottom:16px}
 .view-opts{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
 .opt-toggle{display:inline-flex;align-items:center;gap:9px;color:var(--muted);font-size:14px;cursor:pointer}
 .opt-toggle:hover{color:var(--ink)}
@@ -158,7 +185,7 @@ body.kind-guestbook .opt-toggle{display:none}
      여기서는 제목·도구 모음과 왼쪽 끝을 맞춰야 하므로 되돌립니다. */
   max-width:none;margin:0;padding:0;
   display:grid;grid-template-columns:repeat(var(--cols,1),minmax(0,1fr));
-  gap:18px;align-items:start;
+  gap:12px;align-items:start;
 }
 body[data-cols="2"] #cats{--cols:2}
 body[data-cols="4"] #cats{--cols:4}
@@ -171,40 +198,22 @@ body[data-cols="4"] #cats{--cols:4}
   background:var(--sheet);
   border:1px solid var(--line);
   border-radius:10px;
-  padding:18px 20px 12px;
+  padding:10px 16px 6px;
 }
 .cat:has(.cat-menu[open]){z-index:3}
 .toolbar{position:relative;z-index:4}
 /* 메뉴를 펼친 동안은 합계 바(5)와 떠 있는 단추(6) 위로 올려, 템플릿 목록 끝의 '엑셀 불러오기'가 가려지지 않게 합니다 */
 .toolbar:has(details[open]){z-index:7}
-/* 1줄: 손잡이 · 이름 · 접기   2줄: 손잡이 · 예산/지출 · ⋯ 메뉴 */
+/* 1줄: 이름 · 접기   2줄: 예산/완료 · ⋯ 메뉴 */
 .cat-head{
-  display:grid;grid-template-columns:20px minmax(0,1fr) auto;
-  grid-template-areas:"grip name fold" ".    sum  menu";
-  align-items:center;column-gap:8px;margin-bottom:6px;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;
+  grid-template-areas:"name fold" "sum menu";
+  align-items:center;column-gap:6px;margin-bottom:2px;
 }
-.cat-head .cat-grip{grid-area:grip}
 .cat-head .cat-name{grid-area:name}
 .cat-head .fold-btn{grid-area:fold}
 .cat-head .cat-sum{grid-area:sum}
 .cat-head .cat-menu{grid-area:menu}
-/* 카테고리 순서 바꾸기 손잡이. 카드 안, 이름 왼쪽에 둡니다.
-   예전에는 카드 밖으로 튀어나온 색 탭이었는데 항목 손잡이와 따로 놀았습니다. */
-.cat-grip{
-  width:20px;height:28px;padding:0;border:0;border-radius:5px;background:none;
-  color:var(--swatch, var(--accent-fill));   /* 이 파일의 색이 남는 유일한 자리 */
-  display:grid;place-items:center;cursor:grab;opacity:.75;
-  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
-}
-.cat-grip svg{width:9px;height:17px}
-.cat:hover .cat-grip,.cat-grip:focus-visible{opacity:1}
-.cat-grip:hover{background:var(--hover)}
-.cat-grip:active{cursor:grabbing;background:var(--hover-strong)}
-@media (hover:none){.cat-grip{opacity:1}}
-#cats.sorting .cols,#cats.sorting .rows,#cats.sorting .add-item{display:none}
-#cats.sorting .cat{padding-bottom:12px}
-#cats.sorting .cat-head{margin-bottom:0}
-#cats{position:relative} /* offsets of cards are measured against the grid */
 .item-grip{
   width:18px;height:28px;padding:0;border:0;border-radius:5px;background:none;color:var(--muted);
   display:grid;place-items:center;cursor:grab;opacity:.55;
@@ -222,19 +231,10 @@ body[data-cols="4"] #cats{--cols:4}
   border:2px dashed color-mix(in srgb, var(--accent-fill) 70%, transparent);border-radius:8px;
   background:color-mix(in srgb, var(--accent-soft) 60%, transparent);margin:2px 0;
 }
-.cat.dragging{
-  z-index:30;box-shadow:0 18px 40px rgba(15,20,30,.22);
-  outline:2px solid var(--accent-fill);outline-offset:-1px;
-  transform:scale(1.02);pointer-events:none;
-}
-.cat-slot{
-  border:2px dashed color-mix(in srgb, var(--accent-fill) 70%, transparent);border-radius:10px;
-  background:color-mix(in srgb, var(--accent-soft) 60%, transparent);
-}
-body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-webkit-user-select:none}
+body.is-sorting,body.is-sorting *,body.nav-sorting,body.nav-sorting *{cursor:grabbing !important;user-select:none;-webkit-user-select:none}
 .cat-name{
   flex:1 1 160px;min-width:0;
-  font-weight:700;letter-spacing:-0.02em;font-size:21px;
+  font-weight:700;letter-spacing:-0.02em;font-size:18px;
   border:0;background:transparent;padding:2px 0;
   border-bottom:1px dashed transparent;
 }
@@ -249,41 +249,48 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 .cat-menu{position:relative}
 .cat-menu summary{
   list-style:none;cursor:pointer;
-  width:32px;height:32px;border-radius:6px;
+  width:28px;height:28px;border-radius:6px;
   display:grid;place-items:center;color:var(--muted);
 }
 .cat-menu summary::-webkit-details-marker{display:none}
 .cat-menu summary:hover,.cat-menu[open] summary{background:var(--hover);color:var(--ink)}
 .cat-menu summary svg{width:18px;height:18px}
 
+/* 손잡이 · 체크 · 항목 · 메모 · 선택지 · 수량 · 금액 · [지출] · × */
 .cols,.row{
   display:grid;
-  grid-template-columns:18px 28px minmax(0,1.2fr) minmax(0,1fr) 72px 118px 118px 32px;
-  gap:8px;align-items:center;
+  grid-template-columns:18px 24px minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr) 60px 104px 28px;
+  gap:6px;align-items:center;
 }
-.cols{font-size:12.5px;color:var(--muted);padding:6px 0 4px;border-bottom:1px solid var(--line)}
-.cols .r{text-align:right;padding-right:10px}
-.row{padding:6px 0;border-bottom:1px solid var(--line)}
+body.show-spend .cols:not(.guest),body.show-spend .row:not(.guest){
+  grid-template-columns:18px 24px minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr) 60px 104px 104px 28px;
+}
+/* 지출 칸은 '지출 칸 보기'를 켰을 때만 */
+body:not(.show-spend) .row .actual,body:not(.show-spend) .cols:not(.guest) span:nth-child(8){display:none}
+.cols{font-size:12px;color:var(--muted);padding:3px 0 2px;border-bottom:1px solid var(--line)}
+.cols .r{text-align:right;padding-right:8px}
+.row{padding:1px 0;border-bottom:1px solid var(--line)}
 .row:last-of-type{border-bottom:0}
 .row input[type="text"]{
   width:100%;min-width:0;
   border:1px solid transparent;background:transparent;
-  padding:7px 10px;border-radius:6px;
+  padding:3px 8px;border-radius:6px;line-height:1.35;
 }
 .row input[type="text"]:hover{border-color:var(--line)}
 .row input[type="text"]:focus{outline:none;border-color:var(--muted);background:var(--paper)}
 .row .money{text-align:right;font-variant-numeric:tabular-nums}
+.row .memo{color:var(--muted);font-size:13.5px}
+.row .memo:focus{color:var(--ink)}
 /* 끝낸 항목: 빗금 대신 이름을 더 진하고 굵게 */
 .row.done .name{color:var(--ink-strong, var(--ink));font-weight:600}
-/* 가격: 고른 선택지 가격 × 수량. 직접 고치지 않아요 */
-.row input.price{cursor:default;color:var(--ink)}
-.row input.price:hover,.row input.price:focus{border-color:transparent;background:transparent}
+/* 빈 금액·지출 칸의 칸 이름은 줄이 둘로 접혀 칸 이름 줄이 없을 때만 흐리게 보여요 (아래 @container) */
+.row input.money::placeholder{color:transparent;font-size:13.5px}
 
 /* 수량 */
-.qty{display:flex;align-items:center;min-width:0;border:1px solid transparent;border-radius:6px;padding-right:8px;cursor:text}
+.qty{display:flex;align-items:center;min-width:0;border:1px solid transparent;border-radius:6px;padding-right:7px;cursor:text}
 .qty:hover{border-color:var(--line)}
 .qty:focus-within{border-color:var(--muted);background:var(--paper)}
-.row .qty input[type="text"]{border:0;background:transparent;padding:7px 3px 7px 6px;text-align:right;font-variant-numeric:tabular-nums}
+.row .qty input[type="text"]{border:0;background:transparent;padding:3px 3px 3px 6px;text-align:right;font-variant-numeric:tabular-nums}
 .row .qty input[type="text"]:focus{background:transparent}
 .qty span{color:var(--muted);font-size:13px;flex:none}
 
@@ -292,13 +299,13 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 .row.guest .name{padding-left:10px}
 .cols.guest span:nth-child(2){padding-left:10px}
 /* 합계 바: 예산표는 예산·지출 합계, 방명록은 축의금 합계와 인원 */
-body.kind-guestbook .t-spend{display:none}
+body.kind-guestbook .t-spend,body:not(.show-spend) .t-spend{display:none}
 body:not(.kind-guestbook) .t-people{display:none}
 
 
 /* Fold a category's items */
 .fold-btn{
-  flex:none;width:32px;height:32px;border:0;border-radius:6px;background:none;color:var(--muted);
+  flex:none;width:28px;height:28px;border:0;border-radius:6px;background:none;color:var(--muted);
   display:grid;place-items:center;
 }
 .fold-btn:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
@@ -307,12 +314,11 @@ body:not(.kind-guestbook) .t-people{display:none}
 .cat.collapsed .fold-btn svg{transform:rotate(180deg)}
 .cat.collapsed .cols,.cat.collapsed .rows,.cat.collapsed .add-item{display:none}
 .cat.collapsed .cat-head{margin-bottom:0}
-.cat.collapsed{padding-bottom:14px}
-#cats.sorting .fold-btn{display:none}
+.cat.collapsed{padding-bottom:10px}
 
 /* 선택지 button in each row */
 .pick{
-  display:flex;align-items:center;gap:6px;width:100%;min-width:0;height:34px;padding:0 10px;
+  display:flex;align-items:center;gap:6px;width:100%;min-width:0;height:28px;padding:0 9px;
   border:1px dashed var(--line);border-radius:6px;background:none;color:var(--muted);
   font-size:13.5px;text-align:left;
 }
@@ -325,9 +331,9 @@ body:not(.kind-guestbook) .t-people{display:none}
 .pick.chosen .pick-count{background:var(--sheet)}
 
 /* 선택지 모두 보기: 후보를 세로로 늘어놓고 고른 것에 색을 둡니다 */
-.picks{display:flex;flex-direction:column;gap:4px;min-width:0;padding:2px 0}
+.picks{display:flex;flex-direction:column;gap:3px;min-width:0;padding:2px 0}
 .pick-opt{
-  display:flex;align-items:center;gap:8px;width:100%;min-width:0;min-height:30px;padding:4px 10px;
+  display:flex;align-items:center;gap:8px;width:100%;min-width:0;min-height:26px;padding:3px 9px;
   border:1px solid var(--line);border-radius:6px;background:none;color:var(--muted);
   font-size:13px;text-align:left;
 }
@@ -365,7 +371,27 @@ body:not(.kind-guestbook) .t-people{display:none}
 /* '선택 안 함': 늘 맨 위에 있는 빈 선택 */
 .opt-none:not(.selected) .opt-name,.pick-none:not(.on) .pick-opt-name{color:var(--muted)}
 .opt-empty{color:var(--muted);font-size:14px;text-align:center;padding:22px 12px;border:1.5px dashed var(--line);border-radius:10px}
-.opt{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:10px;padding:4px}
+.opt{border:1px solid var(--line);border-radius:10px;padding:4px}
+.opt-top{display:flex;align-items:center;gap:2px}
+/* 고른 선택지: 머리줄이 [● 이름 칸 | 가격 칸], 아래 한 줄에 [링크 | 비고] */
+.opt-head-edit{
+  flex:1;min-width:0;display:grid;grid-template-columns:18px minmax(0,1fr) 130px;gap:6px;align-items:center;
+  padding:4px 4px 4px 10px;
+}
+.opt-edit-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;padding:0 8px 6px 38px}
+.opt-head-edit input,.opt-edit-form input{
+  width:100%;min-width:0;border:1px solid color-mix(in srgb, var(--accent-fill) 30%, var(--line));border-radius:8px;
+  background:var(--sheet);padding:6px 10px;font-size:14px;line-height:1.35;  /* 두 줄의 칸 높이를 같게 */
+}
+.opt-head-edit .opt-radio{margin-right:4px}
+.opt-head-edit input[data-f="name"]{font-weight:600}
+.opt-head-edit input:focus,.opt-edit-form input:focus{outline:none;border-color:var(--accent)}
+.opt-head-edit .money{text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:640px){
+  .opt-head-edit{grid-template-columns:18px minmax(0,1fr) 104px;padding-left:8px}
+  .opt-edit-form{grid-template-columns:1fr;padding-left:8px}
+}
+
 .opt.selected{border-color:var(--accent-fill);background:var(--accent-soft)}
 .opt-main{
   flex:1;min-width:0;display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:2px 12px;align-items:center;
@@ -411,20 +437,22 @@ body:not(.kind-guestbook) .t-people{display:none}
   .opt-name{white-space:normal;word-break:keep-all;overflow-wrap:anywhere}
 }
 .check{display:flex;justify-content:center}
-.check input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+.check input{width:18px;height:18px;accent-color:var(--accent);margin:0;opacity:.45;transition:opacity .15s}
+.check input:checked{opacity:.75}
+.row:hover .check input,.check input:focus-visible{opacity:.9}
 .del-item{
   border:0;background:none;color:var(--muted);font-size:18px;line-height:1;
-  width:32px;height:32px;border-radius:6px;
+  width:28px;height:28px;border-radius:6px;
 }
 .del-item:hover{color:var(--warn);background:var(--paper)}
 .add-item{
-  margin-top:6px;border:0;background:none;color:var(--accent);
-  font-weight:500;padding:8px 4px;
+  margin-top:2px;border:0;background:none;color:var(--accent);
+  font-weight:500;font-size:14px;padding:4px 4px;
 }
 .add-item:hover{text-decoration:underline}
 
 .add-cat{
-  width:100%;padding:16px;margin-top:18px;border:1.5px dashed var(--line);border-radius:10px;
+  width:100%;padding:12px;margin-top:12px;border:1.5px dashed var(--line);border-radius:10px;
   background:transparent;color:var(--muted);font-weight:500;
 }
 .add-cat:hover{border-color:var(--accent);color:var(--accent)}
@@ -479,29 +507,30 @@ body:not(.kind-guestbook) .t-people{display:none}
 .saved-at:empty{display:none}
 
 
-/* Narrow category card (2/4 columns, or phone): item goes onto three lines */
+/* Narrow category card (2/4 columns, or phone): 이름 · 메모가 첫 줄, 선택지 · 금액 · 수량이 둘째 줄.
+   지출 칸을 켜면 금액과 지출이 셋째 줄로 내려갑니다. 칸 이름 줄은 보이지 않아요 (금액·지출은 빈칸 안내로). */
 @container (max-width:620px){
-  .cols:not(.guest){grid-template-columns:18px 28px 1fr 1fr 64px}
-  .cols:not(.guest) span:nth-child(3),.cols:not(.guest) span:nth-child(4),.cols:not(.guest) span:nth-child(5){display:none}
-  .cols.guest,.row.guest{grid-template-columns:18px minmax(0,1fr) 120px 32px}
-  .row:not(.guest){
-    grid-template-columns:18px 28px 1fr 1fr 64px;
-    grid-template-areas:"g c n n d" ". . o o q" ". . b a .";
-    row-gap:2px;
+  .cols:not(.guest){display:none}   /* 줄이 둘로 접히면 칸 이름은 맞출 자리가 없어서 뺍니다 */
+  .cols.guest,.row.guest{grid-template-columns:18px minmax(0,1fr) 120px 28px}
+  .row:not(.guest),body.show-spend .row:not(.guest){
+    grid-template-columns:18px 24px 1fr 1fr 60px;
+    grid-template-areas:"g c n m d" ". . o b q";
+    row-gap:1px;
   }
+  body.show-spend .row:not(.guest){grid-template-areas:"g c n m d" ". . o o q" ". . b a ."}
   .row:not(.guest) .item-grip{grid-area:g}
   .row:not(.guest) .check{grid-area:c}
   .row:not(.guest) .name{grid-area:n}
-  .row:not(.guest) .del-item{grid-area:d}
+  .row:not(.guest) .memo{grid-area:m}
+  .row:not(.guest) .del-item{grid-area:d;justify-self:end}
   .row:not(.guest) .budget{grid-area:b}
   .row:not(.guest) .actual{grid-area:a}
-  .row:not(.guest) .pick{grid-area:o;height:30px}
+  .row:not(.guest) .pick{grid-area:o;height:28px}
   .row:not(.guest) .picks{grid-area:o}
   .row:not(.guest) .picks .pick{height:auto}
   .row:not(.guest) .qty{grid-area:q}
-  .row:not(.guest) .del-item{justify-self:end}
-  .row{padding:4px 0}
-  .row input[type="text"]{padding:5px 8px}
+  .row{padding:3px 0}
+  .row input.money::placeholder{color:color-mix(in srgb, var(--muted) 50%, transparent)}
 }
 
 @media (max-width:1100px){
@@ -517,13 +546,12 @@ body:not(.kind-guestbook) .t-people{display:none}
 @media (max-width:640px){
   .wrap{padding-top:12px}
   .file-switch-btn{max-width:56vw}
-  .cat{padding:14px 14px 10px}
+  .cat{padding:8px 12px 6px}
   .totals-inner{gap:14px 20px}
   /* 좁은 화면에서는 엑셀 내보내기를 빼고, 저장 시각만 오른쪽에 둡니다 */
   .t-export{flex:none;margin-left:auto}
   .saved-at{flex:none;text-align:right}
   .export{display:none}
-  body{padding-bottom:150px}
   .toast{bottom:130px}
 }
 @media (prefers-reduced-motion:reduce){.toast,.tpl-btn,.tool-btn,.tpl-btn .chev{transition:none}}
@@ -532,15 +560,17 @@ body:not(.kind-guestbook) .t-people{display:none}
 #planner ~ .toast,
 body:has(#planner) .toast{bottom:120px}
 
-/* 카테고리로 건너뛰기 — 합계 바 위 오른쪽에 뜬 유리 단추와 목록.
-   뒤로 카드와 글자가 지나가므로 흐림만으로도 유리로 읽힙니다. */
+/* 카테고리 내비게이션 — 합계 바 위 오른쪽에 뜬 유리 단추와 목록.
+   뒤로 카드와 글자가 지나가므로 흐림만으로도 유리로 읽힙니다.
+   동그란 단추 위에 '카테고리 추가', 열면 그 위에 목록이 뜹니다. */
 .cat-nav{
   position:fixed;z-index:6;
   right:max(20px, env(safe-area-inset-right));
   bottom:calc(var(--totals-h, 88px) + 16px);
 }
-.cat-nav[hidden],body.is-sorting .cat-nav{display:none}
-.cat-nav-btn,.cat-nav-pop{
+body.is-sorting .cat-nav{display:none}
+.cat-nav-btns{display:flex;flex-direction:column;align-items:center;gap:8px}
+.cat-nav-btn,.cat-nav-add,.cat-nav-pop{
   background:rgba(255,255,255,.58);
   border:1px solid rgba(255,255,255,.85);
   -webkit-backdrop-filter:blur(18px) saturate(160%);
@@ -552,43 +582,78 @@ body:has(#planner) .toast{bottom:120px}
     inset 0 0 0 1px rgba(255,255,255,.35);
 }
 .cat-nav-btn{
-  list-style:none;cursor:pointer;user-select:none;
+  cursor:pointer;user-select:none;padding:0;
   width:48px;height:48px;border-radius:50%;
   display:grid;place-items:center;color:var(--ink);
   transition:transform .16s ease, background-color .16s ease;
 }
-.cat-nav-btn::-webkit-details-marker{display:none}
-.cat-nav-btn:hover{background:rgba(255,255,255,.75);transform:translateY(-1px)}
-.cat-nav-btn:active{transform:scale(.96)}
-.cat-nav-btn:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.cat-nav-add{
+  display:grid;place-items:center;padding:0;
+  width:38px;height:38px;border-radius:50%;color:var(--ink);
+  transition:transform .16s ease, background-color .16s ease;
+}
+.cat-nav-add svg{width:16px;height:16px}
+.cat-nav-btn:hover,.cat-nav-add:hover{background:rgba(255,255,255,.75);transform:translateY(-1px)}
+.cat-nav-btn:active,.cat-nav-add:active{transform:scale(.96)}
+.cat-nav-btn:focus-visible,.cat-nav-add:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 .cat-nav-btn svg{width:20px;height:20px;grid-area:1 / 1}
-.cat-nav .ico-close,.cat-nav[open] .ico-list{display:none}
-.cat-nav[open] .ico-close{display:block}
+.cat-nav .ico-close,.cat-nav.open .ico-list{display:none}
+.cat-nav.open .ico-close{display:block}
 .cat-nav-pop{
   position:absolute;right:0;bottom:calc(100% + 10px);
   width:min(280px, calc(100vw - 40px));
-  max-height:min(60vh, calc(100vh - var(--totals-h, 88px) - 110px));
+  max-height:min(60vh, calc(100vh - var(--totals-h, 88px) - 150px));
   overflow:auto;overscroll-behavior:contain;
   padding:6px;border-radius:18px;
   transform-origin:bottom right;
   animation:cat-nav-in .16s ease;
 }
+.cat-nav-pop[hidden]{display:none}
 @keyframes cat-nav-in{from{opacity:0;transform:translateY(6px) scale(.97)}}
 .cat-nav-title{color:var(--muted);font-size:12px;font-weight:600;padding:8px 12px 6px}
-.cat-nav-pop button{
-  display:flex;align-items:center;gap:10px;width:100%;
-  border:0;background:none;color:var(--ink);text-align:left;
-  padding:9px 12px;border-radius:11px;font-size:14px;
+#catNavList{position:relative}  /* 끄는 줄의 offsetTop 기준 */
+.cat-nav-item{display:flex;align-items:center;border-radius:11px;position:relative}
+.cat-nav-item.dragging{
+  z-index:2;background:var(--sheet);
+  box-shadow:0 8px 20px rgba(15,20,30,.18);outline:2px solid var(--accent-fill);outline-offset:-2px;
 }
-.cat-nav-pop button::before{
+.cat-nav-grip{
+  flex:none;width:22px;height:34px;padding:0;border:0;border-radius:7px;background:none;
+  display:grid;place-items:center;color:var(--muted);cursor:grab;opacity:.6;
+  touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+}
+.cat-nav-grip svg{width:8px;height:14px}
+.cat-nav-item:hover .cat-nav-grip,.cat-nav-grip:focus-visible{opacity:1}
+.cat-nav-grip:hover{background:rgba(55,53,47,.07);color:var(--ink)}
+@media (hover:none){.cat-nav-grip{opacity:1}}
+.cat-nav-go{
+  flex:1;min-width:0;display:flex;align-items:center;gap:10px;
+  border:0;background:none;color:var(--ink);text-align:left;
+  padding:8px 10px 8px 4px;border-radius:11px;font-size:14px;
+}
+.cat-nav-go::before{
   content:"";width:7px;height:7px;border-radius:50%;flex:none;
   background:var(--swatch, var(--accent-fill));opacity:.35;
 }
-.cat-nav-pop button:hover{background:rgba(55,53,47,.07)}
-.cat-nav-pop button[aria-current="true"]{font-weight:600;background:rgba(55,53,47,.06)}
-.cat-nav-pop button[aria-current="true"]::before{opacity:1}
+.cat-nav-go:hover{background:rgba(55,53,47,.07)}
+.cat-nav-go[aria-current="true"]{font-weight:600;background:rgba(55,53,47,.06)}
+.cat-nav-go[aria-current="true"]::before{opacity:1}
 .cat-nav-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cat-nav-meta{flex:none;color:var(--muted);font-size:12px;font-weight:400;font-variant-numeric:tabular-nums}
+.cat-nav-item.naming{padding:3px 2px}
+.cat-nav-input{
+  width:100%;min-width:0;font-size:14px;font-weight:600;
+  border:1px solid var(--accent-fill);border-radius:9px;background:var(--sheet);color:var(--ink);
+  padding:7px 10px;
+}
+.cat-nav-input:focus{outline:none;box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-fill) 25%, transparent)}
+.cat-nav-empty{color:var(--muted);font-size:13px;padding:6px 12px 10px}
+/* 휴대폰에서는 열어 둔 목록이 화면을 덜 가리게 */
+@media (max-width:640px){
+  .cat-nav{right:max(14px, env(safe-area-inset-right))}
+  .cat-nav-pop{width:min(240px, calc(100vw - 28px));max-height:min(46vh, calc(100vh - var(--totals-h, 88px) - 150px))}
+  .cat-nav-go{padding:7px 8px 7px 2px}
+}
 /* 내려앉은 카테고리를 잠깐 표시합니다 */
 .cat.cat-flash{animation:cat-flash 1.4s ease}
 @keyframes cat-flash{
@@ -597,15 +662,18 @@ body:has(#planner) .toast{bottom:120px}
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]) .cat-nav-btn,
+  :root:not([data-theme="light"]) .cat-nav-add,
   :root:not([data-theme="light"]) .cat-nav-pop{
     background:rgba(40,40,42,.6);border-color:rgba(255,255,255,.1);
     box-shadow:0 12px 32px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
   }
-  :root:not([data-theme="light"]) .cat-nav-btn:hover{background:rgba(52,52,54,.7)}
-  :root:not([data-theme="light"]) .cat-nav-pop button:hover,
-  :root:not([data-theme="light"]) .cat-nav-pop button[aria-current="true"]{background:rgba(255,255,255,.07)}
+  :root:not([data-theme="light"]) .cat-nav-btn:hover,
+  :root:not([data-theme="light"]) .cat-nav-add:hover{background:rgba(52,52,54,.7)}
+  :root:not([data-theme="light"]) .cat-nav-go:hover,
+  :root:not([data-theme="light"]) .cat-nav-grip:hover,
+  :root:not([data-theme="light"]) .cat-nav-go[aria-current="true"]{background:rgba(255,255,255,.07)}
 }
-@media (prefers-reduced-motion:reduce){.cat-nav-pop,.cat.cat-flash{animation:none}.cat-nav-btn{transition:none}}
+@media (prefers-reduced-motion:reduce){.cat-nav-pop,.cat.cat-flash{animation:none}.cat-nav-btn,.cat-nav-add{transition:none}}
 
 /* 파일 줄 오른쪽의 남은 날. 눌러서 정하고 고칩니다. */
 .dday-chip{

@@ -47,7 +47,8 @@
   }
   syncActive();
   function replaceActive(data){
-    const plan = newPlan(Object.assign(data, { id: state.id, accent: state.accent }));
+    // 색과 제목 이모지는 파일의 것이라 그대로 둡니다
+    const plan = newPlan(Object.assign(data, { id: state.id, accent: state.accent }, state.icon ? { icon: state.icon } : {}));
     store.plans[store.plans.indexOf(state)] = plan;
     state = plan;
   }
@@ -104,10 +105,10 @@
 
   // ---- render ----
   const catsEl = document.getElementById("cats");
-  // 칸보다 긴 항목 이름은 커서를 올리면 툴팁으로 전체를 보여 줍니다
+  // 칸보다 긴 항목 이름과 메모는 커서를 올리면 툴팁으로 전체를 보여 줍니다
   catsEl.addEventListener("mouseover", e => {
     const t = e.target;
-    if(!t.classList || !t.classList.contains("name")) return;
+    if(!t.classList || !(t.classList.contains("name") || t.classList.contains("memo"))) return;
     if(t.scrollWidth > t.clientWidth) t.title = t.value;
     else t.removeAttribute("title");
   });
@@ -147,8 +148,9 @@
 
   const chosenOf = it => (it.options || []).find(o => o.id === it.choiceId);
   const qtyOf = it => Math.max(1, parseInt(it.qty, 10) || 1);
-  // 가격 is the item total; one unit = the chosen option's price, else 가격 ÷ 수량
-  const unitOf = it => { const o = chosenOf(it); return o && o.price ? o.price : (it.budget || 0) / qtyOf(it); };
+  // 금액 is the item total; one unit = the chosen option's price, else 금액 ÷ 수량.
+  // 금액을 직접 고쳤으면(priceManual) 고른 선택지 가격 대신 적은 값을 따라가요.
+  const unitOf = it => { const o = chosenOf(it); return o && o.price && !it.priceManual ? o.price : (it.budget || 0) / qtyOf(it); };
   const unitTitle = it => qtyOf(it) > 1 && it.budget ? ` title="개당 ${won(Math.round(unitOf(it)))}"` : "";
   function pickHTML(it){
     const n = (it.options || []).length, chosen = chosenOf(it);
@@ -185,10 +187,11 @@
       <button type="button" class="item-grip" aria-label="순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg></button>
       <label class="check"><input type="checkbox" class="done-box" ${it.done ? "checked" : ""} aria-label="완료 표시"></label>
       <input type="text" class="name" value="${esc(it.name)}" placeholder="항목 이름" aria-label="항목 이름">
+      <input type="text" class="memo" value="${esc(it.memo || "")}" placeholder="메모" aria-label="메모">
       ${pickHTML(it)}
       <label class="qty"><input type="text" class="qty-in" inputmode="numeric" value="${qtyOf(it)}" aria-label="수량"><span aria-hidden="true">개</span></label>
-      <input type="text" class="money budget price" value="${plain(it.budget)}" aria-label="금액 (고른 선택지의 가격 × 수량)" readonly tabindex="-1"${unitTitle(it)}>
-      <input type="text" class="money actual" inputmode="numeric" value="${plain(it.actual)}" aria-label="지출" placeholder="${it.done ? "" : "-"}">
+      <input type="text" class="money budget price" inputmode="numeric" value="${plain(it.budget)}" aria-label="금액" placeholder="금액"${unitTitle(it)}>
+      <input type="text" class="money actual" inputmode="numeric" value="${plain(it.actual)}" aria-label="지출" placeholder="지출">
       <button type="button" class="del-item" aria-label="항목 삭제">×</button>
     </div>`;
   }
@@ -270,16 +273,16 @@
     renderFileBar();
     renderDday();
     titleEl.value = state.title || "";
+    renderEmoji();
     fitTitle();
     introEl.value = state.intro || "";
     fitIntro();
     if(!state.categories.length){
-      catsEl.innerHTML = `<div class="empty">카테고리가 없어요. 아래에서 카테고리를 추가하거나 위의 템플릿을 불러오세요.</div>`;
+      catsEl.innerHTML = `<div class="empty">카테고리가 없어요. 오른쪽 아래의 '카테고리 추가'를 누르거나 위의 템플릿을 불러오세요.</div>`;
     } else {
       catsEl.innerHTML = state.categories.map(c => `
         <section class="cat${c.collapsed ? " collapsed" : ""}" data-cid="${c.id}">
           <div class="cat-head">
-            <button type="button" class="cat-grip" aria-label="'${esc(catLabel(c))}' 순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 16" aria-hidden="true"><circle cx="2" cy="2.5" r="1.3" fill="currentColor"/><circle cx="6" cy="2.5" r="1.3" fill="currentColor"/><circle cx="2" cy="8" r="1.3" fill="currentColor"/><circle cx="6" cy="8" r="1.3" fill="currentColor"/><circle cx="2" cy="13.5" r="1.3" fill="currentColor"/><circle cx="6" cy="13.5" r="1.3" fill="currentColor"/></svg></button>
             <input type="text" class="cat-name" value="${esc(c.name)}" placeholder="카테고리 이름" aria-label="카테고리 이름">
             <span class="cat-sum">${catSumHTML(c)}</span>
             ${foldBtnHTML(c)}
@@ -298,21 +301,27 @@
             ? `<div class="cols guest" aria-hidden="true"><span></span><span>이름</span><span class="r">축의금</span><span></span></div>
           <div class="rows">${c.items.map(guestRowHTML).join("")}</div>
           <button type="button" class="add-item">+ 이름 추가</button>`
-            : `<div class="cols" aria-hidden="true"><span></span><span></span><span>항목</span><span>선택지</span><span class="r">수량</span><span class="r">금액</span><span class="r">지출</span><span></span></div>
+            : `<div class="cols" aria-hidden="true"><span></span><span></span><span>항목</span><span>메모</span><span>선택지</span><span class="r">수량</span><span class="r">금액</span><span class="r">지출</span><span></span></div>
           <div class="rows">${c.items.map(rowHTML).join("")}</div>
           <button type="button" class="add-item">+ 항목 추가</button>`}
         </section>`).join("");
     }
     if(Math.abs(window.scrollY - keepY) > 1) window.scrollTo(0, keepY);
     updateTotals();
-    // 카테고리로 건너뛰기는 카테고리가 둘 이상일 때만 띄웁니다
-    catNav.hidden = state.categories.length < 2;
+    if(navOpen) renderCatNav();
   }
 
-  // ---- 카테고리로 건너뛰기 ----
-  // 목록은 열 때마다 새로 그립니다. 이름을 고치거나 순서를 바꿔도 따로 챙길 게 없어요.
+  // ---- 카테고리 내비게이션 ----
+  // 합계 바 위에 떠 있습니다. 동그란 단추로만 열고 닫아요 (다른 곳을 눌러도 닫히지 않습니다).
+  // 여기서 카테고리로 건너뛰고, 손잡이로 순서를 바꾸고, 새 카테고리 이름을 적습니다.
   const catNav = document.getElementById("catNav");
+  const catNavBtn = document.getElementById("catNavBtn");
+  const catNavPop = document.getElementById("catNavPop");
   const catNavList = document.getElementById("catNavList");
+  const NAV_KEY = "prep-budget-catnav";
+  let navOpen = false;
+  let naming = null; // 내비에서 이름을 적고 있는 새 카테고리
+  let navDrag = null;
   const totalsEl = document.querySelector(".totals");
   // 합계 바 높이는 화면 폭에 따라 달라서, 그 위에 뜨도록 재어서 넘깁니다
   if(totalsEl && window.ResizeObserver){
@@ -325,32 +334,234 @@
     const hit = cards.find(el => el.getBoundingClientRect().bottom > line);
     return hit ? hit.dataset.cid : null;
   }
+  const NAV_GRIP = `<svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg>`;
   function renderCatNav(){
+    if(navDrag) return;
     const here = currentCatId();
     const guest = isGuest(state);
-    catNavList.innerHTML = state.categories.map(c => {
+    // 이름을 적는 중에 다시 그려도 커서 자리를 지킵니다
+    const typing = document.activeElement && document.activeElement.classList.contains("cat-nav-input") ? document.activeElement : null;
+    const caret = typing ? [typing.selectionStart, typing.selectionEnd] : null;
+    catNavList.innerHTML = state.categories.length ? state.categories.map(c => {
+      if(c.id === naming) return `<div class="cat-nav-item naming" role="listitem" data-cid="${esc(c.id)}">
+        <input type="text" class="cat-nav-input" value="${esc(c.name)}" placeholder="새 카테고리 이름" aria-label="새 카테고리 이름" enterkeyhint="done">
+      </div>`;
       const n = itemCount(c);
-      return `<button type="button" data-go="${esc(c.id)}"${c.id === here ? ` aria-current="true"` : ""}>
-        <span class="cat-nav-name">${esc(catLabel(c))}</span>
-        <span class="cat-nav-meta">${n}${guest ? "명" : "개"}</span>
-      </button>`;
-    }).join("");
+      return `<div class="cat-nav-item" role="listitem" data-cid="${esc(c.id)}">
+        <button type="button" class="cat-nav-grip" aria-label="'${esc(catLabel(c))}' 순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기">${NAV_GRIP}</button>
+        <button type="button" class="cat-nav-go" data-go="${esc(c.id)}"${c.id === here ? ` aria-current="true"` : ""}>
+          <span class="cat-nav-name">${esc(catLabel(c))}</span>
+          <span class="cat-nav-meta">${n}${guest ? "명" : "개"}</span>
+        </button>
+      </div>`;
+    }).join("") : `<div class="cat-nav-empty">아직 카테고리가 없어요</div>`;
+    if(typing){
+      const again = catNavList.querySelector(".cat-nav-input");
+      if(again){ again.focus({ preventScroll: true }); try{ again.setSelectionRange(caret[0], caret[1]); }catch(_){} }
+    }
   }
-  catNav.addEventListener("toggle", () => { if(catNav.open) renderCatNav(); });
-  catNavList.addEventListener("click", e => {
-    const btn = e.target.closest("[data-go]");
-    if(!btn) return;
-    const el = catsEl.querySelector(`.cat[data-cid="${CSS.escape(btn.dataset.go)}"]`);
-    catNav.open = false;
-    if(!el) return;
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 16, behavior: still ? "auto" : "smooth" });
+  function markCurrent(){
+    const here = currentCatId();
+    catNavList.querySelectorAll(".cat-nav-go").forEach(b => {
+      if(b.dataset.go === here) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+    });
+  }
+  function setNav(open, quiet){
+    navOpen = open;
+    catNavPop.hidden = !open;
+    catNav.classList.toggle("open", open);
+    catNavBtn.setAttribute("aria-expanded", String(open));
+    catNavBtn.setAttribute("aria-label", open ? "카테고리 목록 닫기" : "카테고리 목록");
+    catNavBtn.title = open ? "카테고리 목록 닫기" : "카테고리 목록";
+    if(quiet) return; // 처음 열 때는 첫 render() 가 목록을 그려요
+    if(open) renderCatNav();
+    try{ localStorage.setItem(NAV_KEY, open ? "open" : "closed"); }catch(e){}
+  }
+  catNavBtn.addEventListener("click", () => setNav(!navOpen));
+  // 처음에는 펼쳐 둡니다. 닫아 두면 그 뒤로는 닫힌 채로 열려요.
+  let navStart = true;
+  try{ navStart = localStorage.getItem(NAV_KEY) !== "closed"; }catch(e){}
+  if(navStart) setNav(true, true);
+  let navRaf = 0;
+  window.addEventListener("scroll", () => {
+    if(!navOpen || navRaf) return;
+    navRaf = requestAnimationFrame(() => { navRaf = 0; markCurrent(); });
+  }, { passive: true });
+
+  function flashCat(el){
     // 어디에 내렸는지 잠깐 테두리로 알려 줍니다
     el.classList.remove("cat-flash");
     void el.offsetWidth;
     el.classList.add("cat-flash");
     setTimeout(() => el.classList.remove("cat-flash"), 1400);
+  }
+  catNavList.addEventListener("click", e => {
+    const btn = e.target.closest("[data-go]");
+    if(!btn) return;
+    const el = catsEl.querySelector(`.cat[data-cid="${CSS.escape(btn.dataset.go)}"]`);
+    if(!el) return;
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 12, behavior: reduceMotion() ? "auto" : "smooth" });
+    flashCat(el);
     track("category_jump", { count: state.categories.length });
+  });
+
+  // 새 카테고리: 맨 아래에 빈 카드를 만들고, 이름은 내비에서 적습니다
+  function addCategory(){
+    if(naming) finishNaming(false, true);
+    const c = { id: nid(), name: "", items: [newItem()] };
+    state.categories.push(c);
+    naming = c.id;
+    setNav(true, true);
+    try{ localStorage.setItem(NAV_KEY, "open"); }catch(e){}
+    render(); save();
+    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: reduceMotion() ? "auto" : "smooth" });
+    const input = catNavList.querySelector(".cat-nav-input");
+    if(input){ input.focus({ preventScroll: true }); input.scrollIntoView({ block: "nearest" }); }
+  }
+  document.getElementById("addCat").addEventListener("click", addCategory);
+  // 목록 맨 아래의 점선 단추: 카드에서 바로 이름을 적어요 (빈 목록에서 찾기 쉽게)
+  document.getElementById("addCatBottom").addEventListener("click", () => {
+    if(naming) finishNaming(false, true);
+    const c = { id: nid(), name: "", items: [newItem()] };
+    state.categories.push(c);
+    render(); save();
+    const input = catsEl.querySelector(`.cat[data-cid="${CSS.escape(c.id)}"] .cat-name`);
+    if(input){ input.focus({ preventScroll: true }); input.scrollIntoView({ block: "center", behavior: reduceMotion() ? "auto" : "smooth" }); }
+  });
+
+  // 이름 적기를 마칩니다. 이름도 항목도 비어 있으면 실수로 누른 것으로 보고 지워요 (keep 이면 남깁니다).
+  function finishNaming(toItems, keep){
+    if(!naming) return;
+    const c = state.categories.find(x => x.id === naming);
+    naming = null;
+    if(c && !keep && !c.name.trim() && !c.items.some(hasContent)){
+      state.categories = state.categories.filter(x => x !== c);
+      render(); save();
+      return;
+    }
+    renderCatNav();
+    if(toItems && c){
+      const input = catsEl.querySelector(`.cat[data-cid="${CSS.escape(c.id)}"] .row .name`);
+      if(input) input.focus();
+    }
+  }
+  catNavList.addEventListener("input", e => {
+    if(!e.target.classList.contains("cat-nav-input")) return;
+    const c = state.categories.find(x => x.id === naming);
+    if(!c) return;
+    c.name = e.target.value;
+    const card = catsEl.querySelector(`.cat[data-cid="${CSS.escape(c.id)}"] .cat-name`);
+    if(card) card.value = c.name;
+    save();
+  });
+  catNavList.addEventListener("keydown", e => {
+    if(!e.target.classList.contains("cat-nav-input") || e.isComposing) return;
+    if(e.key === "Enter"){ e.preventDefault(); finishNaming(true, true); }
+    if(e.key === "Escape"){ e.preventDefault(); finishNaming(false); }
+  });
+  catNavList.addEventListener("focusout", e => {
+    if(!e.target.classList.contains("cat-nav-input") || !naming) return;
+    // 같은 카드의 칸으로 옮겨 가면 거기서 이어서 적는 것이니 지우지 않아요
+    const to = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".cat");
+    finishNaming(false, !!(to && to.dataset.cid === naming));
+  });
+
+  // 순서 바꾸기: 내비의 손잡이를 끌거나, 손잡이에서 ↑/↓
+  // 끄는 줄은 제자리에서 translate 로 따라오고, 나머지 줄은 flip 으로 밀려납니다.
+  // (유리 효과의 backdrop-filter 때문에 position:fixed 가 목록 안에 갇혀서, 띄우지 않고 옮겨요)
+  function navMove(y){
+    const d = navDrag;
+    const items = [...catNavList.querySelectorAll(".cat-nav-item")];
+    const cur = items.indexOf(d.item), h = d.item.offsetHeight;
+    const top = y - catNavList.getBoundingClientRect().top - d.gy; // 끄는 줄의 윗변 (목록 기준)
+    const center = top + h / 2;
+    const rest = items.filter(el => el !== d.item);
+    let to = 0;
+    rest.forEach(el => {
+      const t = el.offsetTop - (items.indexOf(el) > cur ? h : 0);
+      if(center > t + el.offsetHeight / 2) to++;
+    });
+    if(to !== cur){
+      flip(rest, () => { const ref = rest[to]; if(ref) ref.before(d.item); else catNavList.appendChild(d.item); });
+      d.moved = true;
+    }
+    d.item.style.transform = `translateY(${top - d.item.offsetTop}px)`;
+  }
+  function navAutoScroll(){
+    if(!navDrag) return;
+    const b = catNavPop.getBoundingClientRect(), y = navDrag.y;
+    const speed = y < b.top + 36 ? -Math.min(14, (b.top + 36 - y) / 3 + 2)
+                : y > b.bottom - 36 ? Math.min(14, (y - b.bottom + 36) / 3 + 2) : 0;
+    if(speed){ catNavPop.scrollTop += speed; navMove(y); }
+    navDrag.raf = requestAnimationFrame(navAutoScroll);
+  }
+  // 카드 순서를 내비 순서에 맞춥니다 (통째로 다시 그리지 않아서 보던 자리가 그대로예요)
+  function applyCatOrder(order){
+    state.categories.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+    // 보고 있던 카드가 화면에서 같은 자리에 남도록 합니다
+    const here = currentCatId();
+    const anchor = here && catsEl.querySelector(`.cat[data-cid="${CSS.escape(here)}"]`);
+    const move = () => state.categories.forEach(c => {
+      const el = catsEl.querySelector(`.cat[data-cid="${CSS.escape(c.id)}"]`);
+      if(el) catsEl.appendChild(el);
+    });
+    if(anchor) keepInView(anchor, move); else move();
+    save();
+  }
+  function navEnd(cancel){
+    if(!navDrag) return;
+    const { item, raf, moved } = navDrag;
+    cancelAnimationFrame(raf);
+    navDrag = null;
+    document.body.classList.remove("nav-sorting");
+    item.classList.remove("dragging");
+    if(cancel){ item.style.transform = ""; renderCatNav(); return; }
+    const from = item.getBoundingClientRect().top;
+    item.style.transform = "";
+    const dy = from - item.getBoundingClientRect().top;
+    if(dy && !reduceMotion()) item.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 160, easing: EASE });
+    if(moved){
+      applyCatOrder([...catNavList.querySelectorAll(".cat-nav-item")].map(el => el.dataset.cid));
+      track("category_reorder", { count: state.categories.length });
+    }
+  }
+  catNavList.addEventListener("pointerdown", e => {
+    const grip = e.target.closest(".cat-nav-grip");
+    if(!grip || e.button !== 0) return;
+    e.preventDefault();
+    if(naming) finishNaming(false, true);
+    const item = grip.closest(".cat-nav-item");
+    const r = item.getBoundingClientRect();
+    item.classList.add("dragging");
+    document.body.classList.add("nav-sorting");
+    try{ grip.setPointerCapture(e.pointerId); }catch(_){}
+    navDrag = { item, gy: e.clientY - r.top, y: e.clientY, moved: false, raf: 0 };
+    navDrag.raf = requestAnimationFrame(navAutoScroll);
+  });
+  window.addEventListener("pointermove", e => {
+    if(!navDrag) return;
+    navDrag.y = e.clientY;
+    navMove(e.clientY);
+  });
+  window.addEventListener("pointerup", () => navEnd(false));
+  window.addEventListener("pointercancel", () => navEnd(true));
+  document.addEventListener("keydown", e => { if(navDrag && e.key === "Escape") navEnd(true); });
+  catNavList.addEventListener("keydown", e => {
+    const grip = e.target.closest(".cat-nav-grip");
+    if(!grip) return;
+    const step = { ArrowUp: -1, ArrowDown: 1 }[e.key];
+    if(!step) return;
+    e.preventDefault();
+    const id = grip.closest(".cat-nav-item").dataset.cid;
+    const order = state.categories.map(c => c.id);
+    const i = order.indexOf(id), j = i + step;
+    if(j < 0 || j >= order.length) return;
+    order.splice(i, 1);
+    order.splice(j, 0, id);
+    applyCatOrder(order);
+    renderCatNav();
+    const again = catNavList.querySelector(`.cat-nav-item[data-cid="${CSS.escape(id)}"] .cat-nav-grip`);
+    if(again){ again.focus(); again.scrollIntoView({ block: "nearest" }); }
   });
 
   // 예산 합계 = 모든 항목의 가격, 지출 합계 = 지출 칸의 합 (체크하면 가격이 저절로 들어가요)
@@ -384,6 +595,39 @@
     titleEl.style.width = Math.ceil(probe.getBoundingClientRect().width) + 4 + "px";
   }
   window.addEventListener("resize", () => fitTitle());
+
+  // ---- 제목 왼쪽 이모지 ----
+  // 따로 그림 파일 없이 기기의 기본 이모지를 씁니다. 파일마다 하나 (state.icon).
+  const EMOJIS = ["💍","💒","👰","🤵","💐","🥂","💌","🎂","🎁","🎉","📸","💄",
+                  "👶","🍼","🧸","🎀","🤰","🧷","🛁","🚼","🏠","🛋️","🧺","🍳",
+                  "✈️","🏖️","🧳","🚗","💰","💳","🧾","📋","📅","✅","⭐","❤️",
+                  "🌸","🌷","🌿","🍀","☀️","🌙","🐶","🐱","🐰","🐻","🍰","☕️"];
+  const emojiMenu = document.getElementById("emojiMenu");
+  const emojiVal = document.getElementById("emojiVal");
+  const emojiGrid = document.getElementById("emojiGrid");
+  emojiGrid.innerHTML = EMOJIS.map(e => `<button type="button" class="emoji-opt" data-emoji="${e}" aria-label="${e}">${e}</button>`).join("");
+  function renderEmoji(){
+    const icon = state.icon || "";
+    emojiVal.textContent = icon;
+    emojiMenu.classList.toggle("has-emoji", !!icon);
+    const label = icon ? "이모지 바꾸기" : "이모지 넣기";
+    emojiMenu.querySelector("summary").setAttribute("aria-label", label);
+    emojiMenu.querySelector("summary").title = label;
+    emojiGrid.querySelectorAll(".emoji-opt").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.emoji === icon)));
+    document.getElementById("emojiClear").hidden = !icon;
+  }
+  emojiGrid.addEventListener("click", e => {
+    const b = e.target.closest("[data-emoji]");
+    if(!b) return;
+    state.icon = b.dataset.emoji;
+    emojiMenu.open = false;
+    renderEmoji(); save();
+  });
+  document.getElementById("emojiClear").addEventListener("click", () => {
+    delete state.icon;
+    emojiMenu.open = false;
+    renderEmoji(); save();
+  });
   titleEl.addEventListener("input", () => {
     fitTitle();
     state.title = titleEl.value;
@@ -430,6 +674,7 @@
     const it = findItem(t, c);
     if(!it) return;
     if(t.classList.contains("name")) it.name = t.value;
+    if(t.classList.contains("memo")) it.memo = t.value;
     if(t.classList.contains("qty-in")){
       t.value = t.value.replace(/[^\d]/g, "").slice(0, 4);
       const q = parseInt(t.value, 10);
@@ -443,7 +688,17 @@
       const pos = Math.max(0, t.value.length - fromEnd);
       try{ t.setSelectionRange(pos, pos); }catch(_){}
       if(t.classList.contains("actual")){ it.actual = v; delete it.actualAuto; } // 지출은 직접 고칠 수 있어요
-      else it.budget = v; // 축의금 (예산표의 가격 칸은 읽기 전용이에요)
+      else {
+        it.budget = v; // 축의금, 또는 예산표의 금액 (직접 고친 값)
+        if(!isGuest(state)){
+          const o = chosenOf(it);
+          if(o && v === (o.price || 0) * qtyOf(it)) delete it.priceManual; else it.priceManual = true;
+          syncSpend(it);
+          const sp = t.closest(".row").querySelector(".actual");
+          if(sp && sp !== document.activeElement) sp.value = plain(it.actual);
+          if(qtyOf(it) > 1 && it.budget) t.title = `개당 ${won(Math.round(unitOf(it)))}`; else t.removeAttribute("title");
+        }
+      }
       t.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
     }
     updateTotals(); save();
@@ -490,13 +745,13 @@
     const rowEl = t.closest(".row");
     rowEl.classList.toggle("done", it.done);
     const sp = rowEl.querySelector(".actual");
-    sp.value = plain(it.actual); sp.placeholder = it.done ? "" : "-";
+    sp.value = plain(it.actual);
     t.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
     updateTotals(); save();
   });
 
   const newItem = () => ({ id: nid(), name: "", budget: 0, done: false });
-  const hasContent = i => i.name || i.budget || (i.options && i.options.length);
+  const hasContent = i => i.name || i.memo || i.budget || (i.options && i.options.length);
   const snapshot = () => JSON.stringify(store);
   const catLabel = c => c.name || "이름 없는 카테고리";
 
@@ -570,7 +825,7 @@
     }
     if(t.classList.contains("clear-money")){
       const snap = snapshot();
-      c.items.forEach(i => { i.budget = 0; i.done = false; i.choiceId = null; });
+      c.items.forEach(i => { i.budget = 0; i.done = false; i.choiceId = null; delete i.priceManual; });
       render(); save();
       toast(`'${catLabel(c)}'의 금액을 지웠어요`, snap);
     }
@@ -591,7 +846,7 @@
       e.target.closest(".row").querySelector(".budget").focus();
       return;
     }
-    if(e.target.classList.contains("name") || (isGuest(state) && e.target.classList.contains("budget"))){
+    if(e.target.classList.contains("name") || e.target.classList.contains("memo") || (isGuest(state) && e.target.classList.contains("budget"))){
       e.preventDefault();
       const c = findCat(e.target);
       const cur = findItem(e.target, c);
@@ -604,8 +859,9 @@
     }
   });
 
-  // ---- reorder categories and items: drag a grip (mouse or touch), or arrow keys on it ----
-  // While dragging, the card/row floats under the pointer and a dashed slot marks where it will land;
+  // ---- reorder items: drag a grip (mouse or touch), or arrow keys on it ----
+  // (Categories are reordered from the category nav above.)
+  // While dragging, the row floats under the pointer and a dashed slot marks where it will land;
   // the others slide (FLIP animation) whenever the slot moves. Items can also move to another category.
   let drag = null;
   const EASE = "cubic-bezier(.2,.8,.2,1)";
@@ -631,10 +887,6 @@
       el.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 220, easing: EASE });
     });
   }
-
-  // Layout boxes relative to the grid (offsets ignore running animations, so hit-testing stays stable)
-  const box = el => ({ l: el.offsetLeft, t: el.offsetTop, w: el.offsetWidth, h: el.offsetHeight });
-  const others = () => [...catsEl.querySelectorAll(".cat:not(.dragging)")];
 
   const inside = (el, x, y) => { const b = el.getBoundingClientRect(); return x >= b.left && x <= b.right && y >= b.top && y <= b.bottom; };
 
@@ -678,22 +930,7 @@
     const { card, slot, gx, gy } = drag;
     card.style.left = `${x - gx}px`;
     card.style.top = `${y - gy}px`;
-    if(drag.kind === "item"){ moveItemSlot(x, y); return; }
-
-    const g = catsEl.getBoundingClientRect();
-    const px = x - g.left, py = y - g.top;
-    const target = others().find(el => { const b = box(el); return px >= b.l && px <= b.l + b.w && py >= b.t && py <= b.t + b.h; });
-    if(!target) return;
-    const seq = [...catsEl.children].filter(el => el === slot || el.matches(".cat:not(.dragging)"));
-    const from = seq.indexOf(slot), to = seq.indexOf(target);
-    const b = box(target), sameRow = Math.abs(b.t - slot.offsetTop) < 8;
-    // Only move once the pointer is past the target's middle, so cards don't flip back and forth
-    const past = sameRow
-      ? (to > from ? px > b.l + b.w / 2 : px < b.l + b.w / 2)
-      : (to > from ? py > b.t + b.h / 2 : py < b.t + b.h / 2);
-    if(!past) return;
-    flip(others(), () => { if(to > from) target.after(slot); else target.before(slot); });
-    drag.moved = true;
+    moveItemSlot(x, y);
   }
 
   function autoScroll(){
@@ -708,50 +945,31 @@
 
   function endDrag(cancel){
     if(!drag) return;
-    const { kind, card, slot, raf, moved } = drag;
+    const { card, slot, raf, moved } = drag;
     cancelAnimationFrame(raf);
     drag = null;
     document.body.classList.remove("is-sorting");
-    if(cancel){ catsEl.classList.remove("sorting"); render(); return; } // back to the saved order
+    if(cancel){ render(); return; } // back to the saved order
 
-    if(kind === "item"){
-      const from = card.getBoundingClientRect();
-      slot.replaceWith(card);
-      card.classList.remove("dragging-row");
-      card.removeAttribute("style");
-      const to = card.getBoundingClientRect();
-      if(!reduceMotion()) card.animate(
-        [{ transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)` }, { transform: "none" }],
-        { duration: 180, easing: EASE });
-      if(moved){
-        // Rebuild every category's item order from the page (an item may have changed category)
-        const byId = new Map();
-        state.categories.forEach(c => c.items.forEach(i => byId.set(i.id, i)));
-        catsEl.querySelectorAll(".cat").forEach(cardEl => {
-          const c = state.categories.find(x => x.id === cardEl.dataset.cid);
-          c.items = [...cardEl.querySelectorAll(".row")].map(r => byId.get(r.dataset.iid)).filter(Boolean);
-          cardEl.querySelector(".cat-sum").innerHTML = catSumHTML(c);
-          const fold = cardEl.querySelector(".fold-btn");
-          fold.setAttribute("aria-label", foldLabel(c)); fold.title = foldLabel(c);
-        });
-        save();
-      }
-      return;
-    }
-
-    // Drop: put the card where the slot is, unfold the cards, then glide it in from where it was let go
     const from = card.getBoundingClientRect();
     slot.replaceWith(card);
-    card.classList.remove("dragging");
+    card.classList.remove("dragging-row");
     card.removeAttribute("style");
-    keepInView(card, () => catsEl.classList.remove("sorting"));
     const to = card.getBoundingClientRect();
     if(!reduceMotion()) card.animate(
       [{ transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)` }, { transform: "none" }],
-      { duration: 200, easing: EASE });
+      { duration: 180, easing: EASE });
     if(moved){
-      const order = [...catsEl.querySelectorAll(".cat")].map(el => el.dataset.cid);
-      state.categories.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+      // Rebuild every category's item order from the page (an item may have changed category)
+      const byId = new Map();
+      state.categories.forEach(c => c.items.forEach(i => byId.set(i.id, i)));
+      catsEl.querySelectorAll(".cat").forEach(cardEl => {
+        const c = state.categories.find(x => x.id === cardEl.dataset.cid);
+        c.items = [...cardEl.querySelectorAll(".row")].map(r => byId.get(r.dataset.iid)).filter(Boolean);
+        cardEl.querySelector(".cat-sum").innerHTML = catSumHTML(c);
+        const fold = cardEl.querySelector(".fold-btn");
+        fold.setAttribute("aria-label", foldLabel(c)); fold.title = foldLabel(c);
+      });
       save();
     }
   }
@@ -772,29 +990,9 @@
       row.classList.add("dragging-row");
       document.body.classList.add("is-sorting");
       try{ itemGrip.setPointerCapture(e.pointerId); }catch(_){}
-      drag = { kind: "item", card: row, slot, gx: e.clientX - r.left, gy: e.clientY - r.top, x: e.clientX, y: e.clientY, moved: false, raf: 0 };
+      drag = { card: row, slot, gx: e.clientX - r.left, gy: e.clientY - r.top, x: e.clientX, y: e.clientY, moved: false, raf: 0 };
       drag.raf = requestAnimationFrame(autoScroll);
-      return;
     }
-    const grip = e.target.closest(".cat-grip");
-    if(!grip || e.button !== 0) return;
-    e.preventDefault();
-    closeMenus();
-    const card = grip.closest(".cat");
-    keepInView(card, () => catsEl.classList.add("sorting"));
-    document.body.classList.add("is-sorting");
-
-    // Lift the card out of the grid; a slot of the same size keeps its place
-    const r = card.getBoundingClientRect();
-    const slot = document.createElement("div");
-    slot.className = "cat-slot";
-    slot.style.height = `${r.height}px`;
-    card.before(slot);
-    Object.assign(card.style, { position: "fixed", left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, margin: "0" });
-    card.classList.add("dragging");
-    try{ grip.setPointerCapture(e.pointerId); }catch(_){}
-    drag = { kind: "cat", card, slot, gx: e.clientX - r.left, gy: e.clientY - r.top, x: e.clientX, y: e.clientY, moved: false, raf: 0 };
-    drag.raf = requestAnimationFrame(autoScroll);
   });
   // On window, so the drag keeps working when the pointer leaves the grid (e.g. over the totals bar)
   window.addEventListener("pointermove", e => {
@@ -820,29 +1018,7 @@
       render(); save();
       const g = catsEl.querySelector(`[data-iid="${it.id}"] .item-grip`);
       if(g){ g.focus(); g.scrollIntoView({ block: "nearest" }); }
-      return;
     }
-    const grip = e.target.closest(".cat-grip");
-    if(!grip) return;
-    const step = { ArrowUp: -1, ArrowLeft: -1, ArrowDown: 1, ArrowRight: 1 }[e.key];
-    if(!step) return;
-    e.preventDefault();
-    const c = findCat(grip);
-    const i = state.categories.indexOf(c), j = i + step;
-    if(j < 0 || j >= state.categories.length) return;
-    state.categories.splice(i, 1);
-    state.categories.splice(j, 0, c);
-    render(); save();
-    const moved = catsEl.querySelector(`[data-cid="${c.id}"] .cat-grip`);
-    if(moved){ moved.focus(); moved.scrollIntoView({ block: "nearest" }); }
-  });
-
-  document.getElementById("addCat").addEventListener("click", () => {
-    const c = { id: nid(), name: "", items: [{ id: nid(), name: "", budget: 0, done: false }] };
-    state.categories.push(c);
-    render(); save();
-    const input = catsEl.querySelector(`[data-cid="${c.id}"] .cat-name`);
-    if(input){ input.focus(); input.scrollIntoView({ block: "center", behavior: "smooth" }); }
   });
 
   document.querySelectorAll("[data-tpl]").forEach(btn => btn.addEventListener("click", () => {
@@ -905,11 +1081,21 @@
     render();
   });
 
+  // ---- view: 지출 칸 보기 (기본은 꺼 둡니다. 꺼도 지출은 계속 계산되고 엑셀에도 들어가요) ----
+  const SPEND_KEY = "prep-budget-show-spend";
+  const spendToggle = document.getElementById("spendToggle");
+  try{ spendToggle.checked = localStorage.getItem(SPEND_KEY) === "on"; }catch(e){}
+  document.body.classList.toggle("show-spend", spendToggle.checked);
+  spendToggle.addEventListener("change", () => {
+    document.body.classList.toggle("show-spend", spendToggle.checked);
+    try{ localStorage.setItem(SPEND_KEY, spendToggle.checked ? "on" : "off"); }catch(e){}
+  });
+
   // ---- 선택지 (options per item: products, vendors, ...) ----
   const optDialog = document.getElementById("optDialog");
   const optList = document.getElementById("optList");
   const optForm = document.getElementById("optForm");
-  let optCtx = null; // { cid, iid, editId }
+  let optCtx = null; // { cid, iid, scrollY }
 
   function optItem(){
     if(!optCtx) return null;
@@ -921,11 +1107,10 @@
   const affNote = document.getElementById("affNote");
 
   const ICON_LINK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 3h4v4M13 3L7.5 8.5M11 9.5V12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-  const ICON_EDIT = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10.5 3l2.5 2.5L6 12.5H3.5V10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>';
   const ICON_DEL = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
 
-  // 선택지를 고르거나(항목 가격 = 선택지 가격 × 수량) 이미 고른 것을 다시 누르면 풉니다.
-  // 항목 가격은 직접 고칠 수 없어서, 고른 선택지가 없으면 0원이에요.
+  // 선택지를 고르거나(항목 금액 = 선택지 가격 × 수량) 이미 고른 것을 다시 누르면 풉니다.
+  // 고르면 금액이 선택지 가격으로 다시 맞춰져요. 금액 칸은 그 뒤에 직접 고칠 수 있어요.
   // 대화상자와 '선택지 모두 보기'의 칩이 함께 씁니다. 골랐으면 true.
   // '선택 안 함': 고른 선택지를 풀고 가격을 0원으로
   function clearChoice(it){
@@ -933,6 +1118,7 @@
     const prev = chosenOf(it);
     it.choiceId = null;
     it.budget = 0;
+    delete it.priceManual;
     render(); save();
     toast(prev ? `'${prev.name}' 선택을 풀었어요` : "선택을 풀었어요");
   }
@@ -941,12 +1127,14 @@
     if(it.choiceId === o.id){
       it.choiceId = null;
       it.budget = 0;
+      delete it.priceManual;
       render(); save();
       if(!optDialog.open) toast(`'${o.name}' 선택을 풀었어요`);
       return false;
     }
     it.choiceId = o.id;
     it.budget = (o.price || 0) * qtyOf(it);
+    delete it.priceManual;
     render(); save();
     toast(!o.price ? `'${o.name}' 선택 · 가격이 없어서 0원이에요` : qtyOf(it) > 1 ? `'${o.name}' 선택 · 금액 ${won(it.budget)} (${qtyOf(it)}개)` : `'${o.name}' 선택 · 금액 ${won(it.budget)}`);
     return true;
@@ -958,7 +1146,7 @@
     const opts = it.options || [];
     document.getElementById("optTitle").textContent = `${it.name || "이름 없는 항목"} 선택지`;
     document.getElementById("optSub").textContent = opts.length
-      ? "하나를 고르면 이 항목의 금액(선택지 가격 × 수량)이 돼요. '선택 안 함'을 고르면 0원이에요."
+      ? "하나를 고르면 이 항목의 금액(선택지 가격 × 수량)이 되고, 고른 선택지는 펼쳐져서 바로 고칠 수 있어요."
       : "비교할 제품이나 업체를 추가해 보세요.";
     // 쿠팡 파트너스 고지는 이 항목에 쿠팡 링크가 있을 때만 보여요
     affNote.hidden = !opts.some(o => o.link && isCoupang(o.link));
@@ -973,32 +1161,42 @@
     optList.innerHTML = opts.length ? noneRow + opts.map(o => {
       const sel = o.id === it.choiceId;
       const host = o.link ? hostOf(o.link) : "";
+      // 고른 선택지는 펼쳐져서 그 자리에서 이름·가격·링크·비고를 고칩니다 (적는 대로 저장돼요)
+      // 고른 것은 머리줄의 이름·가격이 바로 고치는 칸이 되고, 아래 한 줄에 링크·비고가 붙어요
+      const head = sel
+        ? `<div class="opt-head-edit">
+            <span class="opt-radio" aria-hidden="true"></span>
+            <input type="text" data-f="name" value="${esc(o.name)}" placeholder="이름 (제품, 업체 등)" aria-label="선택지 이름">
+            <input type="text" data-f="price" inputmode="numeric" class="money" value="${plain(o.price)}" placeholder="가격" aria-label="가격">
+          </div>`
+        : `<button type="button" class="opt-main" aria-pressed="false">
+            <span class="opt-radio" aria-hidden="true"></span>
+            <span class="opt-name">${esc(o.name)}</span>
+            <span class="opt-price${o.price ? "" : " none"}">${o.price ? won(o.price) : "가격 없음"}</span>
+            ${o.note ? `<span class="opt-note">${esc(o.note)}</span>` : ""}
+            ${host ? `<span class="opt-host">${esc(host)}</span>` : ""}
+          </button>`;
       return `<div class="opt${sel ? " selected" : ""}" data-oid="${o.id}">
-        <button type="button" class="opt-main" aria-pressed="${sel}">
-          <span class="opt-radio" aria-hidden="true"></span>
-          <span class="opt-name">${esc(o.name)}</span>
-          <span class="opt-price${o.price ? "" : " none"}">${o.price ? won(o.price) : "가격 없음"}</span>
-          ${o.note ? `<span class="opt-note">${esc(o.note)}</span>` : ""}
-          ${host ? `<span class="opt-host">${esc(host)}</span>` : ""}
-        </button>
-        ${o.link ? `<a class="opt-tool" href="${esc(o.link)}" target="_blank" rel="noopener noreferrer sponsored nofollow" aria-label="'${esc(o.name)}' 링크 열기" title="링크 열기">${ICON_LINK}</a>` : ""}
-        <button type="button" class="opt-tool opt-edit" aria-label="'${esc(o.name)}' 고치기" title="고치기">${ICON_EDIT}</button>
-        <button type="button" class="opt-tool opt-del danger" aria-label="'${esc(o.name)}' 삭제" title="삭제">${ICON_DEL}</button>
+        <div class="opt-top">
+          ${head}
+          ${o.link ? `<a class="opt-tool" href="${esc(o.link)}" target="_blank" rel="noopener noreferrer sponsored nofollow" aria-label="'${esc(o.name)}' 링크 열기" title="링크 열기">${ICON_LINK}</a>` : ""}
+          <button type="button" class="opt-tool opt-del danger" aria-label="'${esc(o.name)}' 삭제" title="삭제">${ICON_DEL}</button>
+        </div>
+        ${sel ? `<div class="opt-edit-form">
+          <input type="text" data-f="link" inputmode="url" value="${esc(o.link || "")}" placeholder="참고 링크 (선택)" aria-label="참고 링크">
+          <input type="text" data-f="note" value="${esc(o.note || "")}" placeholder="비고 (선택) · 예: 대여 포함" aria-label="비고">
+        </div>` : ""}
       </div>`;
     }).join("") : `<div class="opt-empty">아직 선택지가 없어요</div>`;
   }
 
   function resetOptForm(){
     optForm.reset();
-    optCtx.editId = null;
-    document.getElementById("optFormTitle").textContent = "선택지 추가";
-    document.getElementById("optSubmit").textContent = "추가";
-    document.getElementById("optCancel").hidden = true;
   }
 
   function openOptions(c, it){
     closeMenus();
-    optCtx = { cid: c.id, iid: it.id, editId: null, scrollY: window.scrollY };
+    optCtx = { cid: c.id, iid: it.id, scrollY: window.scrollY };
     resetOptForm();
     renderOptions();
     optDialog.showModal();
@@ -1011,7 +1209,7 @@
     if(!row) return;
     const it = optItem();
     if(row.dataset.none){
-      if(e.target.closest(".opt-main")){ clearChoice(it); optDialog.close(); }
+      if(e.target.closest(".opt-main")){ clearChoice(it); renderOptions(); }
       return;
     }
     const o = (it.options || []).find(x => x.id === row.dataset.oid);
@@ -1022,22 +1220,17 @@
       return;
     }
     if(e.target.closest(".opt-main")){
-      if(chooseOption(it, o)) optDialog.close(); else renderOptions();
-    } else if(e.target.closest(".opt-edit")){
-      optCtx.editId = o.id;
-      optForm.elements.name.value = o.name;
-      optForm.elements.link.value = o.link || "";
-      optForm.elements.price.value = plain(o.price);
-      optForm.elements.note.value = o.note || "";
-      document.getElementById("optFormTitle").textContent = "선택지 고치기";
-      document.getElementById("optSubmit").textContent = "저장";
-      document.getElementById("optCancel").hidden = false;
-      optForm.elements.name.focus();
+      // 고르면 창은 그대로 두고, 고른 것이 펼쳐져요. 이미 고른 것을 누르면 이름 칸으로 갑니다.
+      const was = it.choiceId === o.id;
+      if(!was) chooseOption(it, o);
+      renderOptions();
+      const f = optList.querySelector(`.opt[data-oid="${CSS.escape(o.id)}"] [data-f="name"]`);
+      if(f){ f.closest(".opt").scrollIntoView({ block: "nearest" }); if(was) f.focus({ preventScroll: true }); }
+      if(!was && f && e.detail === 0) f.focus({ preventScroll: true }); // 키보드로 골랐을 때만 (휴대폰에서 자판이 뜨지 않게)
     } else if(e.target.closest(".opt-del")){
       const snap = snapshot();
       it.options = it.options.filter(x => x !== o);
-      if(it.choiceId === o.id){ it.choiceId = null; it.budget = 0; }
-      if(optCtx.editId === o.id) resetOptForm();
+      if(it.choiceId === o.id){ it.choiceId = null; it.budget = 0; delete it.priceManual; }
       render(); save(); renderOptions();
       toast(`'${o.name}' 선택지를 지웠어요`, snap);
     }
@@ -1047,33 +1240,83 @@
     const t = e.target, v = parseMoney(t.value);
     t.value = plain(v);
   });
-  document.getElementById("optCancel").addEventListener("click", () => { resetOptForm(); optForm.elements.name.focus(); });
+  // 확인: 아래 칸에 적다 만 선택지가 있으면 추가하고 창을 닫아요
+  document.getElementById("optDone").addEventListener("click", () => {
+    if(optForm.elements.name.value.trim() && !addOptionFromForm()) return;
+    optDialog.close();
+  });
 
-  optForm.addEventListener("submit", e => {
-    e.preventDefault();
+  // 펼친 선택지 고치기: 적는 대로 저장하고, 항목 줄과 머리글도 바로 맞춰요
+  function updateOptHead(row, o){
+    const nm = row.querySelector(".opt-name"), pr = row.querySelector(".opt-price");
+    if(nm) nm.textContent = o.name || "이름 없는 선택지";
+    if(pr){ pr.textContent = o.price ? won(o.price) : "가격 없음"; pr.classList.toggle("none", !o.price); }
+  }
+  optList.addEventListener("input", e => {
+    const f = e.target.dataset && e.target.dataset.f;
+    if(!f) return;
+    const it = optItem(), row = e.target.closest(".opt");
+    const o = it && (it.options || []).find(x => x.id === row.dataset.oid);
+    if(!o) return;
+    if(f === "price"){
+      const v = parseMoney(e.target.value);
+      e.target.value = plain(v);
+      o.price = v;
+      // 금액을 직접 고치지 않았다면 고른 선택지 가격을 따라가요
+      if(it.choiceId === o.id && !it.priceManual) it.budget = v * qtyOf(it);
+    } else if(f === "name"){
+      o.name = e.target.value.trim() ? e.target.value : o.name;
+    } else if(f === "note"){
+      o.note = e.target.value.trim();
+    } else if(f === "link"){
+      return; // 링크는 다 적고 나서(change) 확인합니다
+    }
+    updateOptHead(row, o);
+    render(); save();
+  });
+  optList.addEventListener("change", e => {
+    if(!e.target.dataset || e.target.dataset.f !== "link") return;
+    const it = optItem(), row = e.target.closest(".opt");
+    const o = it && (it.options || []).find(x => x.id === row.dataset.oid);
+    if(!o) return;
+    const raw = e.target.value.trim(), link = safeLink(raw);
+    if(raw && !link){ toast("링크는 http나 https 주소만 넣을 수 있어요"); e.target.value = o.link || ""; return; }
+    o.link = link;
+    save();
+    renderOptions();
+  });
+  // 이름을 비운 채로 나가면 원래 이름으로 돌려 둡니다
+  optList.addEventListener("focusout", e => {
+    if(!e.target.dataset || e.target.dataset.f !== "name") return;
+    const it = optItem(), row = e.target.closest(".opt");
+    const o = it && (it.options || []).find(x => x.id === row.dataset.oid);
+    if(o && !e.target.value.trim()) e.target.value = o.name;
+  });
+
+  // 아래 칸의 새 선택지를 추가합니다. 추가했으면 true.
+  function addOptionFromForm(){
     const it = optItem();
-    if(!it) return;
+    if(!it) return false;
     const name = optForm.elements.name.value.trim();
-    if(!name){ optForm.elements.name.focus(); return; }
+    if(!name){ optForm.elements.name.focus(); return false; }
     const rawLink = optForm.elements.link.value.trim();
     const link = safeLink(rawLink);
-    if(rawLink && !link){ toast("링크는 http나 https 주소만 넣을 수 있어요"); optForm.elements.link.focus(); return; }
+    if(rawLink && !link){ toast("링크는 http나 https 주소만 넣을 수 있어요"); optForm.elements.link.focus(); return false; }
     const price = parseMoney(optForm.elements.price.value);
     const note = optForm.elements.note.value.trim();
     it.options = it.options || [];
-    const editing = optCtx.editId && it.options.find(x => x.id === optCtx.editId);
-    if(editing){
-      Object.assign(editing, { name, link, price, note });
-      if(it.choiceId === editing.id) it.budget = price * qtyOf(it); // keep the chosen price and the item price in sync
-    } else {
-      const first = !it.options.length;
-      const o = { id: nid(), name, link, price, note };
-      it.options.push(o);
-      // 첫 선택지는 바로 골라 둡니다. 이미 선택지가 있으면 지금 고른 것(또는 선택 안 함)을 그대로 둬요.
-      if(first){ it.choiceId = o.id; it.budget = price * qtyOf(it); }
-    }
+    const first = !it.options.length;
+    const o = { id: nid(), name, link, price, note };
+    it.options.push(o);
+    // 첫 선택지는 바로 골라 둡니다. 이미 선택지가 있으면 지금 고른 것(또는 선택 안 함)을 그대로 둬요.
+    if(first){ it.choiceId = o.id; it.budget = price * qtyOf(it); delete it.priceManual; }
     render(); save();
     resetOptForm(); renderOptions();
+    return true;
+  }
+  optForm.addEventListener("submit", e => {
+    e.preventDefault();
+    if(!addOptionFromForm()) return;
     optList.scrollTop = optList.scrollHeight;
     optForm.elements.name.focus();
   });
@@ -1154,8 +1397,8 @@
 
   // Plan sheet columns, in the same order as the screen
   // 지출 = 화면의 지출 칸 (체크하면 가격이 저절로 들어가고, 직접 고칠 수도 있어요)
-  const XC = { name: 1, pick: 2, qty: 3, budget: 4, spend: 5, done: 6, link: 7 };
-  const XHEAD = ["항목", "선택지", "수량", "금액", "지출", "완료", "링크"];
+  const XC = { name: 1, memo: 2, pick: 3, qty: 4, budget: 5, spend: 6, done: 7, link: 8 };
+  const XHEAD = ["항목", "메모", "선택지", "수량", "금액", "지출", "완료", "링크"];
   const XL = key => String.fromCharCode(64 + XC[key]); // column letter
   const isMoneyCol = n => n === XC.budget || n === XC.spend;
 
@@ -1165,7 +1408,7 @@
   function addPlanSheet(wb, plan, sheetName, links){
     const ws = wb.addWorksheet(sheetName, { views: [{ state: "frozen", ySplit: 4, showGridLines: false }] });
     const NC = XHEAD.length;
-    ws.columns = [{ width: 28 }, { width: 22 }, { width: 8 }, { width: 16 }, { width: 16 }, { width: 8 }, { width: 26 }];
+    ws.columns = [{ width: 24 }, { width: 28 }, { width: 22 }, { width: 8 }, { width: 16 }, { width: 16 }, { width: 8 }, { width: 26 }];
     ws.pageSetup = { paperSize: 9, orientation: "portrait", fitToPage: true, fitToWidth: 1, fitToHeight: 0 };
     const eachCol = (row, fn) => { for(let n = 1; n <= NC; n++) fn(row.getCell(n), n); };
     const theme = accentXL(plan.accent);
@@ -1217,6 +1460,7 @@
         const row = ws.getRow(r);
         const chosen = chosenOf(it);
         row.getCell(XC.name).value = it.name;
+        if(it.memo) row.getCell(XC.memo).value = it.memo;
         if(chosen) row.getCell(XC.pick).value = chosen.name;
         row.getCell(XC.qty).value = qtyOf(it);
         row.getCell(XC.budget).value = it.budget || 0;
@@ -1667,7 +1911,7 @@
 
   // Columns are found by header name, so every export version (with or without 선택지/수량) reads the same way.
   // "old" = first version, where 카테고리 had its own column instead of band rows.
-  const HEAD_KEYS = { "이름": "name", "축의금": "budget", "카테고리": "cat", "항목": "name", "선택지": "pick", "수량": "qty", "예산": "budget", "가격": "budget", "금액": "budget", "실제 지출": "actual", "지출": "actual", "완료": "done", "링크": "link" };
+  const HEAD_KEYS = { "이름": "name", "축의금": "budget", "카테고리": "cat", "항목": "name", "메모": "memo", "선택지": "pick", "수량": "qty", "예산": "budget", "가격": "budget", "금액": "budget", "실제 지출": "actual", "지출": "actual", "완료": "done", "링크": "link" };
 
   function parsePlanSheet(ws){
     for(let h = 1; h <= 10; h++){
@@ -1730,9 +1974,11 @@
         if(cat && (!cur || cat !== cur.name)) openCat(cat);
       }
 
-      if(!name && !budget && !actual) continue;
+      const memo = col.memo ? cellText(v(col.memo)) : "";
+      if(!name && !memo && !budget && !actual) continue;
       if(!cur) openCat("기타");
       const item = { id: nid(), name, budget, done: col.done ? cellDone(v(col.done)) : false };
+      if(memo) item.memo = memo;
       if(actual) item.actual = actual; // 불러온 지출은 직접 적은 값으로 둡니다
       const qty = col.qty ? parseInt(cellText(v(col.qty)).replace(/[^\d]/g, ""), 10) : 0;
       if(qty > 1) item.qty = Math.min(qty, 9999);

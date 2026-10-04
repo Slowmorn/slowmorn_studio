@@ -30,8 +30,8 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/base.css?v=20260927a">
-<link rel="stylesheet" href="../assets/site.css?v=20260926h">
-<link rel="stylesheet" href="../assets/app.css?v=20260927l">
+<link rel="stylesheet" href="../assets/site.css?v=20261004a">
+<link rel="stylesheet" href="../assets/app.css?v=20261004j">
 </head>
 <body>
 <header class="topbar">
@@ -71,6 +71,13 @@
   </nav>
 
   <div class="title-row">
+    <details class="menu emoji-menu" id="emojiMenu">
+      <summary class="emoji-btn" id="emojiBtn" aria-label="이모지 넣기" title="이모지 넣기"><svg class="emoji-ph" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="10" r="1.2" fill="currentColor"/><circle cx="15" cy="10" r="1.2" fill="currentColor"/><path d="M8.5 14.2c.9 1.3 2.1 2 3.5 2s2.6-.7 3.5-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span class="emoji-val" id="emojiVal"></span></summary>
+      <div class="menu-pop emoji-pop" role="group" aria-label="이모지 고르기">
+        <div class="emoji-grid" id="emojiGrid"></div>
+        <button type="button" class="emoji-clear" id="emojiClear">이모지 없애기</button>
+      </div>
+    </details>
     <input id="planTitle" class="plan-title" type="text" aria-label="예산표 이름" value="">
     <span class="title-done" id="titleDone" aria-live="polite"></span>
   </div>
@@ -93,6 +100,7 @@
     </div>
     <div class="view-opts">
     <label class="opt-toggle"><input type="checkbox" id="allOptsToggle"><span class="switch" aria-hidden="true"></span><span>선택지 모두 보기</span></label>
+    <label class="opt-toggle"><input type="checkbox" id="spendToggle"><span class="switch" aria-hidden="true"></span><span>지출 칸 보기</span></label>
     <div class="view-toggle">
       <div class="seg" role="group" aria-label="카테고리를 몇 열로 볼지">
         <button type="button" data-cols="1" aria-pressed="true"><svg viewBox="0 0 16 12" aria-hidden="true"><rect x="0.5" y="0.5" width="15" height="11" rx="1.5" fill="none" stroke="currentColor"/></svg>1열</button>
@@ -104,7 +112,7 @@
   </div>
 
   <main id="cats" aria-live="polite"></main>
-  <button id="addCat" class="add-cat">카테고리 추가</button>
+  <button id="addCatBottom" class="add-cat" type="button">카테고리 추가</button>
 
   <p class="save-note">적는 대로 자동으로 저장돼요. 파일을 지우거나 이름을 바꾸는 건 <a href="../">버짓보드</a>에서 합니다.</p>
   <div class="foot-actions"><button id="clearAllItems" type="button">카테고리만 남기고 항목 비우기</button><button id="resetAll" type="button">내용 비우기</button></div>
@@ -146,41 +154,43 @@
     <p class="aff-note" id="affNote" hidden>이 항목의 일부 링크는 쿠팡 파트너스 활동의 일환으로, 이에 따라 일정액의 수수료를 제공받습니다.</p>
     <form id="optForm" class="opt-form" autocomplete="off">
       <div class="opt-form-title" id="optFormTitle">선택지 추가</div>
-      <input name="name" type="text" placeholder="이름 (제품, 업체 등)" aria-label="선택지 이름" required>
+      <input name="name" type="text" placeholder="이름 (제품, 업체 등)" aria-label="선택지 이름">
       <div class="opt-form-row">
         <input name="link" type="text" inputmode="url" placeholder="참고 링크 (선택)" aria-label="참고 링크">
         <input name="price" type="text" inputmode="numeric" class="money" placeholder="가격" aria-label="가격">
       </div>
       <input name="note" type="text" placeholder="비고 (선택) · 예: 대여 포함, 3월 할인" aria-label="비고">
       <div class="opt-form-foot">
-        <small>고르면 이 항목의 예산이 가격 × 수량으로 바뀌어요</small>
-        <button type="button" class="btn-ghost" id="optCancel" hidden>취소</button>
-        <button type="submit" class="btn-primary" id="optSubmit">추가</button>
+        <small>고르면 이 항목의 금액이 가격 × 수량으로 바뀌어요</small>
+        <button type="submit" class="btn-ghost" id="optSubmit">추가</button>
+        <button type="button" class="btn-primary" id="optDone">확인</button>
       </div>
     </form>
   </div>
 </dialog>
 
-<!-- 카테고리로 건너뛰기. 합계 바 위 오른쪽에 떠 있습니다. -->
-<details class="menu cat-nav" id="catNav" hidden>
-  <summary class="cat-nav-btn" aria-label="카테고리로 이동" title="카테고리로 이동">
-    <svg class="ico-list" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5.5h9M7 10h9M7 14.5h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="3.8" cy="5.5" r="1.2" fill="currentColor"/><circle cx="3.8" cy="10" r="1.2" fill="currentColor"/><circle cx="3.8" cy="14.5" r="1.2" fill="currentColor"/></svg>
-    <svg class="ico-close" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
-  </summary>
-  <div class="cat-nav-pop">
-    <div class="cat-nav-cats" id="catNavCats">
-      <div class="cat-nav-title">카테고리</div>
-      <div id="catNavList"></div>
-    </div>
+<!-- 카테고리 내비게이션. 합계 바 위 오른쪽에 떠 있고, 동그란 단추로만 열고 닫습니다.
+     여기서 카테고리로 건너뛰고, 순서를 바꾸고, 새 카테고리를 추가합니다. -->
+<div class="cat-nav" id="catNav">
+  <div class="cat-nav-pop" id="catNavPop" hidden>
+    <div class="cat-nav-title">카테고리</div>
+    <div id="catNavList" role="list"></div>
   </div>
-</details>
+  <div class="cat-nav-btns">
+    <button type="button" class="cat-nav-btn" id="catNavBtn" aria-expanded="false" aria-controls="catNavPop" aria-label="카테고리 목록" title="카테고리 목록">
+      <svg class="ico-list" viewBox="0 0 20 20" aria-hidden="true"><path d="M7 5.5h9M7 10h9M7 14.5h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><circle cx="3.8" cy="5.5" r="1.2" fill="currentColor"/><circle cx="3.8" cy="10" r="1.2" fill="currentColor"/><circle cx="3.8" cy="14.5" r="1.2" fill="currentColor"/></svg>
+      <svg class="ico-close" viewBox="0 0 20 20" aria-hidden="true"><path d="M5.5 5.5l9 9M14.5 5.5l-9 9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+    </button>
+    <button type="button" class="cat-nav-add" id="addCat" aria-label="카테고리 추가" title="카테고리 추가"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+  </div>
+</div>
 
 <div id="toast" class="toast" role="status"></div>
 
 <script src="../assets/config.js?v=20260923v"></script>
 <script src="../assets/auth.js?v=20260926i"></script>
-<script src="../assets/store.js?v=20260927j"></script>
+<script src="../assets/store.js?v=20261004a"></script>
 <script src="../assets/shell.js?v=20260926g"></script>
-<script src="../assets/app.js?v=20260927n"></script>
+<script src="../assets/app.js?v=20261004g"></script>
 </body>
 </html>

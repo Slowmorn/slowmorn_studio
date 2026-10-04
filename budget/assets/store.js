@@ -71,6 +71,7 @@
           const src = typeof n === "string" ? { name: n } : n;
           const it = { id: nid(), name: src.name || "", budget: src.budget || 0, actual: 0, done: false };
           if(src.qty > 1) it.qty = src.qty;
+          if(src.memo) it.memo = src.memo;
           if(src.options && src.options.length){
             it.options = src.options.map(o => ({ id: nid(), name: o.name, link: safeLink(o.link), price: o.price || 0, note: o.note || "" }));
           }
@@ -95,7 +96,7 @@
   }
 
   // 이름도 내용도 그대로인 새 파일인지 (저절로 생긴 빈 파일은 계정으로 옮기지 않아요)
-  const hasContent = i => i.name || i.budget || i.actual || (i.options && i.options.length);
+  const hasContent = i => i.name || i.memo || i.budget || i.actual || (i.options && i.options.length);
   const isTouched = p => (p.title || "") !== "새 예산표"
     || (p.categories || []).some(c => (c.items || []).some(hasContent))
     || !(p.categories || []).every(c => !c.name || c.name === "첫 번째 카테고리");
