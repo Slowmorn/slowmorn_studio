@@ -303,13 +303,18 @@ body:not(.show-spend) .row .actual,body:not(.show-spend) .cols:not(.guest) span:
 .cols .r{text-align:right;padding-right:8px}
 .row{padding:1px 0;border-bottom:1px solid var(--line)}
 .row:last-of-type{border-bottom:0}
-.row input[type="text"]{
+.row input[type="text"],.row textarea{
   width:100%;min-width:0;
   border:1px solid transparent;background:transparent;
   padding:3px 8px;border-radius:6px;line-height:1.35;
 }
-.row input[type="text"]:hover{border-color:var(--line)}
-.row input[type="text"]:focus{outline:none;border-color:var(--muted);background:var(--paper)}
+.row input[type="text"]:hover,.row textarea:hover{border-color:var(--line)}
+.row input[type="text"]:focus,.row textarea:focus{outline:none;border-color:var(--muted);background:var(--paper)}
+/* 메모: 한 줄로 시작해서 길어지면 줄을 바꿔 늘어나요 */
+.row textarea.memo{
+  display:block;font:inherit;font-size:13.5px;line-height:1.35;resize:none;overflow:hidden;
+  word-break:keep-all;overflow-wrap:anywhere;
+}
 .row .money{text-align:right;font-variant-numeric:tabular-nums}
 .row .memo{color:var(--muted);font-size:13.5px}
 .row .memo:focus{color:var(--ink)}

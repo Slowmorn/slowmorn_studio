@@ -105,10 +105,10 @@
 
   // ---- render ----
   const catsEl = document.getElementById("cats");
-  // 칸보다 긴 항목 이름과 메모는 커서를 올리면 툴팁으로 전체를 보여 줍니다
+  // 칸보다 긴 항목 이름은 커서를 올리면 툴팁으로 전체를 보여 줍니다 (메모는 줄을 바꿔 다 보여요)
   catsEl.addEventListener("mouseover", e => {
     const t = e.target;
-    if(!t.classList || !(t.classList.contains("name") || t.classList.contains("memo"))) return;
+    if(!t.classList || !t.classList.contains("name")) return;
     if(t.scrollWidth > t.clientWidth) t.title = t.value;
     else t.removeAttribute("title");
   });
@@ -180,7 +180,7 @@
       <button type="button" class="item-grip" aria-label="순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg></button>
       <label class="check"><input type="checkbox" class="done-box" ${it.done ? "checked" : ""} aria-label="완료 표시"></label>
       <input type="text" class="name" value="${esc(it.name)}" placeholder="항목 이름" aria-label="항목 이름">
-      <input type="text" class="memo" value="${esc(it.memo || "")}" placeholder="메모" aria-label="메모">
+      <textarea class="memo" rows="1" placeholder="메모" aria-label="메모">${esc(it.memo || "")}</textarea>
       ${pickHTML(it)}
       <label class="qty"><input type="text" class="qty-in" inputmode="numeric" value="${qtyOf(it)}" aria-label="수량"><span aria-hidden="true">개</span></label>
       <input type="text" class="money budget price" inputmode="numeric" value="${plain(it.budget)}" aria-label="금액" placeholder="금액"${unitTitle(it)}>
@@ -258,6 +258,16 @@
 
   const EMOJI_PH = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="10" r="1.2" fill="currentColor"/><circle cx="15" cy="10" r="1.2" fill="currentColor"/><path d="M8.5 14.2c.9 1.3 2.1 2 3.5 2s2.6-.7 3.5-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
 
+  // 메모는 길어지면 줄을 바꾸고 칸이 그만큼 늘어나요
+  function fitMemo(el){
+    el.style.height = "auto";
+    el.style.height = el.scrollHeight + (el.offsetHeight - el.clientHeight) + "px";
+  }
+  const fitMemos = () => catsEl.querySelectorAll(".row .memo").forEach(fitMemo);
+  let memoRaf = 0;
+  window.addEventListener("resize", () => { cancelAnimationFrame(memoRaf); memoRaf = requestAnimationFrame(fitMemos); });
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(() => fitMemos());
+
   function render(){
     const guest = isGuest(state);
     syncAllSpend();
@@ -299,6 +309,7 @@
           <button type="button" class="add-item">+ 항목 추가</button>`}
         </section>`).join("");
     }
+    fitMemos();
     if(Math.abs(window.scrollY - keepY) > 1) window.scrollTo(0, keepY);
     updateTotals();
     updateMini();
@@ -724,7 +735,7 @@
     const it = findItem(t, c);
     if(!it) return;
     if(t.classList.contains("name")) it.name = t.value;
-    if(t.classList.contains("memo")) it.memo = t.value;
+    if(t.classList.contains("memo")){ it.memo = t.value; fitMemo(t); }
     if(t.classList.contains("qty-in")){
       t.value = t.value.replace(/[^\d]/g, "").slice(0, 4);
       const q = parseInt(t.value, 10);
