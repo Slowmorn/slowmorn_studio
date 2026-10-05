@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://slowmorn.com/</loc><lastmod>2026-10-05</lastmod></url>
   <url><loc>https://slowmorn.com/budget/</loc><lastmod>2026-10-05</lastmod></url>
   <url><loc>https://slowmorn.com/budget/planner/</loc><lastmod>2026-10-05</lastmod></url>
   <url><loc>https://slowmorn.com/budget/guide/</loc><lastmod>2026-10-05</lastmod></url>
@@ -8,4 +9,6 @@
   <url><loc>https://slowmorn.com/budget/guestbook/</loc><lastmod>2026-10-05</lastmod></url>
   <url><loc>https://slowmorn.com/budget/privacy/</loc><lastmod>2026-10-05</lastmod></url>
   <url><loc>https://slowmorn.com/budget/terms/</loc><lastmod>2026-10-05</lastmod></url>
+  <url><loc>https://slowmorn.com/benedi.html</loc></url>
+  <url><loc>https://slowmorn.com/errorspace.html</loc></url>
 </urlset>

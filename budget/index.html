@@ -51,7 +51,7 @@
 
 <section class="hero">
   <div class="hero-inner">
-    <p class="hero-kicker">결혼·육아 준비 예산표와 체크리스트</p>
+    <p class="hero-kicker">버짓리스트 · 결혼·육아 준비 예산표와 체크리스트</p>
     <h1>준비할 건 많고, 고를 건 더 많으니까</h1>
     <!-- 소개 글은 캐릭터가 말풍선으로 건네요. 캐릭터는 둥둥 뜨고, 눈을 깜빡이고 두리번거리고, 가끔(누르면 바로) 한 바퀴 돌아요. -->
     <div class="hero-talk">
@@ -119,13 +119,32 @@
   "@context": "https://schema.org",
   "@graph": [
     {
+      "@type": "WebSite",
+      "@id": "https://slowmorn.com/budget/#website",
+      "url": "https://slowmorn.com/budget/",
+      "name": "버짓리스트",
+      "alternateName": ["버짓 리스트", "Budget List", "budgetlist"],
+      "inLanguage": "ko",
+      "publisher": { "@id": "https://slowmorn.com/#org" }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://slowmorn.com/#org",
+      "name": "Slowmorn",
+      "url": "https://slowmorn.com/",
+      "email": "hello@slowmorn.com"
+    },
+    {
       "@type": "WebApplication",
       "name": "버짓리스트",
+      "alternateName": "Budget List",
+      "url": "https://slowmorn.com/budget/",
       "applicationCategory": "FinanceApplication",
       "operatingSystem": "Web",
       "inLanguage": "ko",
       "description": "결혼·출산·육아 준비 목록과 항목별 선택지를 카테고리로 나눠 한눈에 정리하는 무료 예산표와 체크리스트.",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" }
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "KRW" },
+      "publisher": { "@id": "https://slowmorn.com/#org" }
     }
   ]
 }
