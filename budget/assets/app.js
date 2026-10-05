@@ -47,8 +47,8 @@
   }
   syncActive();
   function replaceActive(data){
-    // 색과 제목 이모지는 파일의 것이라 그대로 둡니다
-    const plan = newPlan(Object.assign(data, { id: state.id, accent: state.accent }, state.icon ? { icon: state.icon } : {}));
+    // 색은 파일의 것이라 그대로 둡니다
+    const plan = newPlan(Object.assign(data, { id: state.id, accent: state.accent }));
     store.plans[store.plans.indexOf(state)] = plan;
     state = plan;
   }
@@ -212,7 +212,7 @@
     ddayChip.title = `${label ? label + " · " : ""}${state.dday} · 눌러서 고치기`;
   }
   if(ddayChip) ddayChip.addEventListener("click", () => {
-    window.BudgetShell.openDday(state, () => { renderDday(); renderFileBar(); });
+    window.BudgetShell.openDday(state, () => { renderDday(); renderFileBar(); updateMini(); });
   });
 
   function renderFileBar(){
@@ -256,6 +256,8 @@
   // Icon only; the label (with the hidden item count) goes to the tooltip and screen readers
   const foldBtnHTML = c => `<button type="button" class="fold-btn" aria-expanded="${!c.collapsed}" aria-label="${foldLabel(c)}" title="${foldLabel(c)}"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3.5 5.5L7 9l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>`;
 
+  const EMOJI_PH = `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="9" cy="10" r="1.2" fill="currentColor"/><circle cx="15" cy="10" r="1.2" fill="currentColor"/><path d="M8.5 14.2c.9 1.3 2.1 2 3.5 2s2.6-.7 3.5-2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+
   function render(){
     const guest = isGuest(state);
     syncAllSpend();
@@ -266,14 +268,14 @@
     renderFileBar();
     renderDday();
     titleEl.value = state.title || "";
-    renderEmoji();
     fitTitle();
     if(!state.categories.length){
-      catsEl.innerHTML = `<div class="empty">카테고리가 없어요. 오른쪽 아래의 '카테고리 추가'를 누르거나 위의 템플릿을 불러오세요.</div>`;
+      catsEl.innerHTML = `<div class="empty">카테고리가 없어요. 아래의 '카테고리 추가'를 누르거나 위의 템플릿을 불러오세요.</div>`;
     } else {
       catsEl.innerHTML = state.categories.map(c => `
         <section class="cat${c.collapsed ? " collapsed" : ""}" data-cid="${c.id}">
           <div class="cat-head">
+            <button type="button" class="cat-emoji${c.icon ? " has" : ""}" aria-haspopup="dialog" aria-label="${c.icon ? "카테고리 이모지 바꾸기" : "카테고리 이모지 넣기"}" title="${c.icon ? "이모지 바꾸기" : "이모지 넣기"}">${c.icon ? esc(c.icon) : EMOJI_PH}</button>
             <input type="text" class="cat-name" value="${esc(c.name)}" placeholder="카테고리 이름" aria-label="카테고리 이름">
             <span class="cat-sum">${catSumHTML(c)}</span>
             ${foldBtnHTML(c)}
@@ -299,7 +301,8 @@
     }
     if(Math.abs(window.scrollY - keepY) > 1) window.scrollTo(0, keepY);
     updateTotals();
-    if(navOpen) renderCatNav();
+    updateMini();
+    renderCatNav();
     renderHello();
   }
 
@@ -317,25 +320,41 @@
     renderHello();
   });
 
-  // ---- 카테고리 내비게이션 ----
-  // 합계 바 위에 떠 있습니다. 동그란 단추로만 열고 닫아요 (다른 곳을 눌러도 닫히지 않습니다).
-  // 여기서 카테고리로 건너뛰고, 손잡이로 순서를 바꾸고, 새 카테고리 이름을 적습니다.
-  const catNav = document.getElementById("catNav");
-  const catNavBtn = document.getElementById("catNavBtn");
-  const catNavPop = document.getElementById("catNavPop");
+  // ---- 카테고리 가로 목록과 위에 붙는 막대 ----
+  // 목록은 요약 카드 안에 있다가, 스크롤해서 카드의 목록 자리가 화면 위로 지나가면
+  // 화면 위에 나타나는 막대로 옮겨 가요 (한 줄 요약과 함께). 다시 올라오면 카드로 돌아옵니다.
+  // 카테고리를 눌러 건너뛰고, 손잡이로 순서를 바꾸고, + 로 새 카테고리 이름을 적습니다.
+  const planBar = document.getElementById("planBar");
+  const cardCats = document.getElementById("cardCats");
+  const pbCats = document.getElementById("pbCats");
   const catNavList = document.getElementById("catNavList");
-  const NAV_KEY = "prep-budget-catnav";
-  let navOpen = false;
-  let naming = null; // 내비에서 이름을 적고 있는 새 카테고리
+  let naming = null; // 목록에서 이름을 적고 있는 새 카테고리
   let navDrag = null;
-  const totalsEl = document.querySelector(".totals");
-  // 합계 바 높이는 화면 폭에 따라 달라서, 그 위에 뜨도록 재어서 넘깁니다
-  if(totalsEl && window.ResizeObserver){
-    new ResizeObserver(() => document.body.style.setProperty("--totals-h", totalsEl.offsetHeight + "px")).observe(totalsEl);
+  let lastBarH = 0;
+  // 막대 높이만큼 위를 비워 둡니다 (카테고리로 이동, 끌 때 위쪽 자동 스크롤). 아직 안 떴으면 짐작값으로.
+  const barH = () => planBar.classList.contains("stuck") ? (lastBarH = planBar.offsetHeight) : (lastBarH || (window.innerWidth <= 640 ? 92 : 56));
+  function setStuck(on){
+    if(on === planBar.classList.contains("stuck")) return;
+    const x = catNavList.scrollLeft;
+    const focused = pbCats.contains(document.activeElement) ? document.activeElement : null;
+    if(on){
+      cardCats.style.height = cardCats.offsetHeight + "px"; // 빈자리가 줄어 화면이 튀지 않게
+      planBar.appendChild(pbCats);
+    } else {
+      cardCats.appendChild(pbCats);
+      cardCats.style.height = "";
+    }
+    planBar.classList.toggle("stuck", on);
+    catNavList.scrollLeft = x;
+    if(focused && document.activeElement !== focused) focused.focus({ preventScroll: true });
+    if(on) lastBarH = planBar.offsetHeight;
   }
-  // 화면 위쪽 1/3 선에 걸쳐 있는 카테고리를 '지금 보는 곳'으로 칩니다
+  if(window.IntersectionObserver){
+    new IntersectionObserver(([e]) => setStuck(!e.isIntersecting && e.boundingClientRect.top < 0)).observe(cardCats);
+  }
+  // 막대 바로 아래 선에 걸쳐 있는 카테고리를 '지금 보는 곳'으로 칩니다
   function currentCatId(){
-    const line = window.innerHeight / 3;
+    const line = barH() + 40;
     const cards = [...catsEl.querySelectorAll(".cat")];
     const hit = cards.find(el => el.getBoundingClientRect().bottom > line);
     return hit ? hit.dataset.cid : null;
@@ -348,6 +367,7 @@
     // 이름을 적는 중에 다시 그려도 커서 자리를 지킵니다
     const typing = document.activeElement && document.activeElement.classList.contains("cat-nav-input") ? document.activeElement : null;
     const caret = typing ? [typing.selectionStart, typing.selectionEnd] : null;
+    const keepX = catNavList.scrollLeft;
     catNavList.innerHTML = state.categories.length ? state.categories.map(c => {
       if(c.id === naming) return `<div class="cat-nav-item naming" role="listitem" data-cid="${esc(c.id)}">
         <input type="text" class="cat-nav-input" value="${esc(c.name)}" placeholder="새 카테고리 이름" aria-label="새 카테고리 이름" enterkeyhint="done">
@@ -356,41 +376,34 @@
       return `<div class="cat-nav-item" role="listitem" data-cid="${esc(c.id)}">
         <button type="button" class="cat-nav-grip" aria-label="'${esc(catLabel(c))}' 순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기">${NAV_GRIP}</button>
         <button type="button" class="cat-nav-go" data-go="${esc(c.id)}"${c.id === here ? ` aria-current="true"` : ""}>
-          <span class="cat-nav-name">${esc(catLabel(c))}</span>
-          <span class="cat-nav-meta">${n}${guest ? "명" : "개"}</span>
+          ${c.icon ? `<span class="cat-nav-emoji" aria-hidden="true">${esc(c.icon)}</span>` : ""}<span class="cat-nav-name">${esc(catLabel(c))}</span>
+          <span class="cat-nav-meta">${n}</span>
         </button>
       </div>`;
-    }).join("") : `<div class="cat-nav-empty">아직 카테고리가 없어요</div>`;
+    }).join("") : `<div class="cat-nav-empty">카테고리가 없어요. + 로 추가해 보세요</div>`;
+    catNavList.scrollLeft = keepX;
     if(typing){
       const again = catNavList.querySelector(".cat-nav-input");
       if(again){ again.focus({ preventScroll: true }); try{ again.setSelectionRange(caret[0], caret[1]); }catch(_){} }
     }
   }
+  // 지금 보는 카테고리를 표시하고, 가로 목록에서 보이도록 옆으로 밀어 둡니다
   function markCurrent(){
     const here = currentCatId();
+    let on = null;
     catNavList.querySelectorAll(".cat-nav-go").forEach(b => {
-      if(b.dataset.go === here) b.setAttribute("aria-current", "true"); else b.removeAttribute("aria-current");
+      if(b.dataset.go === here){ b.setAttribute("aria-current", "true"); on = b; } else b.removeAttribute("aria-current");
     });
+    if(on && !navDrag){
+      const item = on.closest(".cat-nav-item");
+      const l = item.offsetLeft, r = l + item.offsetWidth, vw = catNavList.clientWidth, x = catNavList.scrollLeft;
+      if(l < x + 8) catNavList.scrollTo({ left: Math.max(0, l - 24), behavior: "smooth" });
+      else if(r > x + vw - 8) catNavList.scrollTo({ left: r - vw + 24, behavior: "smooth" });
+    }
   }
-  function setNav(open, quiet){
-    navOpen = open;
-    catNavPop.hidden = !open;
-    catNav.classList.toggle("open", open);
-    catNavBtn.setAttribute("aria-expanded", String(open));
-    catNavBtn.setAttribute("aria-label", open ? "카테고리 목록 닫기" : "카테고리 목록");
-    catNavBtn.title = open ? "카테고리 목록 닫기" : "카테고리 목록";
-    if(quiet) return; // 처음 열 때는 첫 render() 가 목록을 그려요
-    if(open) renderCatNav();
-    try{ localStorage.setItem(NAV_KEY, open ? "open" : "closed"); }catch(e){}
-  }
-  catNavBtn.addEventListener("click", () => setNav(!navOpen));
-  // 처음에는 펼쳐 둡니다. 닫아 두면 그 뒤로는 닫힌 채로 열려요.
-  let navStart = true;
-  try{ navStart = localStorage.getItem(NAV_KEY) !== "closed"; }catch(e){}
-  if(navStart) setNav(true, true);
   let navRaf = 0;
   window.addEventListener("scroll", () => {
-    if(!navOpen || navRaf) return;
+    if(navRaf) return;
     navRaf = requestAnimationFrame(() => { navRaf = 0; markCurrent(); });
   }, { passive: true });
 
@@ -401,30 +414,38 @@
     el.classList.add("cat-flash");
     setTimeout(() => el.classList.remove("cat-flash"), 1400);
   }
+  // 막대에 가리지 않게, 막대 높이만큼 위를 띄우고 내립니다
+  const scrollToCat = el => window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - barH() - 12, behavior: reduceMotion() ? "auto" : "smooth" });
   catNavList.addEventListener("click", e => {
     const btn = e.target.closest("[data-go]");
     if(!btn) return;
     const el = catsEl.querySelector(`.cat[data-cid="${CSS.escape(btn.dataset.go)}"]`);
     if(!el) return;
-    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 12, behavior: reduceMotion() ? "auto" : "smooth" });
+    scrollToCat(el);
     flashCat(el);
     track("category_jump", { count: state.categories.length });
   });
+  // 세로 휠로도 가로 목록을 옆으로 넘길 수 있게
+  catNavList.addEventListener("wheel", e => {
+    if(Math.abs(e.deltaY) <= Math.abs(e.deltaX) || catNavList.scrollWidth <= catNavList.clientWidth) return;
+    e.preventDefault();
+    catNavList.scrollLeft += e.deltaY;
+  }, { passive: false });
 
-  // 새 카테고리: 맨 아래에 빈 카드를 만들고, 이름은 내비에서 적습니다
+  // 새 카테고리: 맨 아래에 빈 카드를 만들고, 이름은 막대에서 적습니다
   function addCategory(){
     if(naming) finishNaming(false, true);
     const c = { id: nid(), name: "", items: [newItem()] };
     state.categories.push(c);
     naming = c.id;
-    setNav(true, true);
-    try{ localStorage.setItem(NAV_KEY, "open"); }catch(e){}
     render(); save();
     window.scrollTo({ top: document.documentElement.scrollHeight, behavior: reduceMotion() ? "auto" : "smooth" });
+    catNavList.scrollLeft = catNavList.scrollWidth;
     const input = catNavList.querySelector(".cat-nav-input");
-    if(input){ input.focus({ preventScroll: true }); input.scrollIntoView({ block: "nearest" }); }
+    if(input) input.focus({ preventScroll: true });
   }
   document.getElementById("addCat").addEventListener("click", addCategory);
+  document.getElementById("toTop").addEventListener("click", () => window.scrollTo({ top: 0, behavior: reduceMotion() ? "auto" : "smooth" }));
   // 목록 맨 아래의 점선 단추: 카드에서 바로 이름을 적어요 (빈 목록에서 찾기 쉽게)
   document.getElementById("addCatBottom").addEventListener("click", () => {
     if(naming) finishNaming(false, true);
@@ -472,36 +493,38 @@
     finishNaming(false, !!(to && to.dataset.cid === naming));
   });
 
-  // 순서 바꾸기: 내비의 손잡이를 끌거나, 손잡이에서 ↑/↓
-  // 끄는 줄은 제자리에서 translate 로 따라오고, 나머지 줄은 flip 으로 밀려납니다.
-  // (유리 효과의 backdrop-filter 때문에 position:fixed 가 목록 안에 갇혀서, 띄우지 않고 옮겨요)
-  function navMove(y){
+  // 순서 바꾸기: 칩의 손잡이를 끌거나, 손잡이에서 ←/→
+  // 카드 안에서는 칩이 여러 줄이라 위아래로도 옮기고, 위 막대에서는 한 줄을 옆으로 옮겨요.
+  // 끄는 칩은 제자리에서 translate 로 따라오고, 나머지 칩은 flip 으로 밀려납니다.
+  function navMove(x, y){
     const d = navDrag;
-    const items = [...catNavList.querySelectorAll(".cat-nav-item")];
-    const cur = items.indexOf(d.item), h = d.item.offsetHeight;
-    const top = y - catNavList.getBoundingClientRect().top - d.gy; // 끄는 줄의 윗변 (목록 기준)
-    const center = top + h / 2;
-    const rest = items.filter(el => el !== d.item);
-    let to = 0;
-    rest.forEach(el => {
-      const t = el.offsetTop - (items.indexOf(el) > cur ? h : 0);
-      if(center > t + el.offsetHeight / 2) to++;
-    });
-    if(to !== cur){
-      flip(rest, () => { const ref = rest[to]; if(ref) ref.before(d.item); else catNavList.appendChild(d.item); });
-      d.moved = true;
+    const oneRow = planBar.classList.contains("stuck");
+    const rest = [...catNavList.querySelectorAll(".cat-nav-item")].filter(el => el !== d.item);
+    const box = catNavList.getBoundingClientRect();
+    const px = x - box.left + catNavList.scrollLeft, py = y - box.top;
+    // 포인터 아래의 칩 (offset 으로 재서 밀려나는 애니메이션에 흔들리지 않아요). 한 줄일 때는 가로 위치만 봐요.
+    const inX = el => px >= el.offsetLeft && px <= el.offsetLeft + el.offsetWidth;
+    const hit = rest.find(el => inX(el) && (oneRow || (py >= el.offsetTop - 3 && py <= el.offsetTop + el.offsetHeight + 3)));
+    if(hit){
+      const after = px > hit.offsetLeft + hit.offsetWidth / 2;
+      const already = after ? hit.nextElementSibling === d.item : d.item.nextElementSibling === hit;
+      if(!already){
+        flip(rest, () => { if(after) hit.after(d.item); else hit.before(d.item); });
+        d.moved = true;
+      }
     }
-    d.item.style.transform = `translateY(${top - d.item.offsetTop}px)`;
+    const tx = px - d.gx - d.item.offsetLeft, ty = oneRow ? 0 : py - d.gy - d.item.offsetTop;
+    d.item.style.transform = `translate(${tx}px, ${ty}px)`;
   }
   function navAutoScroll(){
     if(!navDrag) return;
-    const b = catNavPop.getBoundingClientRect(), y = navDrag.y;
-    const speed = y < b.top + 36 ? -Math.min(14, (b.top + 36 - y) / 3 + 2)
-                : y > b.bottom - 36 ? Math.min(14, (y - b.bottom + 36) / 3 + 2) : 0;
-    if(speed){ catNavPop.scrollTop += speed; navMove(y); }
+    const b = catNavList.getBoundingClientRect(), x = navDrag.x;
+    const speed = x < b.left + 40 ? -Math.min(14, (b.left + 40 - x) / 3 + 2)
+                : x > b.right - 40 ? Math.min(14, (x - b.right + 40) / 3 + 2) : 0;
+    if(speed && planBar.classList.contains("stuck")){ catNavList.scrollLeft += speed; navMove(x, navDrag.y); }
     navDrag.raf = requestAnimationFrame(navAutoScroll);
   }
-  // 카드 순서를 내비 순서에 맞춥니다 (통째로 다시 그리지 않아서 보던 자리가 그대로예요)
+  // 카드 순서를 막대 순서에 맞춥니다 (통째로 다시 그리지 않아서 보던 자리가 그대로예요)
   function applyCatOrder(order){
     state.categories.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
     // 보고 있던 카드가 화면에서 같은 자리에 남도록 합니다
@@ -522,10 +545,10 @@
     document.body.classList.remove("nav-sorting");
     item.classList.remove("dragging");
     if(cancel){ item.style.transform = ""; renderCatNav(); return; }
-    const from = item.getBoundingClientRect().top;
+    const from = item.getBoundingClientRect();
     item.style.transform = "";
-    const dy = from - item.getBoundingClientRect().top;
-    if(dy && !reduceMotion()) item.animate([{ transform: `translateY(${dy}px)` }, { transform: "none" }], { duration: 160, easing: EASE });
+    const to = item.getBoundingClientRect(), dx = from.left - to.left, dy = from.top - to.top;
+    if((dx || dy) && !reduceMotion()) item.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }], { duration: 160, easing: EASE });
     if(moved){
       applyCatOrder([...catNavList.querySelectorAll(".cat-nav-item")].map(el => el.dataset.cid));
       track("category_reorder", { count: state.categories.length });
@@ -541,13 +564,13 @@
     item.classList.add("dragging");
     document.body.classList.add("nav-sorting");
     try{ grip.setPointerCapture(e.pointerId); }catch(_){}
-    navDrag = { item, gy: e.clientY - r.top, y: e.clientY, moved: false, raf: 0 };
+    navDrag = { item, gx: e.clientX - r.left, gy: e.clientY - r.top, x: e.clientX, y: e.clientY, moved: false, raf: 0 };
     navDrag.raf = requestAnimationFrame(navAutoScroll);
   });
   window.addEventListener("pointermove", e => {
     if(!navDrag) return;
-    navDrag.y = e.clientY;
-    navMove(e.clientY);
+    navDrag.x = e.clientX; navDrag.y = e.clientY;
+    navMove(e.clientX, e.clientY);
   });
   window.addEventListener("pointerup", () => navEnd(false));
   window.addEventListener("pointercancel", () => navEnd(true));
@@ -555,7 +578,7 @@
   catNavList.addEventListener("keydown", e => {
     const grip = e.target.closest(".cat-nav-grip");
     if(!grip) return;
-    const step = { ArrowUp: -1, ArrowDown: 1 }[e.key];
+    const step = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -1, ArrowDown: 1 }[e.key];
     if(!step) return;
     e.preventDefault();
     const id = grip.closest(".cat-nav-item").dataset.cid;
@@ -567,10 +590,11 @@
     applyCatOrder(order);
     renderCatNav();
     const again = catNavList.querySelector(`.cat-nav-item[data-cid="${CSS.escape(id)}"] .cat-nav-grip`);
-    if(again){ again.focus(); again.scrollIntoView({ block: "nearest" }); }
+    if(again){ again.focus({ preventScroll: true }); again.scrollIntoView({ block: "nearest", inline: "nearest" }); }
   });
 
   // 예산 합계 = 모든 항목의 가격, 지출 합계 = 지출 칸의 합 (체크하면 가격이 저절로 들어가요)
+  // 요약 카드와, 위에 붙었을 때의 한 줄 요약을 함께 채웁니다.
   function updateTotals(){
     let b = 0, spent = 0, done = 0, count = 0;
     state.categories.forEach(c => c.items.forEach(i => {
@@ -586,7 +610,17 @@
     document.getElementById("tSpendMan").innerHTML = manwon(spent) || "&nbsp;";
     document.getElementById("tPeople").textContent = `${count}명`;
     document.getElementById("titleDone").innerHTML = guest ? "" : `완료 <b>${done}</b> / ${count}`;
+    document.getElementById("barBudget").innerHTML = `${guest ? "축의금" : "예산"} <b>${won(b)}</b>`;
+    document.getElementById("barSpend").innerHTML = guest ? "" : `지출 <b>${won(spent)}</b>`;
+    document.getElementById("barDone").innerHTML = guest ? `<b>${count}</b>명` : `완료 <b>${done}</b>/${count}`;
     showSaved();
+  }
+  // 한 줄 요약의 이름·남은 날
+  function updateMini(){
+    document.getElementById("barTitle").textContent = planLabel(state);
+    const n = BS.daysLeft(state.dday), dd = document.getElementById("barDday");
+    dd.textContent = n === null ? "" : (n === 0 ? "D-day" : n > 0 ? `D-${n}` : `D+${-n}`);
+    dd.className = "pb-chip" + (n === null ? "" : n < 0 ? " past" : n <= 14 ? " soon" : "");
   }
 
   const findCat = el => state.categories.find(c => c.id === el.closest(".cat").dataset.cid);
@@ -602,42 +636,60 @@
   }
   window.addEventListener("resize", () => fitTitle());
 
-  // ---- 제목 왼쪽 이모지 ----
-  // 따로 그림 파일 없이 기기의 기본 이모지를 씁니다. 파일마다 하나 (state.icon).
+  // ---- 카테고리 이름 앞 이모지 ----
+  // 따로 그림 파일 없이 기기의 기본 이모지를 씁니다. 카테고리마다 하나 (c.icon).
   const EMOJIS = ["💍","💒","👰","🤵","💐","🥂","💌","🎂","🎁","🎉","📸","💄",
                   "👶","🍼","🧸","🎀","🤰","🧷","🛁","🚼","🏠","🛋️","🧺","🍳",
                   "✈️","🏖️","🧳","🚗","💰","💳","🧾","📋","📅","✅","⭐","❤️",
                   "🌸","🌷","🌿","🍀","☀️","🌙","🐶","🐱","🐰","🐻","🍰","☕️"];
-  const emojiMenu = document.getElementById("emojiMenu");
-  const emojiVal = document.getElementById("emojiVal");
+  const emojiPop = document.getElementById("catEmojiPop");
   const emojiGrid = document.getElementById("emojiGrid");
   emojiGrid.innerHTML = EMOJIS.map(e => `<button type="button" class="emoji-opt" data-emoji="${e}" aria-label="${e}">${e}</button>`).join("");
-  function renderEmoji(){
-    const icon = state.icon || "";
-    emojiVal.textContent = icon;
-    emojiMenu.classList.toggle("has-emoji", !!icon);
-    const label = icon ? "이모지 바꾸기" : "이모지 넣기";
-    emojiMenu.querySelector("summary").setAttribute("aria-label", label);
-    emojiMenu.querySelector("summary").title = label;
-    emojiGrid.querySelectorAll(".emoji-opt").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.emoji === icon)));
-    document.getElementById("emojiClear").hidden = !icon;
+  let emojiFor = null; // { cid, btn }
+  function openCatEmoji(c, btn){
+    if(emojiFor && emojiFor.cid === c.id){ closeCatEmoji(); return; }
+    closeMenus();
+    emojiFor = { cid: c.id };
+    emojiGrid.querySelectorAll(".emoji-opt").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.emoji === (c.icon || ""))));
+    document.getElementById("emojiClear").hidden = !c.icon;
+    emojiPop.hidden = false;
+    // 누른 단추 바로 아래에, 화면 밖으로 나가지 않게 둡니다
+    const r = btn.getBoundingClientRect(), w = emojiPop.offsetWidth;
+    emojiPop.style.left = Math.max(8, Math.min(r.left, document.documentElement.clientWidth - w - 8)) + window.scrollX + "px";
+    emojiPop.style.top = r.bottom + 6 + window.scrollY + "px";
+    const first = emojiGrid.querySelector('[aria-pressed="true"]') || emojiGrid.querySelector(".emoji-opt");
+    if(first) first.focus({ preventScroll: true });
+  }
+  function closeCatEmoji(back){
+    if(!emojiFor) return;
+    const cid = emojiFor.cid;
+    emojiFor = null;
+    emojiPop.hidden = true;
+    if(back){ const b = catsEl.querySelector(`.cat[data-cid="${CSS.escape(cid)}"] .cat-emoji`); if(b) b.focus({ preventScroll: true }); }
+  }
+  function setCatEmoji(icon){
+    const c = emojiFor && state.categories.find(x => x.id === emojiFor.cid);
+    closeCatEmoji();
+    if(!c) return;
+    if(icon) c.icon = icon; else delete c.icon;
+    render(); save();
   }
   emojiGrid.addEventListener("click", e => {
     const b = e.target.closest("[data-emoji]");
-    if(!b) return;
-    state.icon = b.dataset.emoji;
-    emojiMenu.open = false;
-    renderEmoji(); save();
+    if(b) setCatEmoji(b.dataset.emoji);
   });
-  document.getElementById("emojiClear").addEventListener("click", () => {
-    delete state.icon;
-    emojiMenu.open = false;
-    renderEmoji(); save();
+  document.getElementById("emojiClear").addEventListener("click", () => setCatEmoji(""));
+  document.addEventListener("pointerdown", e => {
+    if(emojiFor && !emojiPop.contains(e.target) && !e.target.closest(".cat-emoji")) closeCatEmoji();
   });
+  document.addEventListener("keydown", e => { if(emojiFor && e.key === "Escape") closeCatEmoji(true); });
+  window.addEventListener("resize", () => closeCatEmoji());
+
   titleEl.addEventListener("input", () => {
     fitTitle();
     state.title = titleEl.value;
     fileNameEl.textContent = planLabel(state);
+    updateMini();
     save();
   });
 
@@ -770,6 +822,7 @@
     const t = e.target.closest("button");
     if(!t || !t.closest(".cat")) return;
     const c = findCat(t);
+    if(t.classList.contains("cat-emoji")){ openCatEmoji(c, t); return; }
     if(t.classList.contains("add-item")){
       const it = newItem();
       c.items.push(it);
@@ -933,8 +986,7 @@
 
   function autoScroll(){
     if(!drag) return;
-    const bar = document.querySelector(".totals").getBoundingClientRect().height;
-    const top = 80, bottom = window.innerHeight - bar - 60;
+    const top = barH() + 60, bottom = window.innerHeight - 60;
     const speed = drag.y < top ? -Math.min(24, (top - drag.y) / 3 + 4)
                 : drag.y > bottom ? Math.min(24, (drag.y - bottom) / 3 + 4) : 0;
     if(speed){ window.scrollBy(0, speed); moveDragTo(drag.x, drag.y); }
@@ -992,7 +1044,7 @@
       drag.raf = requestAnimationFrame(autoScroll);
     }
   });
-  // On window, so the drag keeps working when the pointer leaves the grid (e.g. over the totals bar)
+  // On window, so the drag keeps working when the pointer leaves the grid
   window.addEventListener("pointermove", e => {
     if(!drag) return;
     drag.x = e.clientX; drag.y = e.clientY;

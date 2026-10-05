@@ -1,5 +1,5 @@
 /* 예산표 앱 스타일 — assets/base.css 다음에 읽습니다 */
-body{padding-bottom:calc(var(--totals-h, 88px) + 116px)} /* 합계 바와 그 위에 뜬 카테고리 단추 자리 */
+body{padding-bottom:64px}
 body{--wrap:1240px}  /* 1열도 2열과 같은 폭 */
 body[data-cols="4"]{--wrap:1640px}
 .wrap{max-width:var(--wrap);margin:0 auto;padding:20px 20px 0;scroll-margin-top:12px}
@@ -29,37 +29,22 @@ body[data-cols="4"]{--wrap:1640px}
 .plan-title{
   display:block;width:100%;
   font-weight:700;letter-spacing:-0.02em;
-  font-size:clamp(28px,5vw,40px);line-height:1.2;
-  border:0;background:transparent;padding:4px 0;margin:0;
-  border-bottom:1px dashed transparent;
+  font-size:clamp(24px,4vw,32px);line-height:1.2;
+  border:0;background:transparent;padding:2px 0;margin:0;
+  border-bottom:1px solid transparent;
 }
-.plan-title:hover{border-bottom-color:var(--line)}
 /* 제목 줄: 이름 오른쪽에 완료 개수 */
 .title-row{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 14px;position:relative;margin-bottom:14px}
 .title-row .plan-title{flex:0 1 auto;width:auto;max-width:100%;min-width:2ch}
 /* 제목 글자 폭을 재는 보이지 않는 자 (plan-title 과 같은 글꼴) */
 .plan-title-probe{
   position:absolute;visibility:hidden;white-space:pre;left:0;top:0;pointer-events:none;
-  font-weight:700;letter-spacing:-0.02em;font-size:clamp(28px,5vw,40px);line-height:1.2;
+  font-weight:700;letter-spacing:-0.02em;font-size:clamp(24px,4vw,32px);line-height:1.2;
 }
 /* 제목 왼쪽 이모지. 없을 때는 흐린 웃는 얼굴 단추만 */
-.emoji-menu{position:relative;flex:none;align-self:center}
-.emoji-btn{
-  list-style:none;cursor:pointer;user-select:none;
-  display:grid;place-items:center;min-width:44px;height:48px;padding:0 2px;border-radius:10px;
-  color:var(--muted);
-}
-.emoji-btn::-webkit-details-marker{display:none}
-.emoji-btn:hover,.emoji-menu[open] .emoji-btn{background:var(--hover)}
-.emoji-btn:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
-.emoji-ph{width:26px;height:26px;opacity:.45}
-.emoji-btn:hover .emoji-ph{opacity:.8}
-.emoji-val{font-size:clamp(28px,4.6vw,38px);line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
-.emoji-menu.has-emoji .emoji-ph{display:none}
-.emoji-menu:not(.has-emoji) .emoji-val{display:none}
-.title-row:has(.emoji-menu){gap:0 10px}
-.title-row:has(.emoji-menu[open]){z-index:8}
-.emoji-pop{left:0;right:auto;width:min(316px, calc(100vw - 32px));padding:8px}
+/* 카테고리 이모지 고르기 상자 (자바스크립트가 누른 단추 아래에 놓아요) */
+.emoji-pop{position:absolute;top:0;left:0;right:auto;z-index:30;width:min(316px, calc(100vw - 16px));padding:8px}
+.emoji-pop[hidden]{display:none}
 .emoji-grid{display:grid;grid-template-columns:repeat(8, 1fr);gap:2px}
 .menu-pop .emoji-opt{
   aspect-ratio:1;width:auto;border:0;border-radius:8px;background:none;padding:0;
@@ -70,6 +55,53 @@ body[data-cols="4"]{--wrap:1640px}
 .menu-pop .emoji-opt[aria-pressed="true"]{background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent-fill)}
 .menu-pop .emoji-clear{margin-top:6px;width:100%;color:var(--muted);font-size:13px;text-align:center}
 .emoji-clear[hidden]{display:none}
+/* 요약 카드: [이모지 이름 ✎ · D-day] / 진행 막대 · 완료 / 예산·지출 합계 · 저장 · 내보내기 */
+/* 버짓보드의 판과 같은 옅은 유리판 (색 없음) */
+.plan-card{
+  position:relative;z-index:5;margin-bottom:14px;padding:16px 20px;  /* 말풍선이 툴바 위에 오도록 */
+  border-radius:22px;
+  border:1px solid rgba(64,62,58,.08);
+  background:linear-gradient(162deg, rgba(96,94,88,.045) 0%, rgba(96,94,88,.075) 52%, rgba(96,94,88,.05) 100%);
+  box-shadow:
+    0 1px 2px rgba(40,36,32,.07),
+    0 5px 12px -5px rgba(40,36,32,.15),
+    0 14px 26px -16px rgba(40,36,32,.2),
+    inset 0 0 0 1px rgba(255,255,255,.5),
+    inset 0 1px 0 rgba(255,255,255,.9),
+    inset 0 -1px 0 rgba(64,62,58,.05),
+    inset 0 0 14px -5px rgba(255,255,255,.95),
+    inset 0 0 44px rgba(255,255,255,.22);
+}
+.plan-card::after{
+  content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(180deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,.08) 10%, transparent 24%);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .plan-card{
+    background:rgba(40,40,42,.44);border-color:rgba(255,255,255,.1);
+    box-shadow:0 18px 50px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  :root:not([data-theme="light"]) .plan-card::after{display:none}
+}
+.pc-top.title-row{flex-wrap:nowrap;align-items:center;margin-bottom:10px}
+.pc-title{position:relative;min-width:0;flex:0 1 auto;display:flex;align-items:center;gap:6px}
+.pc-title .plan-title{flex:0 1 auto;width:auto;max-width:100%;min-width:2ch}
+/* 이름은 눌러서 고쳐요. 연필은 올렸을 때만 */
+.pc-pen{flex:none;width:15px;height:15px;color:var(--muted);opacity:0;transition:opacity .15s;pointer-events:none}
+.pc-title:hover .pc-pen,.plan-title:focus + .pc-pen{opacity:.8}
+.plan-card .dday-chip{margin-left:auto;font-size:13.5px;padding:5px 12px}
+.pc-top .title-done{align-self:center}
+/* 카테고리 목록 자리. 목록이 위 막대로 옮겨 가도 높이는 그대로 둡니다 */
+.pc-cats-slot{margin:0 0 22px}
+.pc-nums{display:flex;align-items:flex-end;flex-wrap:wrap;gap:12px 32px}
+/* 카드 바닥에 붙도록 '약 n만 원'은 숫자 옆에 둡니다 (아래 줄을 따로 두면 바닥 여백이 커 보여요) */
+.pc-nums .t-main{display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:8px}
+.pc-nums .t-main .t-label{grid-column:1 / -1}
+.pc-nums .t-export{align-self:flex-end}
+@media (max-width:640px){
+  .plan-card{padding:12px 14px;border-radius:18px}
+  .pc-nums{gap:10px 22px}
+}
 .title-done{flex:none;color:var(--muted);font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .title-done:empty{display:none}
 .title-done b{color:var(--ink);font-weight:700}
@@ -193,13 +225,24 @@ body[data-cols="4"] #cats{--cols:4}
 .toolbar{position:relative;z-index:4}
 /* 메뉴를 펼친 동안은 합계 바(5)와 떠 있는 단추(6) 위로 올려, 템플릿 목록 끝의 '엑셀 불러오기'가 가려지지 않게 합니다 */
 .toolbar:has(details[open]){z-index:7}
-/* 1줄: 이름 · 접기   2줄: 예산/완료 · ⋯ 메뉴 */
+/* 1줄: 이모지 · 이름 · ⋯ 메뉴   2줄: 예산/완료 · 접기 */
 .cat-head{
-  display:grid;grid-template-columns:minmax(0,1fr) auto;
-  grid-template-areas:"name fold" "sum menu";
+  display:grid;grid-template-columns:auto minmax(0,1fr) auto;
+  grid-template-areas:"emo name menu" "sum sum fold";
   align-items:center;column-gap:6px;margin-bottom:2px;
 }
+.cat-head .cat-emoji{grid-area:emo}
 .cat-head .cat-name{grid-area:name}
+/* 카테고리 이모지 단추. 비어 있으면 흐린 웃는 얼굴 (올렸을 때 더 또렷하게) */
+.cat-emoji{
+  width:30px;height:30px;padding:0;border:0;border-radius:8px;background:none;
+  display:grid;place-items:center;color:var(--muted);
+  font-size:20px;line-height:1;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+}
+/* 빈 자리의 웃는 얼굴은 파일 색으로 */
+.cat-emoji svg{width:19px;height:19px;color:var(--swatch, var(--accent-fill));opacity:.75;transition:opacity .15s}
+.cat-head:hover .cat-emoji svg,.cat-emoji:focus-visible svg{opacity:1}
+.cat-emoji:hover{background:var(--accent-soft)}
 .cat-head .fold-btn{grid-area:fold}
 .cat-head .cat-sum{grid-area:sum}
 .cat-head .cat-menu{grid-area:menu}
@@ -463,18 +506,6 @@ body:not(.kind-guestbook) .t-people{display:none}
 .foot-actions button{border:0;background:none;color:var(--muted);text-decoration:underline;padding:0;font-size:inherit}
 .foot-actions button:hover{color:var(--warn)}
 
-/* 합계 줄 — 종이 위에 얹힌 한 겹으로 두고, 큰 숫자 하나만 강조합니다 */
-.totals{
-  position:fixed;left:0;right:0;bottom:0;z-index:5;
-  background:color-mix(in srgb, var(--sheet) 88%, transparent);
-  -webkit-backdrop-filter:saturate(180%) blur(12px);
-  backdrop-filter:saturate(180%) blur(12px);
-  border-top:1px solid var(--line);color:var(--ink);
-}
-.totals-inner{
-  max-width:var(--wrap);margin:0 auto;padding:14px 20px calc(14px + env(safe-area-inset-bottom));
-  display:flex;align-items:center;gap:28px;flex-wrap:wrap;
-}
 .t-main .t-label,.t-small .t-label{font-size:12.5px;color:var(--muted)}
 .t-main .t-num{
   font-weight:700;
@@ -485,14 +516,14 @@ body:not(.kind-guestbook) .t-people{display:none}
 .t-small .t-num{font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
 .t-small .t-num.over{color:var(--warn)}
 .export{
-  border:0;border-radius:var(--radius);padding:11px 18px;font-weight:600;
+  border:0;border-radius:var(--radius);padding:7px 14px;font-size:14px;font-weight:600;
   background:var(--ink);color:var(--sheet);white-space:nowrap;
 }
 .export{cursor:pointer;display:inline-block;text-align:center;user-select:none}
 .export:hover{filter:brightness(1.35)}
 .export[aria-disabled="true"]{opacity:.6;cursor:wait}
-.t-export{flex:1;display:flex;align-items:center;gap:14px}
-.saved-at{flex:1;text-align:center;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.t-export{flex:1;display:flex;align-items:center;justify-content:flex-end;gap:14px}
+.saved-at{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .saved-at:empty{display:none}
 
 
@@ -536,112 +567,102 @@ body:not(.kind-guestbook) .t-people{display:none}
   .wrap{padding-top:12px}
   .file-switch-btn{max-width:56vw}
   .cat{padding:8px 12px 6px}
-  .totals-inner{gap:14px 20px}
   /* 좁은 화면에서는 엑셀 내보내기를 빼고, 저장 시각만 오른쪽에 둡니다 */
   .t-export{flex:none;margin-left:auto}
-  .saved-at{flex:none;text-align:right}
   .export{display:none}
-  .toast{bottom:130px}
 }
 @media (prefers-reduced-motion:reduce){.toast,.tpl-btn,.tool-btn,.tpl-btn .chev{transition:none}}
 
-/* 체크리스트 화면은 아래에 합계 바가 깔려 있어 알림을 더 띄웁니다 */
-#planner ~ .toast,
-body:has(#planner) .toast{bottom:120px}
-
-/* 카테고리 내비게이션 — 합계 바 위 오른쪽에 뜬 유리 단추와 목록.
-   뒤로 카드와 글자가 지나가므로 흐림만으로도 유리로 읽힙니다.
-   동그란 단추 위에 '카테고리 추가', 열면 그 위에 목록이 뜹니다. */
-.cat-nav{
-  position:fixed;z-index:6;
-  right:max(20px, env(safe-area-inset-right));
-  bottom:calc(var(--totals-h, 88px) + 16px);
+/* 위에 붙는 막대: 카테고리 가로 목록과 +. 스크롤해서 붙으면 한 줄 요약이 같이 나와요. */
+/* 화면 위에 나타나는 막대. 자리를 차지하지 않고, 카드의 목록이 지나간 뒤에만 보여요 */
+.plan-bar{
+  position:fixed;top:0;left:0;right:0;z-index:6;
+  padding:8px max(20px, calc((100vw - var(--wrap)) / 2 + 20px));
+  display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;
+  background:color-mix(in srgb, var(--page) 86%, transparent);
+  -webkit-backdrop-filter:saturate(180%) blur(12px);
+  backdrop-filter:saturate(180%) blur(12px);
+  box-shadow:0 1px 0 var(--line), 0 10px 24px -14px rgba(40,36,32,.35);
+  transform:translateY(-110%);visibility:hidden;
+  transition:transform .2s ease, visibility 0s linear .2s;
 }
-body.is-sorting .cat-nav{display:none}
-.cat-nav-btns{display:flex;align-items:center;gap:8px}  /* [+] [목록] */
-.cat-nav-btn,.cat-nav-add,.cat-nav-pop{
-  background:rgba(255,255,255,.58);
-  border:1px solid rgba(255,255,255,.85);
-  -webkit-backdrop-filter:blur(18px) saturate(160%);
-  backdrop-filter:blur(18px) saturate(160%);
-  box-shadow:
-    0 1px 2px rgba(40,36,32,.08),
-    0 10px 28px -10px rgba(40,36,32,.32),
-    inset 0 1px 0 rgba(255,255,255,.95),
-    inset 0 0 0 1px rgba(255,255,255,.35);
+.plan-bar.stuck{transform:none;visibility:visible;transition:transform .2s ease}
+.pb-mini{display:flex;align-items:center;gap:6px 12px;min-width:0;font-size:13.5px;color:var(--muted)}
+.pb-title{color:var(--ink);font-size:14.5px;font-weight:700;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb-chip{font-size:11.5px;font-weight:700;padding:1px 8px;border-radius:99px;background:var(--ink);color:var(--sheet);white-space:nowrap}
+.pb-chip.soon{background:#C2603F}
+.pb-chip.past{background:color-mix(in srgb, var(--ink) 45%, transparent)}
+.pb-chip:empty{display:none}
+.pb-stat{white-space:nowrap;font-variant-numeric:tabular-nums}
+.pb-stat b{color:var(--ink);font-weight:700}
+body:not(.show-spend) .pb-spend,body.kind-guestbook .pb-spend{display:none}
+.pb-cats{flex:1 1 320px;min-width:0;display:flex;align-items:center;gap:6px}
+.cat-strip{
+  flex:1;min-width:0;display:flex;align-items:center;gap:6px;position:relative;
+  overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none;padding:2px;
+  /* 양 끝을 흐리게 해서 옆으로 더 있다는 걸 알려요 */
+  -webkit-mask-image:linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 16px), transparent);
+          mask-image:linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 16px), transparent);
 }
-.cat-nav-btn{
-  cursor:pointer;user-select:none;padding:0;
-  width:48px;height:48px;border-radius:50%;
-  display:grid;place-items:center;color:var(--ink);
-  transition:transform .16s ease, background-color .16s ease;
+.cat-strip::-webkit-scrollbar{display:none}
+.cat-nav-item{
+  flex:none;display:flex;align-items:center;position:relative;
+  border:1px solid var(--line);border-radius:99px;background:var(--sheet);
+  transition:background-color .15s, border-color .15s;
 }
-.cat-nav-add{
-  display:grid;place-items:center;padding:0;
-  width:38px;height:38px;border-radius:50%;color:var(--ink);
-  transition:transform .16s ease, background-color .16s ease;
+.cat-nav-item:has(.cat-nav-go[aria-current="true"]){
+  background:var(--accent-soft);border-color:color-mix(in srgb, var(--accent-fill) 45%, var(--line));
 }
-.cat-nav-add svg{width:16px;height:16px}
-.cat-nav-btn:hover,.cat-nav-add:hover{background:rgba(255,255,255,.75);transform:translateY(-1px)}
-.cat-nav-btn:active,.cat-nav-add:active{transform:scale(.96)}
-.cat-nav-btn:focus-visible,.cat-nav-add:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
-.cat-nav-btn svg{width:20px;height:20px;grid-area:1 / 1}
-.cat-nav .ico-close,.cat-nav.open .ico-list{display:none}
-.cat-nav.open .ico-close{display:block}
-.cat-nav-pop{
-  position:absolute;right:0;bottom:calc(100% + 10px);
-  width:min(230px, calc(100vw - 40px));
-  max-height:min(60vh, calc(100vh - var(--totals-h, 88px) - 150px));
-  overflow:auto;overscroll-behavior:contain;
-  padding:6px;border-radius:18px;
-  transform-origin:bottom right;
-  animation:cat-nav-in .16s ease;
-}
-.cat-nav-pop[hidden]{display:none}
-@keyframes cat-nav-in{from{opacity:0;transform:translateY(6px) scale(.97)}}
-.cat-nav-title{color:var(--muted);font-size:12px;font-weight:600;padding:8px 12px 6px}
-#catNavList{position:relative}  /* 끄는 줄의 offsetTop 기준 */
-.cat-nav-item{display:flex;align-items:center;border-radius:11px;position:relative}
-.cat-nav-item.dragging{
-  z-index:2;background:var(--sheet);
-  box-shadow:0 8px 20px rgba(15,20,30,.18);outline:2px solid var(--accent-fill);outline-offset:-2px;
-}
+.cat-nav-item.dragging{z-index:2;box-shadow:0 6px 16px rgba(15,20,30,.18);outline:2px solid var(--accent-fill);outline-offset:-1px}
 .cat-nav-grip{
-  flex:none;width:22px;height:34px;padding:0;border:0;border-radius:7px;background:none;
-  display:grid;place-items:center;color:var(--muted);cursor:grab;opacity:.6;
+  flex:none;width:18px;height:30px;padding:0 0 0 4px;border:0;border-radius:99px 0 0 99px;background:none;
+  display:grid;place-items:center;color:var(--muted);cursor:grab;opacity:.5;
   touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
 }
-.cat-nav-grip svg{width:8px;height:14px}
+.cat-nav-grip svg{width:7px;height:12px}
 .cat-nav-item:hover .cat-nav-grip,.cat-nav-grip:focus-visible{opacity:1}
-.cat-nav-grip:hover{background:rgba(55,53,47,.07);color:var(--ink)}
-@media (hover:none){.cat-nav-grip{opacity:1}}
+@media (hover:none){.cat-nav-grip{opacity:.8}}
 .cat-nav-go{
-  flex:1;min-width:0;display:flex;align-items:center;gap:10px;
-  border:0;background:none;color:var(--ink);text-align:left;
-  padding:8px 10px 8px 4px;border-radius:11px;font-size:14px;
+  display:flex;align-items:center;gap:6px;
+  border:0;background:none;color:var(--ink);
+  padding:4px 12px 4px 3px;border-radius:0 99px 99px 0;font-size:13.5px;white-space:nowrap;
 }
-.cat-nav-go::before{
-  content:"";width:7px;height:7px;border-radius:50%;flex:none;
-  background:var(--swatch, var(--accent-fill));opacity:.35;
-}
-.cat-nav-go:hover{background:rgba(55,53,47,.07)}
-.cat-nav-go[aria-current="true"]{font-weight:600;background:rgba(55,53,47,.06)}
-.cat-nav-go[aria-current="true"]::before{opacity:1}
-.cat-nav-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cat-nav-meta{flex:none;color:var(--muted);font-size:12px;font-weight:400;font-variant-numeric:tabular-nums}
-.cat-nav-item.naming{padding:3px 2px}
+.cat-nav-go[aria-current="true"]{font-weight:600}
+.cat-nav-name{max-width:160px;overflow:hidden;text-overflow:ellipsis}
+.cat-nav-emoji{font-size:14px;line-height:1;margin-right:-2px;font-family:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif}
+/* 요약 카드 안에서는 줄을 바꿔 한 번에 다 보이고, 위 막대에 붙었을 때만 옆으로 넘겨요 */
+.pc-cats-slot .cat-strip{flex-wrap:wrap;overflow:visible;-webkit-mask-image:none;mask-image:none}
+.pc-cats-slot .pb-cats{align-items:flex-start}
+.cat-nav-meta{color:var(--muted);font-size:11.5px;font-weight:400;font-variant-numeric:tabular-nums}
+.cat-nav-item:hover{border-color:color-mix(in srgb, var(--ink) 20%, var(--line))}
+.cat-nav-item.naming{border-color:var(--accent-fill)}
 .cat-nav-input{
-  width:100%;min-width:0;font-size:14px;font-weight:600;
-  border:1px solid var(--accent-fill);border-radius:9px;background:var(--sheet);color:var(--ink);
-  padding:7px 10px;
+  width:170px;font-size:13.5px;font-weight:600;
+  border:0;border-radius:99px;background:transparent;color:var(--ink);padding:5px 12px;
 }
-.cat-nav-input:focus{outline:none;box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-fill) 25%, transparent)}
-.cat-nav-empty{color:var(--muted);font-size:13px;padding:6px 12px 10px}
-/* 휴대폰에서는 열어 둔 목록이 화면을 덜 가리게 */
+.cat-nav-input:focus{outline:none}
+.cat-nav-item.naming:focus-within{box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-fill) 25%, transparent)}
+.cat-nav-empty{color:var(--muted);font-size:13px;padding:4px 6px;white-space:nowrap}
+.cat-strip-add{
+  flex:none;width:32px;height:32px;padding:0;border-radius:50%;
+  border:1px dashed color-mix(in srgb, var(--ink) 25%, var(--line));background:var(--sheet);color:var(--ink);
+  display:grid;place-items:center;
+}
+.cat-strip-add svg{width:15px;height:15px}
+.cat-strip-add:hover{border-style:solid;border-color:var(--accent-fill);background:var(--accent-soft)}
+/* 맨 위로: 위 막대에 붙었을 때만 */
+.cat-strip-top{
+  flex:none;width:32px;height:32px;padding:0;border-radius:50%;
+  border:1px solid var(--line);background:var(--sheet);color:var(--ink);
+  display:grid;place-items:center;
+}
+.cat-strip-top svg{width:16px;height:16px}
+.cat-strip-top:hover{background:var(--hover-strong, var(--hover))}
+.pc-cats-slot .cat-strip-top{display:none}
 @media (max-width:640px){
-  .cat-nav{right:max(14px, env(safe-area-inset-right))}
-  .cat-nav-pop{width:min(210px, calc(100vw - 28px));max-height:min(46vh, calc(100vh - var(--totals-h, 88px) - 150px))}
-  .cat-nav-go{padding:7px 8px 7px 2px}
+  .plan-bar{padding:6px 12px}
+  .pb-mini{flex-basis:100%}
+  .pb-title{max-width:40vw}
 }
 /* 내려앉은 카테고리를 잠깐 표시합니다 */
 .cat.cat-flash{animation:cat-flash 1.4s ease}
@@ -649,27 +670,12 @@ body.is-sorting .cat-nav{display:none}
   0%,35%{box-shadow:0 0 0 3px color-mix(in srgb, var(--swatch, var(--accent-fill)) 45%, transparent)}
   100%{box-shadow:0 0 0 3px transparent}
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]) .cat-nav-btn,
-  :root:not([data-theme="light"]) .cat-nav-add,
-  :root:not([data-theme="light"]) .cat-nav-pop{
-    background:rgba(40,40,42,.6);border-color:rgba(255,255,255,.1);
-    box-shadow:0 12px 32px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.08);
-  }
-  :root:not([data-theme="light"]) .cat-nav-btn:hover,
-  :root:not([data-theme="light"]) .cat-nav-add:hover{background:rgba(52,52,54,.7)}
-  :root:not([data-theme="light"]) .cat-nav-go:hover,
-  :root:not([data-theme="light"]) .cat-nav-grip:hover,
-  :root:not([data-theme="light"]) .cat-nav-go[aria-current="true"]{background:rgba(255,255,255,.07)}
-}
-@media (prefers-reduced-motion:reduce){.cat-nav-pop,.cat.cat-flash{animation:none}.cat-nav-btn,.cat-nav-add{transition:none}}
-
-/* 설명 말풍선: 제목 줄 오른쪽 끝에 떠 있는 캐릭터, 말풍선은 왼쪽으로 뻗어요.
+/* 설명 말풍선: 요약 카드 오른쪽 아래에 걸쳐 떠 있는 캐릭터, 말풍선은 왼쪽으로 뻗어요.
    자리를 차지하지 않고 위에 얹혀서, 닫아도 아래 내용이 움직이지 않아요. */
 .hello{
-  position:absolute;z-index:5;right:0;top:50%;transform:translateY(-50%);
+  position:absolute;z-index:8;right:14px;top:calc(100% - 14px);
   display:flex;align-items:center;gap:12px;
-  width:min(460px, 100%);
+  width:min(460px, calc(100% - 28px));
   animation:hello-in .28s cubic-bezier(.2,.8,.2,1);
 }
 .hello[hidden]{display:none}
@@ -696,11 +702,8 @@ body.is-sorting .cat-nav{display:none}
 .hello-x:hover{background:var(--hover);color:var(--ink)}
 .hello-char{flex:none;width:52px;height:52px;border-radius:14px;display:block}
 /* 좁은 화면에서는 제목 바로 아래에 겹쳐 띄웁니다 */
-@media (max-width:820px){
-  .hello{top:calc(100% + 6px);transform:none;width:100%}
-  .hello-char{width:44px;height:44px}
-}
-@media (prefers-reduced-motion:reduce){.hello{animation:none}}
+@media (max-width:820px){.hello-char{width:44px;height:44px}}
+@media (prefers-reduced-motion:reduce){.hello,.cat.cat-flash{animation:none}.plan-bar{transition:none}}
 
 /* 파일 줄 오른쪽의 남은 날. 눌러서 정하고 고칩니다. */
 .dday-chip{
