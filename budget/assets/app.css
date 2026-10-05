@@ -416,13 +416,14 @@ body:not(.kind-guestbook) .t-people{display:none}
   padding:4px 4px 4px 10px;
 }
 .opt-edit-form{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px;padding:0 8px 6px 38px}
+/* 칸 대신 점선 밑줄만. 고치는 중에는 밑줄이 실선으로 */
 .opt-head-edit input,.opt-edit-form input{
-  width:100%;min-width:0;border:1px solid color-mix(in srgb, var(--accent-fill) 30%, var(--line));border-radius:8px;
-  background:var(--sheet);padding:6px 10px;font-size:14px;line-height:1.35;  /* 두 줄의 칸 높이를 같게 */
+  width:100%;min-width:0;border:0;border-bottom:1px dashed color-mix(in srgb, var(--ink) 35%, transparent);border-radius:0;
+  background:transparent;padding:6px 4px;font-size:14px;line-height:1.35;  /* 두 줄의 칸 높이를 같게 */
 }
 .opt-head-edit .opt-radio{margin-right:4px}
 .opt-head-edit input[data-f="name"]{font-weight:600}
-.opt-head-edit input:focus,.opt-edit-form input:focus{outline:none;border-color:var(--accent)}
+.opt-head-edit input:focus,.opt-edit-form input:focus{outline:none;border-bottom-style:solid;border-bottom-color:var(--accent)}
 .opt-head-edit .money{text-align:right;font-variant-numeric:tabular-nums}
 @media (max-width:640px){
   .opt-head-edit{grid-template-columns:18px minmax(0,1fr) 104px;padding-left:8px}
