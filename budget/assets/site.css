@@ -47,6 +47,49 @@ footer a:hover{text-decoration:underline}
   margin:0 0 12px;max-width:22ch;
 }
 .hero-lead{color:var(--muted);margin:0;max-width:62ch;line-height:1.7}
+/* 소개 글을 건네는 캐릭터와 말풍선 */
+.hero-talk{display:flex;align-items:center;gap:18px;margin-top:6px;max-width:760px}
+.mascot{
+  flex:none;width:104px;height:104px;padding:0;border:0;background:none;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+.mascot svg{width:100%;height:100%;display:block;overflow:visible}
+.mascot:focus-visible{outline:2px solid var(--ink);outline-offset:4px;border-radius:24px}
+.m-shadow{fill:rgba(40,36,32,.14);transform-box:fill-box;transform-origin:center;animation:m-shadow 3.2s ease-in-out infinite}
+.m-body{transform-box:fill-box;transform-origin:50% 60%;animation:m-float 3.2s ease-in-out infinite}
+.m-eyes{transform-box:fill-box;transform-origin:center;animation:m-blink 4.6s infinite}
+.m-pupil{animation:m-look 7s ease-in-out infinite}
+/* 한 바퀴: 살짝 웅크렸다가 돌고 착지 */
+.mascot.spin .m-body{animation:m-spin .9s cubic-bezier(.45,.05,.3,1)}
+@keyframes m-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes m-shadow{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.82);opacity:.6}}
+@keyframes m-blink{0%,44%,50%,92%,100%{transform:scaleY(1)}47%,95%{transform:scaleY(.08)}}
+@keyframes m-look{0%,30%{transform:translateX(0)}38%,58%{transform:translateX(22px)}66%,82%{transform:translateX(-8px)}90%,100%{transform:translateX(0)}}
+@keyframes m-spin{
+  0%{transform:translateY(0) rotate(0) scale(1)}
+  15%{transform:translateY(4px) rotate(0) scale(1.06,.92)}
+  70%{transform:translateY(-22px) rotate(360deg) scale(1)}
+  85%{transform:translateY(2px) rotate(360deg) scale(1.05,.95)}
+  100%{transform:translateY(0) rotate(360deg) scale(1)}
+}
+@media (prefers-reduced-motion:reduce){.m-shadow,.m-body,.m-eyes,.m-pupil,.mascot.spin .m-body{animation:none}}
+/* 소개 글: 말풍선 없이 글만. 타자 치듯 한 글자씩 나와요.
+   자리는 처음부터 다 잡아 두고(흐린 글자 대신 투명), 그 위에 친 글자를 겹쳐서 줄이 밀리지 않아요. */
+.hero-bubble{position:relative;flex:1;min-width:0;font-size:15.5px;line-height:1.7}
+.tw-ghost{visibility:hidden}
+.tw-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+.tw-live{position:absolute;inset:0}
+.tw-live::after{
+  content:"";display:inline-block;width:2px;height:1.05em;margin-left:2px;vertical-align:-.15em;
+  background:currentColor;animation:tw-caret 1s steps(1) infinite;
+}
+.tw-live.done::after{animation:tw-caret 1s steps(1) 3;opacity:0}
+@keyframes tw-caret{0%,49%{opacity:1}50%,100%{opacity:0}}
+@media (max-width:640px){
+  .hero-talk{gap:12px;align-items:flex-start}
+  .mascot{width:72px;height:72px;margin-top:6px}
+  .hero-bubble{font-size:14.5px}
+}
 /* 한국어 제목·소개는 어절 단위로 줄을 바꿉니다 ("많으니 / 까" 처럼 끊기지 않게) */
 .hero h1,.hero-lead,.hero .lead{word-break:keep-all}
 .hero-points{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}

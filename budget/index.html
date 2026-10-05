@@ -31,7 +31,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <link rel="stylesheet" href="assets/base.css?v=20260927a">
-<link rel="stylesheet" href="assets/site.css?v=20261005a">
+<link rel="stylesheet" href="assets/site.css?v=20261005f">
 </head>
 <body class="desk-page">
 
@@ -53,11 +53,30 @@
   <div class="hero-inner">
     <p class="hero-kicker">결혼·육아 준비 예산표와 체크리스트</p>
     <h1>준비할 건 많고, 고를 건 더 많으니까</h1>
-    <p class="hero-lead">
-      결혼과 육아 준비는 체크리스트도 길고, 항목마다 비교할 선택지도 많아요.
-      엑셀로 정리하다 보면 카테고리 나누기부터 막히죠.
-      버짓리스트는 딱 그 일, 준비 목록과 선택지를 한눈에 보이게 정리하는 데만 집중했어요.
-    </p>
+    <!-- 소개 글은 캐릭터가 말풍선으로 건네요. 캐릭터는 둥둥 뜨고, 눈을 깜빡이고 두리번거리고, 가끔(누르면 바로) 한 바퀴 돌아요. -->
+    <div class="hero-talk">
+      <button type="button" class="mascot" id="mascot" aria-label="버짓리스트 캐릭터 (누르면 한 바퀴 돌아요)">
+        <svg viewBox="100 90 400 400" aria-hidden="true">
+          <defs>
+            <clipPath id="mEyeL"><ellipse cx="286" cy="240" rx="42" ry="21"/></clipPath>
+            <clipPath id="mEyeR"><ellipse cx="404" cy="240" rx="42" ry="21"/></clipPath>
+          </defs>
+          <ellipse class="m-shadow" cx="300" cy="482" rx="120" ry="10"/>
+          <g class="m-body">
+            <path d="M120 301V291C120 191.589 200.589 111 300 111C399.411 111 480 191.589 480 291V301C480 394.888 444.183 471 400 471C381.08 471 363.696 457.042 350 433.71C336.304 457.042 318.92 471 300 471C281.08 471 263.696 457.042 250 433.71C236.304 457.042 218.92 471 200 471C155.817 471 120 394.888 120 301Z" fill="#B7E255"/>
+            <g class="m-eyes">
+              <g clip-path="url(#mEyeL)"><ellipse cx="286" cy="240" rx="42" ry="21" fill="#fff"/><rect class="m-pupil" x="244" y="219" width="42" height="42" fill="#000"/></g>
+              <g clip-path="url(#mEyeR)"><ellipse cx="404" cy="240" rx="42" ry="21" fill="#fff"/><rect class="m-pupil" x="362" y="219" width="42" height="42" fill="#000"/></g>
+            </g>
+          </g>
+        </svg>
+      </button>
+      <p class="hero-lead hero-bubble">
+        결혼과 육아 준비는 체크리스트도 길고, 항목마다 비교할 선택지도 많아요.
+        엑셀로 정리하다 보면 카테고리 나누기부터 막히죠.
+        버짓리스트는 딱 그 일, 준비 목록과 선택지를 한눈에 보이게 정리하는 데만 집중했어요.
+      </p>
+    </div>
   </div>
 </section>
 
@@ -127,6 +146,40 @@
 <script src="assets/store.js?v=20260927j"></script>
 <script src="assets/shell.js?v=20260926g"></script>
 <script src="assets/desk.js?v=20261005a"></script>
+<script>
+  // 소개 글을 타자 치듯 한 글자씩 보여 줘요. 읽어 주는 기계와 검색에는 처음부터 전체 글이 있어요.
+  (function(){
+    var p = document.querySelector(".hero-bubble");
+    if(!p || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var text = p.textContent.replace(/\s+/g, " ").trim();
+    p.textContent = "";
+    // 자리를 잡는 투명한 글과 한 글자씩 치는 글은 화면용이라 숨기고, 읽어 주는 기계에는 따로 전체 글을 둡니다
+    var sr = document.createElement("span"); sr.className = "tw-sr"; sr.textContent = text;
+    var ghost = document.createElement("span"); ghost.className = "tw-ghost"; ghost.textContent = text; ghost.setAttribute("aria-hidden", "true");
+    var live = document.createElement("span"); live.className = "tw-live"; live.setAttribute("aria-hidden", "true");
+    p.append(sr, ghost, live);
+    var chars = Array.from(text), i = 0;
+    setTimeout(function tick(){
+      i++;
+      live.textContent = chars.slice(0, i).join("");
+      if(i < chars.length) setTimeout(tick, /[.,!?]/.test(chars[i - 1]) ? 260 : 32);
+      else live.classList.add("done");
+    }, 500);
+  })();
+  // 캐릭터: 처음 한 번, 그 뒤로는 가끔, 누르면 바로 한 바퀴 돌아요 (움직임 줄이기 설정이면 돌지 않아요)
+  (function(){
+    var m = document.getElementById("mascot");
+    if(!m || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    function spin(){
+      if(m.classList.contains("spin")) return;
+      m.classList.add("spin");
+      setTimeout(function(){ m.classList.remove("spin"); }, 900);
+    }
+    m.addEventListener("click", spin);
+    setTimeout(spin, 1200);
+    setInterval(function(){ if(!document.hidden && Math.random() < 0.5) spin(); }, 9000);
+  })();
+</script>
 
 </body>
 </html>
