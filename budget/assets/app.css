@@ -684,7 +684,7 @@ body:not(.show-spend) .pb-spend,body.kind-guestbook .pb-spend{display:none}
   position:relative;flex:1;min-width:0;
   background:var(--sheet);color:var(--ink);
   border:1px solid var(--line);border-radius:14px;
-  box-shadow:0 10px 28px -8px rgba(40,36,32,.3), 0 1px 2px rgba(40,36,32,.08);
+  box-shadow:0 3px 8px -3px rgba(40,36,32,.18), 0 1px 2px rgba(40,36,32,.06);
   padding:9px 30px 9px 13px;
 }
 /* 꼬리: 오른쪽의 캐릭터 쪽으로 */
