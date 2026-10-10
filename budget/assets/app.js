@@ -25,9 +25,21 @@
   const TEMPLATE_LIST = BS.templates;
 
   // Menu entries after 빈 목록, in the data's order
+  // 예산 구성이 있는 템플릿은 커서를 올리면 오른쪽에 구성(과 그 예산 합계)이 펼쳐져요. 템플릿을 바로 누르면 아무것도 고르지 않은 목록이에요.
   document.getElementById("tplBlank").insertAdjacentHTML("afterend", TEMPLATE_LIST.map(t => {
     const e = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-    return `<button type="button" data-tpl="${e(t.id)}" data-label="${e(t.label)}">${e(t.label)}<small>${e(t.desc)}</small></button>`;
+    const main = `<button type="button" data-tpl="${e(t.id)}" data-label="${e(t.label)}">${e(t.label)}<small>${e(t.desc)}</small></button>`;
+    const tiers = t.kind === "guestbook" ? [] : (t.tiers || []);
+    if(!tiers.length) return main;
+    const man = n => n >= 10000 ? "약 " + Math.round(n / 10000).toLocaleString("ko-KR") + "만 원" : (n || 0).toLocaleString("ko-KR") + "원";
+    return `<div class="tpl-sub">${main.replace("<small>", '<span class="tpl-more" aria-hidden="true">›</span><small>')}
+      <div class="tpl-tiers" role="group" aria-label="${e(t.label)} 예산 구성">
+        <div class="menu-note">예산 구성을 골라 불러와요</div>
+        <button type="button" data-tpl="${e(t.id)}" data-label="${e(t.label)}">선택 없이<small>목록과 선택지만</small></button>
+        <hr>
+        ${tiers.map(r => `<button type="button" data-tpl="${e(t.id)}" data-tier="${e(r.id)}" data-label="${e(t.label)} · ${e(r.label)}">${e(r.label)}<small>예산 ${man(BS.summary(BS.fromTemplate(t.id, r.id)).budget)}</small></button>`).join("")}
+      </div>
+    </div>`;
   }).join(""));
 
   const { nid, fromTemplate, newPlan, safeLink, planLabel } = BS;
@@ -624,34 +636,9 @@
     document.getElementById("barBudget").innerHTML = `${guest ? "축의금" : "예산"} <b>${won(b)}</b>`;
     document.getElementById("barSpend").innerHTML = guest ? "" : `지출 <b>${won(spent)}</b>`;
     document.getElementById("barDone").innerHTML = guest ? `<b>${count}</b>명` : `완료 <b>${done}</b>/${count}`;
-    renderTiers();
     showSaved();
   }
 
-  // ---- 예산 구성 (미니멀·스탠다드·풀옵션 …) ----
-  // 템플릿에서 온 구성이 있을 때만 보여요. 버튼마다 그 구성으로 바꿨을 때의 예산 합계가 붙어요.
-  // 선택지를 직접 바꾸면 어느 버튼도 눌려 있지 않아요.
-  const tiersEl = document.getElementById("tTiers"), tierSeg = document.getElementById("tierSeg");
-  const shortWon = n => n >= 10000 ? Math.round(n / 10000).toLocaleString("ko-KR") + "만" : won(n);
-  function renderTiers(){
-    const tiers = !isGuest(state) && state.tiers || [];
-    tiersEl.hidden = !tiers.length;
-    if(!tiers.length){ tierSeg.innerHTML = ""; return; }
-    const on = BS.activeTier(state);
-    tierSeg.innerHTML = tiers.map(r => `<button type="button" data-tier="${esc(r.id)}" aria-pressed="${!!on && on.id === r.id}">${esc(r.label)}<small>${shortWon(BS.tierTotal(state, r.id))}</small></button>`).join("");
-  }
-  tierSeg.addEventListener("click", e => {
-    const b = e.target.closest("[data-tier]");
-    if(!b || b.getAttribute("aria-pressed") === "true") return;
-    const r = (state.tiers || []).find(x => x.id === b.dataset.tier);
-    if(!r) return;
-    const snap = snapshot();
-    BS.applyTier(state, r.id);
-    render(); save();
-    let b2 = 0;
-    state.categories.forEach(c => c.items.forEach(i => { b2 += i.budget || 0; }));
-    toast(`'${r.label}' 구성으로 골랐어요 · 예산 ${won(b2)}`, snap);
-  });
   const tierTagsHTML = o => (o.tiers || []).map(id => (state.tiers || []).find(r => r.id === id)).filter(Boolean)
     .map(r => `<span class="opt-tier">${esc(r.label)}</span>`).join("");
   // 한 줄 요약의 이름·남은 날
@@ -1117,11 +1104,11 @@
     // Keep a name the user typed; only default names get the template's title
     const title = (state.title || "").trim();
     const isDefault = !title || /^새 예산표( \d+)?$/.test(title) || title === "우리 아기 출산 준비" || BS.templates.some(t => t.title === title);
-    const plan = fromTemplate(btn.dataset.tpl);
+    const plan = fromTemplate(btn.dataset.tpl, btn.dataset.tier);
     if(!isDefault) plan.title = state.title;
     replaceActive(plan);
     render(); save();
-    track("template_load", { template: btn.dataset.tpl, source: "menu" });
+    track("template_load", { template: btn.dataset.tpl, tier: btn.dataset.tier || "", source: "menu" });
     toast(`'${btn.dataset.label}' 템플릿을 불러왔어요`, snap);
   }));
 

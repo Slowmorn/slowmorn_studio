@@ -98,14 +98,6 @@ body[data-cols="4"]{--wrap:1640px}
 .pc-nums .t-main{display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:8px}
 .pc-nums .t-main .t-label{grid-column:1 / -1}
 .pc-nums .t-export{align-self:flex-end}
-/* 예산 구성: 누르면 선택지가 그 구성으로 한 번에 골라져요. 버튼마다 그 구성의 예산 합계가 붙어요 */
-.t-tiers{display:flex;flex-direction:column;gap:4px;min-width:0}
-.t-tiers[hidden]{display:none}
-.tier-seg{flex-wrap:wrap}
-.tier-seg button{flex-direction:column;align-items:center;gap:0;padding:4px 12px;line-height:1.25}
-.tier-seg button small{font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:500}
-.tier-seg button[aria-pressed="true"] small{color:var(--ink)}
-body.kind-guestbook .t-tiers{display:none}
 @media (max-width:640px){
   .plan-card{padding:12px 14px;border-radius:18px}
   .pc-nums{gap:10px 22px}
@@ -192,6 +184,23 @@ body.kind-guestbook .opt-toggle{display:none}
 /* Template dropdown */
 .tool-group{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .tpl-menu{position:relative}
+/* 예산 구성이 있는 템플릿: 커서를 올리면 오른쪽에 구성이 펼쳐져요 (터치 화면에서는 바로 아래에 늘 보여요) */
+.tpl-sub{position:relative}
+.tpl-sub > button{position:relative;padding-right:28px}
+.tpl-more{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
+.tpl-sub:hover > button,.tpl-sub:focus-within > button{background:var(--hover)}
+.tpl-tiers{
+  display:none;position:absolute;left:100%;top:-6px;z-index:21;min-width:190px;padding:6px;margin-left:2px;
+  background:var(--sheet);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:0 10px 28px rgba(15,15,14,.13);
+}
+.tpl-tiers::before{content:"";position:absolute;left:-8px;top:0;bottom:0;width:8px} /* 비스듬히 옮겨 가도 닫히지 않게 */
+.tpl-sub:hover .tpl-tiers,.tpl-sub:focus-within .tpl-tiers{display:block}
+@media (hover:none){
+  .tpl-more{display:none}
+  .tpl-sub > button{padding-right:12px}
+  .tpl-tiers{display:block;position:static;margin:0 0 4px 12px;padding:0;border:0;box-shadow:none;background:none;min-width:0}
+  .tpl-tiers::before{display:none}
+}
 .tpl-btn,.tool-btn{
   list-style:none;cursor:pointer;user-select:none;
   display:inline-flex;align-items:center;gap:8px;
@@ -522,7 +531,7 @@ body:not(.kind-guestbook) .t-people{display:none}
 .foot-actions button{border:0;background:none;color:var(--muted);text-decoration:underline;padding:0;font-size:inherit}
 .foot-actions button:hover{color:var(--warn)}
 
-.t-main .t-label,.t-small .t-label,.t-tiers .t-label{font-size:12.5px;color:var(--muted)}
+.t-main .t-label,.t-small .t-label{font-size:12.5px;color:var(--muted)}
 .t-main .t-num{
   font-weight:700;
   font-size:clamp(20px,3.2vw,25px);line-height:1.15;   /* 1억 단위(123,456,789원)까지 두 개가 나란히 들어가게 */
@@ -695,6 +704,9 @@ body:not(.show-spend) .pb-spend,body.kind-guestbook .pb-spend{display:none}
   animation:hello-in .28s cubic-bezier(.2,.8,.2,1);
 }
 .hello[hidden]{display:none}
+/* 툴바 메뉴를 열면 툴바가 카드 위로 올라와 말풍선과 겹쳐요. 메뉴가 열려 있는 동안만 말풍선을 감춥니다 */
+.hello{transition:opacity .15s}
+body:has(.toolbar details[open]) .hello{opacity:0;pointer-events:none}
 @keyframes hello-in{from{opacity:0;translate:8px 0;scale:.97}}
 .hello-bubble{
   position:relative;flex:1;min-width:0;

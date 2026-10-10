@@ -57,7 +57,8 @@
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
-  function fromTemplate(key){
+  // tierId: 고른 예산 구성. 없으면 선택지를 하나도 고르지 않은 목록이에요.
+  function fromTemplate(key, tierId){
     const t = byKey[key] || BLANK;
     // 예산 구성(미니멀·스탠다드·풀옵션 …): 선택지마다 들어가는 구성이 적혀 있어요 (o.tiers)
     const tiers = t.kind === "guestbook" ? [] : (t.tiers || []).filter(r => r && r.id).map(r => ({ id: String(r.id), label: r.label || "구성" }));
@@ -89,8 +90,8 @@
     };
     if(tiers.length){
       plan.tiers = tiers;
-      // 불러오면 기본 구성의 선택지가 미리 골라져서 예산이 바로 보여요
-      applyTier(plan, (tiers.find(r => r.id === t.defaultTier) || tiers[0]).id);
+      // 구성을 골라 불러오면 그 구성의 선택지가 미리 골라져서 예산이 바로 보여요
+      if(tierIds.includes(tierId)) applyTier(plan, tierId);
     }
     return plan;
   }
@@ -108,27 +109,6 @@
       it.budget = o ? (o.price || 0) * qtyOf(it) : 0;
       delete it.priceManual;
     }));
-    p.tier = tid;
-  }
-  // 지금 고른 선택지가 어느 구성과 똑같은지 (직접 바꿨으면 없음). 두 구성이 똑같으면 마지막에 고른 쪽이에요.
-  function activeTier(p){
-    const items = (p.categories || []).flatMap(c => c.items || []).filter(inTiers);
-    const same = r => items.every(it => {
-      const o = tierPick(it, r.id);
-      return (o ? o.id : null) === (it.choiceId || null) && !it.priceManual;
-    });
-    const tiers = p.tiers || [];
-    return tiers.find(r => r.id === p.tier && same(r)) || tiers.find(same) || null;
-  }
-  // 그 구성으로 바꾸면 되는 예산 합계 (구성과 상관없는 항목은 지금 금액 그대로)
-  function tierTotal(p, tid){
-    let sum = 0;
-    (p.categories || []).forEach(c => (c.items || []).forEach(it => {
-      if(!inTiers(it)){ sum += it.budget || 0; return; }
-      const o = tierPick(it, tid);
-      if(o) sum += (o.price || 0) * qtyOf(it);
-    }));
-    return sum;
   }
 
   const newPlan = data => Object.assign({ title: "새 예산표", categories: [] }, data, { id: (data && data.id) || nid() });
@@ -463,7 +443,7 @@
     data,
     get live(){ return live(); },
     get trashed(){ return trashed(); },
-    nid, newPlan, fromTemplate, applyTier, activeTier, tierTotal, accentKey, safeLink, planLabel, isGuest, summary, progress, daysLeft,
+    nid, newPlan, fromTemplate, accentKey, safeLink, planLabel, isGuest, summary, progress, daysLeft,
     find, indexOf,
     save, saveLocalNow, saveToAccount,
     addPlan, addExisting, removePlan, restorePlan, purge, purgeExpired,
