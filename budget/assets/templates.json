@@ -250,6 +250,21 @@
     "title": "출산·육아 준비",
     "intro": "ver. 2026.10\n쌍둥이 아빠가 직접 준비하면서 만든 체크리스트 겸 예산표예요. 나름대로 열심히 찾아보고, 평이 좋은 제품을 항목마다 선택지로 정리해 뒀어요. 겪어본 후 추가 업뎃할게요:) 예비 엄마아빠 화이팅!",
     "kind": "budget",
+    "tiers": [
+      {
+        "id": "min",
+        "label": "스탠다드"
+      },
+      {
+        "id": "std",
+        "label": "스탠다드+"
+      },
+      {
+        "id": "full",
+        "label": "디자이너픽"
+      }
+    ],
+    "defaultTier": "std",
     "categories": [
       {
         "name": "산모",
@@ -482,16 +497,10 @@
           },
           {
             "name": "아기 손수건",
-            "options": [
-              {
-                "name": "밤부베베 손수건",
-                "link": "https://brand.naver.com/bamboobebe/category/009025bfc22a449e82aea3410cb2a7bb?cp=1"
-              },
-              {
-                "name": "베베룬 손수건",
-                "link": "https://brand.naver.com/bebelune/category/26d569842d1b4b27b75a98f5ec7b3426?cp=1"
-              }
-            ]
+            "qty": 30
+          },
+          {
+            "name": ""
           }
         ]
       },
@@ -500,35 +509,54 @@
         "items": [
           {
             "name": "배냇저고리",
+            "memo": "신생아때 필수. 조리원에서 주는 경우도 있어요",
+            "qty": 3,
             "options": [
               {
                 "name": "베베댕 무형광 배냇저고리",
+                "price": 7400,
                 "link": "https://m.bebedeng.co.kr/goods/goods_view.php?goodsNo=1000000032"
               },
               {
                 "name": "큐비앤맘 배냇저고리",
+                "price": 7900,
                 "link": "http://cubynmom.com/category/%EB%B0%B0%EB%83%87%EC%A0%80%EA%B3%A0%EB%A6%AC/925/?srsltid=AU7gw4Wo74W300h56k82Or9JpwVypARJDb8YJZ5PexMQgCrz6Yz_9omm"
               },
               {
                 "name": "베이비베어 배냇저고리",
-                "link": "https://link.coupang.com/a/hbWEzs1PA4"
+                "price": 14200,
+                "link": "https://link.coupang.com/a/hbWEzs1PA4",
+                "note": "배냇저고리 + 손싸개 + 모자"
               }
             ]
           },
           {
             "name": "바디수트",
+            "memo": "일상복, 출산일에 맞춰 계절감 맞게 구매",
+            "qty": 5,
             "options": [
               {
                 "name": "유니클로 쿨 코튼 메쉬 이너 바디수트",
-                "link": "https://www.uniqlo.com/kr/ko/baby/newborn/bodysuits"
+                "price": 9900,
+                "link": "https://www.uniqlo.com/kr/ko/baby/newborn/bodysuits",
+                "note": "가성비",
+                "tiers": [
+                  "min",
+                  "std"
+                ]
               },
               {
-                "name": "H&M 신생아 바디수트",
-                "link": "https://www2.hm.com/ko_kr/baby/products/clothing/bodysuits.html?srsltid=AU7gw4U95kaHSezbcAG3joGCdueFlx-ulWkCorsIT50dR_tC9Lx9Sier"
+                "name": "코니 뉴본 코튼메쉬 바디수트",
+                "price": 20000,
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%BD%94%EB%8B%88%20%EB%B0%94%EB%94%94%EC%88%98%ED%8A%B8#SEARCH_LAYER",
+                "tiers": [
+                  "full"
+                ]
               },
               {
                 "name": "오우아스튜디오 바디수트",
-                "link": "https://link.coupang.com/a/hbWZFdiRRB"
+                "price": 20000,
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%98%A4%EC%9A%B0%EC%95%84%EC%8A%A4%ED%8A%9C%EB%94%94%EC%98%A4%20%EB%B0%94%EB%94%94%EC%88%98%ED%8A%B8&prevQuery=%EC%BD%94%EB%8B%88%20%EB%B0%94%EB%94%94%EC%88%98%ED%8A%B8"
               }
             ]
           },
@@ -537,41 +565,125 @@
             "memo": "조리원에서 제공하는 것으로 충분하다네요"
           },
           {
-            "name": "속싸개",
+            "name": "속싸개 (천 속싸개)",
+            "memo": "출생 직후부터 2~3개월쯤 아기가 뒤집기 기미를 보이면 그만써요. 네모난 천 모양이라, 나중에 이불,담요로 사용도 가능",
+            "qty": 2,
             "options": [
               {
-                "name": "말랑하니 속싸개",
-                "link": "https://link.coupang.com/a/hbY46mEwmW"
+                "name": "오가닉붐 사계절 속싸보",
+                "price": 12400,
+                "link": "https://link.coupang.com/a/hI0O4JJU6K",
+                "tiers": [
+                  "min",
+                  "std"
+                ]
               },
               {
-                "name": "러브투드림 속싸개",
-                "link": "https://swaddleupkorea.com/"
+                "name": "밤부베베 속싸개",
+                "price": 19900,
+                "link": "https://brand.naver.com/konny/products/9875403183?nl-query=%EC%BD%94%EB%8B%88%20%EC%86%8D%EC%8B%B8%EA%B0%9C&nl-au=09511bb8ebf04c52925bf6df59a9a0d4&NaPm=ci%3D09511bb8ebf04c52925bf6df59a9a0d4%7Cct%3Dmv1rzwz0%7Ctr%3Dnslbrd%7Csn%3D555877%7Chk%3De83851d886daa61edcab17f5129e47bc5b1a6cae",
+                "tiers": [
+                  "full"
+                ]
               },
               {
-                "name": "스칸디맘 속싸개",
-                "link": "https://link.coupang.com/a/hbYQlYWJhc"
+                "name": "베이비앙 사계절 속싸개",
+                "price": 16900,
+                "link": "https://brand.naver.com/babyan/products/550270172?n_media=684927&n_query=%EB%B2%A0%EC%9D%B4%EB%B9%84%EC%95%99%EC%86%8D%EC%8B%B8%EA%B0%9C&n_rank=4&n_ad_group=grp-a001-02-000000042709242&n_ad=nad-a001-02-000000304097045&n_campaign_type=2&n_mall_id=babyan&n_mall_pid=550270172&n_ad_group_type=2&n_match=3&NaPm=ct%3Dmv1sd52y%7Cci%3DERd20e069a%2Dc453%2D11f1%2D817f%2D8e945cd7872a%7Ctr%3Dplan%7Chk%3D051efb67df86f5f66446686a55e03095e9a22de2%7Cnacn%3DJ1naBIBzQNr6"
               }
             ]
           },
           {
             "name": "스와들업",
+            "qty": 5,
             "options": [
               {
-                "name": "오우와스튜디오 스와들업",
-                "link": "https://link.coupang.com/a/hbXmvWpsnQ"
+                "name": "말랑하니 스와들업",
+                "price": 20900,
+                "link": "https://search.shopping.naver.com/ns/search?query=%EB%A7%90%EB%9E%91%ED%95%98%EB%8B%88%20%EC%8A%A4%EC%99%80%EB%93%A4%EC%97%85&prevQuery=%EC%95%95%EC%86%8C%EB%B0%94%20%EC%86%8D%EC%8B%B8%EA%B0%9C"
               },
               {
                 "name": "베베곰 스와들업",
+                "price": 22900,
                 "link": "https://link.coupang.com/a/hbXqW70Ima"
               },
               {
-                "name": "엘라바 스와들업",
-                "link": "https://link.coupang.com/a/hbXxOJfs3E"
+                "name": "오우와스튜디오 스와들업",
+                "price": 19900,
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%98%A4%EC%9A%B0%EC%95%84%EC%8A%A4%ED%8A%9C%EB%94%94%EC%98%A4%20%EC%8A%A4%EC%99%80%EB%93%A4%EC%97%85&prevQuery=%EB%B0%A4%EB%B6%80%EB%B2%A0%EB%B2%A0%20%EC%86%8D%EC%8B%B8%EA%B0%9C",
+                "tiers": [
+                  "min",
+                  "std"
+                ]
+              },
+              {
+                "name": "코니 뉴본 모달 스와들수트",
+                "price": 29900,
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%BD%94%EB%8B%88%20%EC%8A%A4%EC%99%80%EB%93%A4%EC%88%98%ED%8A%B8&prevQuery=%EC%BD%94%EB%8B%88%20%EC%86%8D%EC%8B%B8%EA%B0%9C",
+                "tiers": [
+                  "full"
+                ]
               }
             ]
           },
           {
-            "name": "손싸개"
+            "name": "손싸개",
+            "qty": 3,
+            "options": [
+              {
+                "name": "피셔프라이스 면 손싸개 3개 세트",
+                "price": 8700,
+                "link": "https://link.coupang.com/a/hI1ES6Maaq",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "발싸개",
+            "qty": 2,
+            "options": [
+              {
+                "name": "위드오가닉 발싸개",
+                "price": 5500,
+                "link": "https://link.coupang.com/a/hI3E0aBBdY",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "내복",
+            "memo": "실내복으로 좋아요",
+            "options": [
+              {
+                "name": "코코하니 내복",
+                "price": 13400,
+                "link": "https://cocohani.co.kr/",
+                "note": "5개 사면 하나 더",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
+              },
+              {
+                "name": "큐비앤맘 내복",
+                "price": 20000,
+                "link": "https://cubynmom.com/category/%EB%82%B4%EC%9D%98/911/"
+              },
+              {
+                "name": "말랑하니 배앓이 방지 밤부 실내복",
+                "price": 19900,
+                "link": "https://link.coupang.com/a/hI2kSncmDk"
+              }
+            ]
           },
           {
             "name": "모자"
@@ -580,8 +692,14 @@
             "name": "양말",
             "options": [
               {
-                "name": "유니클로 신생아 양말",
-                "link": "https://www.uniqlo.com/kr/ko/baby/newborn/socks"
+                "name": "유니클로 신생아 양말 (3개입)",
+                "price": 9900,
+                "link": "https://www.uniqlo.com/kr/ko/baby/newborn/socks",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
               },
               {
                 "name": "H&M 신생아 양말",
@@ -594,31 +712,45 @@
             ]
           },
           {
-            "name": "내복",
+            "name": "거즈 손수건",
+            "memo": "아기 얼굴, 입 주변 닦는데 사용. 가장 많이 사용하는 손수건.",
+            "qty": 3,
             "options": [
               {
-                "name": "코코하니 내복",
-                "link": "https://cocohani.co.kr/"
+                "name": "밤부베베 시그니처 이지 거즈손수건 (10장)",
+                "price": 16000,
+                "link": "https://brand.naver.com/bamboobebe/category/009025bfc22a449e82aea3410cb2a7bb?cp=1",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
               },
               {
-                "name": "큐비앤맘 내복",
-                "link": "https://cubynmom.com/category/%EB%82%B4%EC%9D%98/911/"
-              },
-              {
-                "name": "말랑하니 내복",
-                "link": "https://link.coupang.com/a/hbZBYP6liK"
+                "name": "베베룬 에코프리미엄 소프트모달 거즈손수건 (10장)",
+                "price": 21000,
+                "link": "https://brand.naver.com/bebelune/category/26d569842d1b4b27b75a98f5ec7b3426?cp=1"
               }
             ]
           },
           {
-            "name": "아기 손수건",
+            "name": "엠보 손수건",
+            "memo": "아기 몸, 엉덩이 닦기. 흡수력 좋은 소재.",
+            "qty": 4,
             "options": [
               {
-                "name": "밤부베베 손수건",
-                "link": "https://brand.naver.com/bamboobebe/category/009025bfc22a449e82aea3410cb2a7bb?cp=1"
+                "name": "밤부베베 시그니처 엠보손수건 (5장)",
+                "price": 17000,
+                "link": "https://brand.naver.com/bamboobebe/products/5915025459",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
               },
               {
-                "name": "베베룬 손수건",
+                "name": "베베룬 에코프리미엄 소프트모달 엠보손수건 (5장)",
+                "price": 16000,
                 "link": "https://brand.naver.com/bebelune/category/26d569842d1b4b27b75a98f5ec7b3426?cp=1"
               }
             ]
@@ -636,32 +768,95 @@
             "options": [
               {
                 "name": "다이치 리우 아기침대",
-                "link": "https://www.babyseatmall.net/?act=shop.goods_list&GC=GD3H01"
+                "price": 203000,
+                "link": "https://www.babyseatmall.net/?act=shop.goods_list&GC=GD3H01",
+                "tiers": [
+                  "min",
+                  "std"
+                ]
               },
               {
                 "name": "리안 드림콧 접이식 아기침대",
+                "price": 243200,
                 "link": "https://link.coupang.com/a/hb0KCMW1tY"
               },
               {
                 "name": "부가부 스타더스트",
-                "link": "https://www.bugaboo.com/kr-ko/%EC%A0%91%EC%9D%B4%EC%8B%9D-%EC%95%84%EA%B8%B0%EC%B9%A8%EB%8C%80/%EB%B6%80%EA%B0%80%EB%B6%80-%EC%8A%A4%ED%83%80%EB%8D%94%EC%8A%A4%ED%8A%B8-%ED%86%A0%ED%94%84-%EC%BD%94%ED%8A%BC%EC%8B%9C%ED%8A%B8-%ED%8F%AC%ED%95%A8-PV007412.html"
+                "price": 494000,
+                "link": "https://www.bugaboo.com/kr-ko/%EC%A0%91%EC%9D%B4%EC%8B%9D-%EC%95%84%EA%B8%B0%EC%B9%A8%EB%8C%80/%EB%B6%80%EA%B0%80%EB%B6%80-%EC%8A%A4%ED%83%80%EB%8D%94%EC%8A%A4%ED%8A%B8-%ED%86%A0%ED%94%84-%EC%BD%94%ED%8A%BC%EC%8B%9C%ED%8A%B8-%ED%8F%AC%ED%95%A8-PV007412.html",
+                "tiers": [
+                  "full"
+                ]
               }
             ]
           },
           {
-            "name": "아기침대",
+            "name": "아기 침대",
+            "memo": "사이즈별로 가격이 상이하다. 매트리스 가격은 별도",
             "options": [
               {
-                "name": "숲소리 범퍼침대",
+                "name": "숲소리 포미오 그라운드침대",
+                "price": 1350000,
                 "link": "https://www.soopsori.co.kr/goods/goods_list.php?cateCd=005"
               },
               {
-                "name": "안데르센 저상형 데이베드 침대",
-                "link": "https://brand.naver.com/andersenmall/category/15edb709fec746a295e856e7ac5f169f?cp=1"
+                "name": "안데르센 올리버 하이가드 원목 저상형 데이베드 침대",
+                "price": 1478700,
+                "link": "https://brand.naver.com/andersenmall/category/15edb709fec746a295e856e7ac5f169f?cp=1",
+                "tiers": [
+                  "full"
+                ]
               },
               {
                 "name": "일룸 쿠시노 저상형 침대",
+                "price": 1041000,
                 "link": "https://www.iloom.com/series/series.do?sn=86&srsltid=AU7gw4VvLMlfiW9UKhCAwvRuoLh20NSEhdgt-mIkig26yCq3YSXNnZlK"
+              },
+              {
+                "name": "쥬다르 범퍼침대",
+                "price": 509000,
+                "link": "https://jeudart.com/category/bed/54/",
+                "tiers": [
+                  "std"
+                ]
+              },
+              {
+                "name": "[렌탈] 베스트슬립  제롬+S6",
+                "price": 50700,
+                "link": "https://brand.naver.com/bestsleep/products/13597214538",
+                "note": "베스트슬립에서 구독형으로 이용 가능하다! 매트리스 포함. (가격은 월 요금)",
+                "tiers": [
+                  "min"
+                ]
+              }
+            ]
+          },
+          {
+            "name": "매트리스",
+            "options": [
+              {
+                "name": "숲소리 플로아 메모리폼 매트리스 SS",
+                "price": 428000,
+                "link": "https://www.soopsori.co.kr/goods/goods_list.php?cateCd=005003"
+              },
+              {
+                "name": "(안데르센) 데르데르 베이비문 미니포켓스프링 매트리스",
+                "price": 440000,
+                "link": "https://brand.naver.com/andersenmall/category/ef7e7e35e5544c7c888fa5748cfd6236?cp=1"
+              },
+              {
+                "name": "일룸 쿠시노 투인원 매트리스",
+                "price": 620000,
+                "link": "https://www.iloom.com/product/item.do?categoryNo=607"
+              },
+              {
+                "name": "쥬다르 컴포트핏 토퍼",
+                "price": 278000,
+                "link": "https://jeudart.com/product/list.html?cate_no=54",
+                "note": "침대프레임 구매 페이지에서 옵션으로 선택 가능. (따로 구매 x)",
+                "tiers": [
+                  "std"
+                ]
               }
             ]
           },
@@ -671,18 +866,29 @@
           {
             "name": "방수 패드",
             "memo": "기저귀 갈이대에도 필요",
+            "qty": 2,
             "options": [
               {
                 "name": "베이비앙 방수패드",
+                "price": 22900,
                 "link": "https://m.babyan.co.kr/category/%EB%B0%A9%EC%88%98%EC%9A%94/346/"
               },
               {
                 "name": "포몽드 방수패드",
-                "link": "https://formongde.com/category/%EB%B0%A9%EC%88%98%ED%8C%A8%EB%93%9C/837/"
+                "price": 44900,
+                "link": "https://formongde.com/category/%EB%B0%A9%EC%88%98%ED%8C%A8%EB%93%9C/837/",
+                "tiers": [
+                  "full"
+                ]
               },
               {
                 "name": "말랑하니 방수패드",
-                "link": "https://link.coupang.com/a/hb45jGHeGy"
+                "price": 13800,
+                "link": "https://link.coupang.com/a/hb45jGHeGy",
+                "tiers": [
+                  "min",
+                  "std"
+                ]
               }
             ]
           },
@@ -691,16 +897,27 @@
             "options": [
               {
                 "name": "비비엔다 쿨매트",
-                "price": 56250,
-                "link": "https://vivienda.co.kr/category/%EC%BF%A8%ED%8C%A8%EB%93%9C%EC%BF%A8%EB%A7%A4%ED%8A%B8/166/"
+                "price": 39000,
+                "link": "https://vivienda.co.kr/category/%EC%BF%A8%ED%8C%A8%EB%93%9C%EC%BF%A8%EB%A7%A4%ED%8A%B8/166/",
+                "tiers": [
+                  "std"
+                ]
               },
               {
                 "name": "아이레빗 냉감패드",
-                "link": "https://link.coupang.com/a/hb5pRNnG4i"
+                "price": 23600,
+                "link": "https://link.coupang.com/a/hb5pRNnG4i",
+                "tiers": [
+                  "min"
+                ]
               },
               {
-                "name": "포몽드 쿨매트",
-                "link": "https://formongde.com/category/%EB%B0%A9%EC%88%98%ED%8C%A8%EB%93%9C/837/"
+                "name": "포몽드 에떼쿨 양면 방수 아기 쿨매트",
+                "price": 64300,
+                "link": "https://formongde.com/category/%EB%B0%A9%EC%88%98%ED%8C%A8%EB%93%9C/837/",
+                "tiers": [
+                  "full"
+                ]
               }
             ]
           },
@@ -716,16 +933,26 @@
             "name": "하이체어",
             "options": [
               {
-                "name": "스토케 트립트랩",
-                "link": "https://www.stokke.com/KOR/ko-kr/category/%ED%95%98%EC%9D%B4%EC%B2%B4%EC%96%B4/%ED%8A%B8%EB%A6%BD%ED%8A%B8%EB%9E%A9"
+                "name": "스토케 트립트랩 신생아 세트",
+                "price": 660000,
+                "link": "https://www.stokke.com/KOR/ko-kr/category/%ED%95%98%EC%9D%B4%EC%B2%B4%EC%96%B4/%ED%8A%B8%EB%A6%BD%ED%8A%B8%EB%9E%A9",
+                "tiers": [
+                  "full"
+                ]
               },
               {
-                "name": "사이벡스 레모 하이체어",
+                "name": "사이벡스 레모 하이체어 4 in 1",
+                "price": 900000,
                 "link": "https://www.cybex-shop.co.kr/goods/goods_view.php?goodsNo=1000000416"
               },
               {
-                "name": "아가드 하이체어",
-                "link": "https://link.coupang.com/a/hb4meaujqC"
+                "name": "아가드 토스비 영유아 하이체어",
+                "price": 118200,
+                "link": "https://link.coupang.com/a/hb4meaujqC",
+                "tiers": [
+                  "min",
+                  "std"
+                ]
               }
             ]
           },
@@ -734,8 +961,13 @@
             "options": [
               {
                 "name": "베이비뵨 바운서",
+                "price": 280000,
                 "link": "https://www.babybjorn.kr/products/baby-bouncers/",
-                "note": "압도적 추천"
+                "note": "압도적 추천",
+                "tiers": [
+                  "std",
+                  "full"
+                ]
               }
             ]
           },
@@ -743,16 +975,33 @@
             "name": "거실 매트",
             "options": [
               {
-                "name": "꼬망세 매트",
-                "link": "https://link.coupang.com/a/hb5YLlbPQO"
+                "name": "꼬망세 매트 (140x200x4cm)",
+                "price": 179000,
+                "link": "https://link.coupang.com/a/hb5YLlbPQO",
+                "tiers": [
+                  "min"
+                ]
               },
               {
-                "name": "비몰 매트",
-                "link": "https://link.coupang.com/a/hb57UWoI3w"
+                "name": "비몰 매트 향균 2단 브이매트 1+1 (100x240)",
+                "price": 242000,
+                "link": "https://bmallshop.co.kr/",
+                "tiers": [
+                  "std"
+                ]
               },
               {
-                "name": "크림하우스 매트",
+                "name": "크림하우스 프리2 폴더매트 (140x240x4cm)",
+                "price": 239000,
                 "link": "https://link.coupang.com/a/hb6iAbjD1U"
+              },
+              {
+                "name": "쥬다르 폴더매트 (240x110x4cm)",
+                "price": 233000,
+                "link": "https://jeudart.com/product/list.html?cate_no=61",
+                "tiers": [
+                  "full"
+                ]
               }
             ]
           },
@@ -761,14 +1010,31 @@
           },
           {
             "name": "타이니모빌",
-            "memo": "대체 불가의 후기"
+            "memo": "대체 불가의 후기",
+            "options": [
+              {
+                "name": "타이니러브 모빌",
+                "price": 125200,
+                "link": "https://link.coupang.com/a/hI6W0GETtI",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
+              }
+            ]
           },
           {
             "name": "아기체육관",
             "options": [
               {
                 "name": "하베브릭스 아기체육관",
-                "link": "https://link.coupang.com/a/hjZpH9s7ps"
+                "price": 61200,
+                "link": "https://link.coupang.com/a/hjZpH9s7ps",
+                "tiers": [
+                  "std",
+                  "full"
+                ]
               }
             ]
           }
@@ -779,19 +1045,44 @@
         "items": [
           {
             "name": "젖병",
+            "memo": "개월 수에 따라 젖병과 꼭지 사이즈가 달라져요. 신생아 때는 보통 SS",
+            "qty": 3,
             "options": [
               {
-                "name": "더블하트 모유실감 젖병",
-                "link": "https://link.coupang.com/a/hbZ65mx8eW"
+                "name": "더블하트 모유실감 젖병 (2개입)",
+                "price": 42900,
+                "link": "https://link.coupang.com/a/hbZ65mx8eW",
+                "note": "젖꼭지 거부 걱정되는 경우",
+                "tiers": [
+                  "std",
+                  "full"
+                ]
               },
               {
-                "name": "란시노 유리젖병",
-                "link": "https://link.coupang.com/a/hb0b7dXL1o"
+                "name": "헤겐 PPSU 젖병 (2개입)",
+                "price": 49100,
+                "link": "https://link.coupang.com/a/hI7FVT9THg",
+                "note": "세척 편리"
               },
               {
-                "name": "닥터브라운 젖병",
+                "name": "닥터브라운 젖병 (2개입)",
+                "price": 46700,
                 "link": "https://link.coupang.com/a/hb0d9Gj4rQ",
                 "note": "배앓이 방지"
+              },
+              {
+                "name": "모윰 올인원 베이직 젖병",
+                "price": 37100,
+                "link": "https://link.coupang.com/a/hI7QVUwLLM"
+              },
+              {
+                "name": "유팡 노꼭지 젖병 2개입",
+                "price": 28200,
+                "link": "https://link.coupang.com/a/hI8nyCqM5A",
+                "note": "젖꼭지 구매는 따로. 2개에 9800원.",
+                "tiers": [
+                  "min"
+                ]
               }
             ]
           },
@@ -801,15 +1092,25 @@
             "options": [
               {
                 "name": "모윰 소프트윙 쪽쪽이",
+                "price": 17700,
                 "link": "https://link.coupang.com/a/hccmFYFiRU"
               },
               {
-                "name": "더블하트 쪽쪽이",
-                "link": "https://brand.naver.com/doubleheart_official/category/fcc080cb6c6c4d0aa280b86c27bcefd8?cp=1"
+                "name": "더블하트 스윗드림 올실리콘 쪽쪽이",
+                "price": 14900,
+                "link": "https://brand.naver.com/doubleheart_official/category/fcc080cb6c6c4d0aa280b86c27bcefd8?cp=1",
+                "tiers": [
+                  "std",
+                  "full"
+                ]
               },
               {
-                "name": "누크 센서티브 올실리콘 쪽쪽이",
-                "link": "https://link.coupang.com/a/hccqtn5H5g"
+                "name": "스와비넥스 에센스 올실리콘 쪽쪽이",
+                "price": 10800,
+                "link": "https://link.coupang.com/a/hccqtn5H5g",
+                "tiers": [
+                  "min"
+                ]
               }
             ]
           },
@@ -817,11 +1118,18 @@
             "name": "젖병 세척기",
             "options": [
               {
-                "name": "식기세척기로 사용"
+                "name": "식기세척기로 사용",
+                "tiers": [
+                  "min",
+                  "full"
+                ]
               },
               {
                 "name": "베이비브레짜 젖병 세척기",
-                "link": "https://link.coupang.com/a/hb7CcFkwOy"
+                "link": "https://link.coupang.com/a/hb7CcFkwOy",
+                "tiers": [
+                  "std"
+                ]
               }
             ]
           },
@@ -830,14 +1138,22 @@
             "options": [
               {
                 "name": "유팡 젖병소독기",
-                "link": "https://link.coupang.com/a/hb6slGx4Wy"
+                "price": 327200,
+                "link": "https://link.coupang.com/a/hb6slGx4Wy",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
               },
               {
                 "name": "케이 젖병소독기",
+                "price": 338800,
                 "link": "https://link.coupang.com/a/hb6BEUHSwK"
               },
               {
                 "name": "폴레드 픽셀 젖병소독기",
+                "price": 299400,
                 "link": "https://link.coupang.com/a/hb8CtlEuY0"
               }
             ]
@@ -846,19 +1162,33 @@
             "name": "분유포트",
             "options": [
               {
-                "name": "베이비브레짜 자동 분유제조기 (분유 쉐이커 필요 없음)",
-                "link": "https://link.coupang.com/a/himtoUalK8"
+                "name": "베이비브레짜 자동 분유제조기",
+                "price": 329000,
+                "link": "https://link.coupang.com/a/himtoUalK8",
+                "note": "분유 쉐이커 필요 없음",
+                "tiers": [
+                  "full"
+                ]
               },
               {
                 "name": "라비킷 분유포트",
-                "link": "https://lavikit.com/product/detail.html?product_no=287&cate_no=99&display_group=1"
+                "price": 199000,
+                "link": "https://lavikit.com/product/detail.html?product_no=287&cate_no=99&display_group=1",
+                "tiers": [
+                  "std"
+                ]
               },
               {
-                "name": "나리몽 분유포트",
-                "link": "https://link.coupang.com/a/himHX8yHU4"
+                "name": "나리몽 출수형 분유포트",
+                "price": 109000,
+                "link": "https://link.coupang.com/a/hJezKCEo6S",
+                "tiers": [
+                  "min"
+                ]
               },
               {
                 "name": "아이닉 올케어 분유포트",
+                "price": 138600,
                 "link": "https://link.coupang.com/a/himMm9uwkm"
               }
             ]
@@ -868,15 +1198,21 @@
             "options": [
               {
                 "name": "나리몽 무선 분유쉐이커",
-                "link": "https://link.coupang.com/a/hiHKL0kH4C"
+                "price": 59000,
+                "link": "https://link.coupang.com/a/hiHKL0kH4C",
+                "tiers": [
+                  "std"
+                ]
               },
               {
                 "name": "꿈비 분유쉐이커",
+                "price": 36900,
                 "link": "https://link.coupang.com/a/hiHOYZNwf6"
               },
               {
                 "name": "폴레드 픽셀 이지 휴대용 분유쉐이커",
-                "link": "https://link.coupang.com/a/hjZhMZL5JA"
+                "price": 44900,
+                "link": "https://poled.co.kr/product/new-%ED%8F%B4%EB%A0%88%EB%93%9C%C2%A0%ED%94%BD%EC%85%80%C2%A0%EC%9D%B4%EC%A7%80%C2%A0%EB%B6%84%EC%9C%A0%EC%89%90%EC%9D%B4%EC%BB%A4-%ED%9C%B4%EB%8C%80%EC%9A%A9-%EC%B4%88%EC%A0%80%EC%86%8C%EC%9D%8C-%EC%A0%84%EB%8F%99-%EC%9E%90%EB%8F%99-%EB%B6%84%EC%9C%A0%EC%A0%9C%EC%A1%B0%EA%B8%B0/601/?srsltid=AU7gw4UpZFz5zk1b700oyfJNLm3JlWeONgSovyW7kWN735uyM655Eoj5"
               }
             ]
           },
@@ -926,16 +1262,21 @@
             "name": "기저귀 갈이대",
             "options": [
               {
-                "name": "소베맘 기저귀갈이대",
+                "name": "소베맘 2세대 프리미엄 기저귀갈이대",
+                "price": 71900,
                 "link": "https://link.coupang.com/a/hb5CWW3Ipo",
-                "note": "국민템"
+                "tiers": [
+                  "std"
+                ]
               },
               {
-                "name": "도노도노 기저귀갈이대",
+                "name": "도노도노 아기 트롤리 기저귀갈이대",
+                "price": 146300,
                 "link": "https://link.coupang.com/a/hb5FFozTSS"
               },
               {
-                "name": "두리 기저귀갈이대",
+                "name": "두리 트롤리 기저귀갈이대 모빌세트",
+                "price": 129000,
                 "link": "https://durimall.co.kr/category/%EA%B8%B0%EC%A0%80%EA%B7%80-%EA%B0%88%EC%9D%B4%EB%8C%80/173/?srsltid=AU7gw4VrFyEYve8ICtbNcE_zcfyZD0YXcfd4E_NbVfPeH_eZbD8UokIN"
               }
             ]
@@ -977,10 +1318,16 @@
             "options": [
               {
                 "name": "매직캔 히포2 휴지통 (27L)",
-                "link": "https://link.coupang.com/a/hiG8W67QoS"
+                "price": 60900,
+                "link": "https://link.coupang.com/a/hJe3gdSSJg",
+                "tiers": [
+                  "std",
+                  "full"
+                ]
               },
               {
                 "name": "소베맘 자동센서 기저귀 휴지통",
+                "price": 52900,
                 "link": "https://link.coupang.com/a/hiHfNxbOLI"
               }
             ]
@@ -995,18 +1342,28 @@
         "items": [
           {
             "name": "아기 욕조 (신생아용)",
+            "memo": "보통 신생아~ 6개월, 6개월 이후로 사이즈가 나누어져 있어요.",
             "qty": 2,
             "options": [
               {
                 "name": "슈너글 아기욕조",
+                "price": 38000,
                 "link": "https://link.coupang.com/a/hcbo0BT6MC"
               },
               {
-                "name": "온다베이비 아기욕조",
-                "link": "https://link.coupang.com/a/hcbrgNwUkC"
+                "name": "온다베이비 플러스 아기욕조",
+                "price": 45500,
+                "link": "https://link.coupang.com/a/hcbrgNwUkC",
+                "note": "신생아~24개월까지 하나로 사용 가능하다.",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
               },
               {
                 "name": "스토케 플레시바스 번들 아기욕조",
+                "price": 92000,
                 "link": "https://link.coupang.com/a/hcbw8L21Ho"
               }
             ]
@@ -1015,17 +1372,24 @@
             "name": "아기 수전",
             "options": [
               {
-                "name": "해피달링 720도 아기수전",
-                "link": "https://link.coupang.com/a/hcbzywiV7A",
-                "note": "720도"
+                "name": "해피달링 720도 워터탭 프로",
+                "price": 22900,
+                "link": "https://link.coupang.com/a/hJfDGHXek8",
+                "tiers": [
+                  "min",
+                  "std",
+                  "full"
+                ]
               },
               {
                 "name": "퓨어닷 스마트 아기수전",
+                "price": 40900,
                 "link": "https://brand.naver.com/petitelinstore/products/12584488197?nl-query=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%8A%A4%EB%A7%88%ED%8A%B8%EC%95%84%EA%B8%B0%EC%88%98%EC%A0%84&nl-au=1563403e34a2413d8d25f0e89bc90eb5&NaPm=ci%3D1563403e34a2413d8d25f0e89bc90eb5%7Cct%3Dmu9iw69e%7Ctr%3Dnslsl%7Csn%3D395905%7Chk%3D2f5e7d1a97c7eed66703161027997b1abb08abf7",
                 "note": "온도표시 기능"
               },
               {
                 "name": "대림바스 아기수전",
+                "price": 25500,
                 "link": "https://link.coupang.com/a/hcbLcAute8"
               }
             ]
@@ -1035,15 +1399,25 @@
             "options": [
               {
                 "name": "슬로운 샤워헤드",
-                "link": "https://brand.naver.com/slown/category/5686debaee2b4e30870249e700df8aea?cp=1"
+                "price": 29800,
+                "link": "https://brand.naver.com/slown/category/5686debaee2b4e30870249e700df8aea?cp=1",
+                "tiers": [
+                  "std",
+                  "full"
+                ]
               },
               {
                 "name": "퓨어닷 아기샤워기",
+                "price": 40900,
                 "link": "https://search.shopping.naver.com/ns/search?query=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%83%A4%EC%9B%8C%ED%97%A4%EB%93%9C"
               },
               {
                 "name": "소베맘 온오프 아기 필터 샤워기 헤드",
-                "link": "https://search.shopping.naver.com/ns/search?query=%EC%86%8C%EB%B2%A0%EB%A7%98%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0"
+                "price": 19900,
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%86%8C%EB%B2%A0%EB%A7%98%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0&prevQuery=%ED%93%A8%EC%96%B4%EB%8B%B7%20%EC%95%84%EA%B8%B0%EC%83%A4%EC%9B%8C%EA%B8%B0",
+                "tiers": [
+                  "min"
+                ]
               }
             ]
           },
@@ -1052,18 +1426,28 @@
             "options": [
               {
                 "name": "포프베베 아기비데",
+                "price": 88200,
                 "link": "https://link.coupang.com/a/hcbP2d1DHg",
-                "note": "설치형"
+                "note": "설치형",
+                "tiers": [
+                  "std"
+                ]
               },
               {
                 "name": "폴레드 허그베어 아기비데",
+                "price": 121900,
                 "link": "https://link.coupang.com/a/hcbSKNHRqm",
                 "note": "설치형"
               },
               {
                 "name": "코니스 이지워시",
+                "price": 73900,
                 "link": "https://brand.naver.com/conys/products/13441981574",
-                "note": "스탠딩형"
+                "note": "스탠딩형",
+                "tiers": [
+                  "min",
+                  "full"
+                ]
               }
             ]
           },
@@ -1195,11 +1579,25 @@
             "options": [
               {
                 "name": "드레텍 미니 온습도계",
-                "link": "https://link.coupang.com/a/hcc1nC4Fqe"
+                "price": 9900,
+                "link": "https://link.coupang.com/a/hcc1nC4Fqe",
+                "tiers": [
+                  "min"
+                ]
               },
               {
                 "name": "휴비딕 온습도계",
+                "price": 11800,
                 "link": "https://link.coupang.com/a/hcc3ArE1ZY"
+              },
+              {
+                "name": "마더케이 온습도계",
+                "price": 13300,
+                "link": "https://link.coupang.com/a/hJf1szKCgS",
+                "tiers": [
+                  "std",
+                  "full"
+                ]
               }
             ]
           },
@@ -1221,11 +1619,21 @@
             "options": [
               {
                 "name": "노시부 콧물흡입기",
+                "price": 269100,
                 "link": "https://link.coupang.com/a/hcb4g6pToa"
               },
               {
                 "name": "코니케어 콧물흡입기",
+                "price": 259000,
                 "link": "https://link.coupang.com/a/hccbjrYRBQ"
+              },
+              {
+                "name": "휴비딕 크린노즈 미니 전동식 콧물흡입기",
+                "price": 37000,
+                "link": "https://link.coupang.com/a/hJgjeioONE",
+                "tiers": [
+                  "std"
+                ]
               }
             ]
           }
@@ -1293,70 +1701,89 @@
         "name": "외출",
         "items": [
           {
-            "name": "카시트 (0세~4세)",
+            "name": "바구니형 카시트 (신생아 ~ 12개월)",
+            "memo": "키가 중요. 75~80cm까지 사용. 이후에 컨버터블 카시트 이용."
+          },
+          {
+            "name": "컨버터블 카시트",
+            "memo": "바구니형 카시트 이후 사용."
+          },
+          {
+            "name": "회전형 카시트",
+            "memo": "바구니형+컨버터블 대신 회전형으로 4세까지 사용.",
             "options": [
               {
                 "name": "브라이텍스 듀얼픽스 프로",
+                "price": 1180000,
                 "link": "https://safian.co.kr/product/%EB%B8%8C%EB%9D%BC%EC%9D%B4%ED%85%8D%EC%8A%A4-%EB%93%80%EC%96%BC%ED%94%BD%EC%8A%A4-%ED%94%84%EB%A1%9C-%EC%8A%A4%ED%83%80%EC%9D%BC-%EC%95%84%EC%9D%B4%EC%82%AC%EC%9D%B4%EC%A6%88-%EC%8B%A0%EC%83%9D%EC%95%84-%EC%9C%A0%EC%95%84-%EC%95%84%EA%B8%B0-%ED%9A%8C%EC%A0%84%ED%98%95-%EC%B9%B4%EC%8B%9C%ED%8A%B8-isofix/3210/category/478/display/1/"
               },
               {
                 "name": "사이벡스 제로나T",
-                "link": "https://www.cybex-shop.co.kr/goods/goods_view.php?goodsNo=1000000447"
+                "price": 1150000,
+                "link": "https://www.cybex-shop.co.kr/goods/goods_view.php?goodsNo=1000000447",
+                "tiers": [
+                  "std",
+                  "full"
+                ]
               },
               {
                 "name": "조이 아이스핀360",
-                "link": "https://joiebaby.co.kr/category/%EC%B9%B4%EC%8B%9C%ED%8A%B8/421/"
+                "price": 678000,
+                "link": "https://joiebaby.co.kr/category/%EC%B9%B4%EC%8B%9C%ED%8A%B8/421/",
+                "tiers": [
+                  "min"
+                ]
               },
               {
                 "name": "다이치 원픽스360",
+                "price": 990000,
                 "link": "https://www.babyseatmall.net/?act=shop.goods_list&GC=GD000J"
               },
               {
                 "name": "뉴나 토들넥스트",
-                "link": "https://nunababy.com/kr/todl-next-convertible-car-seat?color_ref=16693"
+                "price": 1050000,
+                "link": "https://www.coupang.com/np/search?component=&q=%EB%89%B4%EB%82%98+%ED%86%A0%EB%93%A4%EB%84%A5%EC%8A%A4%ED%8A%B8&traceId=mv20d0n3&channel=user"
               }
             ]
           },
           {
             "name": "유모차 (절충형)",
+            "memo": "휴대용과 디럭스를 하나로 해결하기 위한 유모차.",
             "options": [
               {
                 "name": "부가부 드래곤플라이 플러스",
-                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-dragonfly-plus-seat/%EB%B6%80%EA%B0%80%EB%B6%80-%EB%93%9C%EB%9E%98%EA%B3%A4%ED%94%8C%EB%9D%BC%EC%9D%B4-%ED%94%8C%EB%9F%AC%EC%8A%A4-%EC%A0%88%EC%B6%A9%ED%98%95-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-PM007941.html"
+                "price": 1650000,
+                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-dragonfly-plus-seat/%EB%B6%80%EA%B0%80%EB%B6%80-%EB%93%9C%EB%9E%98%EA%B3%A4%ED%94%8C%EB%9D%BC%EC%9D%B4-%ED%94%8C%EB%9F%AC%EC%8A%A4-%EC%A0%88%EC%B6%A9%ED%98%95-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-PM007941.html",
+                "tiers": [
+                  "full"
+                ]
               },
               {
                 "name": "줄즈 허브2",
-                "link": "https://link.coupang.com/a/hcecEQBvUa"
+                "price": 1039100,
+                "link": "https://link.coupang.com/a/hcecEQBvUa",
+                "tiers": [
+                  "std"
+                ]
               },
               {
                 "name": "에그Q 절충형 유모차",
+                "price": 1590000,
                 "link": "https://www.eggstroller.co.kr/goods/view?no=138"
-              }
-            ]
-          },
-          {
-            "name": "유모차 (휴대용)",
-            "options": [
-              {
-                "name": "부가부 버터플라이2",
-                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-butterfly-2/%EB%B6%80%EA%B0%80%EB%B6%80-%EB%B2%84%ED%84%B0%ED%94%8C%EB%9D%BC%EC%9D%B4-2-%ED%9C%B4%EB%8C%80%EC%9A%A9-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-%EB%B2%94%ED%8D%BC%EB%B0%94-%ED%8F%AC%ED%95%A8-PM007649.html"
               },
               {
-                "name": "사이벡스 리베르",
-                "link": "https://brand.naver.com/cybex/category/27038e8e29994589bb3c053f5a127bc3?cp=1"
-              },
-              {
-                "name": "줄즈 에어2",
-                "link": "https://link.coupang.com/a/hceBQA5Piu"
-              },
-              {
-                "name": "스토케 요요5",
-                "link": "https://search.shopping.naver.com/ns/search?query=%EC%8A%A4%ED%86%A0%EC%BC%80%20%EC%9A%94%EC%9A%945&prevQuery=%EC%8B%B8%EC%9D%B4%EB%B2%A1%EC%8A%A4"
+                "name": "리안 절충형 유모차",
+                "price": 525300,
+                "link": "https://link.coupang.com/a/hJhzfd0rmK",
+                "tiers": [
+                  "min"
+                ]
               }
             ]
           },
           {
             "name": "유모차 (디럭스)",
+            "memo": "신생아용",
             "options": [
               {
                 "name": "부가부 폭스5",
@@ -1377,22 +1804,55 @@
             ]
           },
           {
+            "name": "유모차 (휴대용)",
+            "memo": "신생아용으로는 대부분 사용 불가. 바구니 카시트 장착 등이 필요.",
+            "options": [
+              {
+                "name": "부가부 버터플라이2",
+                "link": "https://www.bugaboo.com/kr-ko/%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC/bugaboo-butterfly-2/%EB%B6%80%EA%B0%80%EB%B6%80-%EB%B2%84%ED%84%B0%ED%94%8C%EB%9D%BC%EC%9D%B4-2-%ED%9C%B4%EB%8C%80%EC%9A%A9-%EC%8A%A4%ED%8A%B8%EB%A1%A4%EB%9F%AC-%EB%B2%94%ED%8D%BC%EB%B0%94-%ED%8F%AC%ED%95%A8-PM007649.html"
+              },
+              {
+                "name": "사이벡스 리베르",
+                "link": "https://brand.naver.com/cybex/category/27038e8e29994589bb3c053f5a127bc3?cp=1"
+              },
+              {
+                "name": "줄즈 에어2",
+                "link": "https://link.coupang.com/a/hceBQA5Piu"
+              },
+              {
+                "name": "스토케 요요5",
+                "link": "https://search.shopping.naver.com/ns/search?query=%EC%8A%A4%ED%86%A0%EC%BC%80%20%EC%9A%94%EC%9A%945&prevQuery=%EC%8B%B8%EC%9D%B4%EB%B2%A1%EC%8A%A4"
+              }
+            ]
+          },
+          {
             "name": "아기띠",
             "options": [
               {
                 "name": "베이비뵨 아기띠",
-                "link": "https://link.coupang.com/a/hciJIknNlc"
+                "price": 294200,
+                "link": "https://link.coupang.com/a/hciJIknNlc",
+                "tiers": [
+                  "std"
+                ]
               },
               {
                 "name": "베베스완 방탄조끼 아기띠",
-                "link": "https://link.coupang.com/a/hcfgeErzhs"
+                "price": 258800,
+                "link": "https://link.coupang.com/a/hcfgeErzhs",
+                "tiers": [
+                  "min",
+                  "full"
+                ]
               },
               {
                 "name": "에르고베이비",
+                "price": 289000,
                 "link": "https://link.coupang.com/a/hcfix1eqXs"
               },
               {
                 "name": "아띠포페 아기띠",
+                "price": 412000,
                 "link": "https://search.shopping.naver.com/ns/search?query=%EC%95%84%EB%9D%A0%ED%8F%AC%ED%8E%98%20%EC%95%84%EA%B8%B0%EB%9D%A0&prevQuery=%EC%96%B4%ED%8C%8C%EB%B2%A0%EC%9D%B4%EB%B9%84%20%EB%B9%84%EC%8A%A4%ED%83%80v3"
               }
             ]
