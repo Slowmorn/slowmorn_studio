@@ -49,12 +49,35 @@
   BS.purgeExpired();
   if(!BS.live.length) BS.addPlan("blank");
   let state;
+
+  // ---- 되돌리기 / 다시 하기 (Ctrl·⌘+Z, Ctrl·⌘+Shift+Z, Ctrl+Y) ----
+  // 저장할 때마다 바로 전 상태를 쌓아 둡니다. 글자를 이어서 치는 동안은 한 번으로 묶어요.
+  // 지금 연 파일만 따라가요. 파일을 바꾸거나 같이 쓰는 사람의 변경을 불러오면 처음부터 다시 쌓아요.
+  const UNDO_MAX = 60;
+  let undoStack = [], redoStack = [], undoBase = null, undoApplying = false, lastWasTyping = false, typedAt = 0;
+  const planSnap = () => JSON.stringify(state, (k, v) => k === "updatedAt" ? undefined : v);
+  function resetHistory(){ undoStack = []; redoStack = []; lastWasTyping = false; undoBase = state ? { id: state.id, json: planSnap() } : null; }
+  function recordHistory(){
+    if(undoApplying || !state) return;
+    if(!undoBase || undoBase.id !== state.id){ resetHistory(); return; }
+    const json = planSnap();
+    if(json === undoBase.json) return;
+    const ev = window.event, typing = !!(ev && ev.type === "input"), now = Date.now();
+    if(!(typing && lastWasTyping && now - typedAt < 1500)){
+      undoStack.push(undoBase.json);
+      if(undoStack.length > UNDO_MAX) undoStack.shift();
+    }
+    redoStack = [];
+    lastWasTyping = typing; if(typing) typedAt = now;
+    undoBase = { id: state.id, json };
+  }
   // 실시간 반영은 같이 쓰는 예산표를 열어 둘 때만 연결합니다 (무료 플랜의 동시 연결 수를 아끼려고)
   let watching = null, stopWatch = null, sharedIds = new Set();
   function syncActive(){
     // 휴지통에 든 파일은 건너뜁니다
     state = BS.live.find(p => p.id === store.activeId) || BS.live[0] || store.plans[0];
     store.activeId = state.id;
+    resetHistory();
     ensureWatch();
   }
   syncActive();
@@ -66,7 +89,7 @@
   }
 
   const Auth = window.BudgetAuth;
-  const save = () => { BS.save(state); showSaved(); };
+  const save = () => { BS.save(state); recordHistory(); showSaved(); };
   const hhmm = t => new Date(t).toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit" });
   function showSaved(){
     const el = document.getElementById("savedAt");
@@ -887,8 +910,10 @@
     }
     if(t.classList.contains("del-item")){
       const it = findItem(t, c);
+      const snap = snapshot();
       c.items = c.items.filter(i => i !== it);
       render(); save();
+      if(hasContent(it)) toast(`'${it.name || "이름 없는 항목"}' 항목을 지웠어요`, snap);
     }
     if(t.classList.contains("clear-items")){
       const n = c.items.filter(hasContent).length;
@@ -1408,6 +1433,41 @@
       window.scrollTo(0, y);
       requestAnimationFrame(() => { if(Math.abs(window.scrollY - y) > 1) window.scrollTo(0, y); });
     }
+  });
+
+  function applyHistory(json){
+    const data = JSON.parse(json);
+    Object.keys(state).forEach(k => { delete state[k]; });
+    Object.assign(state, data);
+    undoApplying = true;
+    try{ render(); save(); } finally { undoApplying = false; }
+    undoBase = { id: state.id, json: planSnap() };
+    lastWasTyping = false;
+    if(optDialog.open){ if(optItem()) renderOptions(); else optDialog.close(); }
+  }
+  function undo(){
+    if(!undoStack.length){ toast("더 되돌릴 게 없어요"); return; }
+    redoStack.push(undoBase.json);
+    applyHistory(undoStack.pop());
+    toast("되돌렸어요");
+  }
+  function redo(){
+    if(!redoStack.length){ toast("다시 할 게 없어요"); return; }
+    undoStack.push(undoBase.json);
+    applyHistory(redoStack.pop());
+    toast("다시 했어요");
+  }
+  // 글자 칸 안에서는 그 칸의 글자 되돌리기를 그대로 써요
+  document.addEventListener("keydown", e => {
+    if(!(e.metaKey || e.ctrlKey) || e.altKey || e.isComposing) return;
+    const k = (e.key || "").toLowerCase();
+    const isUndo = k === "z" && !e.shiftKey, isRedo = (k === "z" && e.shiftKey) || (k === "y" && !e.shiftKey);
+    if(!isUndo && !isRedo) return;
+    const el = e.target;
+    if(el && (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "SELECT"
+      || (el.tagName === "INPUT" && !/^(checkbox|radio|button)$/.test(el.type)))) return;
+    e.preventDefault();
+    if(isUndo) undo(); else redo();
   });
 
   // ---- toast (with optional undo) ----
