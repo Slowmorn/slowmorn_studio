@@ -308,16 +308,17 @@ body.is-sorting,body.is-sorting *,body.nav-sorting,body.nav-sorting *{cursor:gra
 /* 손잡이 · 체크 · 항목 · 메모 · 선택지 · 수량 · 금액 · [지출] · × */
 .cols,.row{
   display:grid;
-  grid-template-columns:18px 24px minmax(0,.75fr) minmax(0,1.2fr) minmax(0,1fr) 60px 104px 28px;
+  grid-template-columns:18px 24px minmax(0,.75fr) minmax(0,1.2fr) minmax(0,1fr) 84px 104px 28px;
   gap:6px;align-items:center;
 }
 body.show-spend .cols:not(.guest),body.show-spend .row:not(.guest){
-  grid-template-columns:18px 24px minmax(0,.75fr) minmax(0,1.2fr) minmax(0,1fr) 60px 104px 104px 28px;
+  grid-template-columns:18px 24px minmax(0,.75fr) minmax(0,1.2fr) minmax(0,1fr) 84px 104px 104px 28px;
 }
 /* 지출 칸은 '지출 칸 보기'를 켰을 때만 */
 body:not(.show-spend) .row .actual,body:not(.show-spend) .cols:not(.guest) span:nth-child(8){display:none}
 .cols{font-size:12px;color:var(--muted);padding:3px 0 2px;border-bottom:1px solid var(--line)}
 .cols .r{text-align:right;padding-right:8px}
+.cols .c{text-align:center}
 .row{padding:1px 0;border-bottom:1px solid var(--line)}
 .row:last-of-type{border-bottom:0}
 .row input[type="text"],.row textarea{
@@ -341,12 +342,21 @@ body:not(.show-spend) .row .actual,body:not(.show-spend) .cols:not(.guest) span:
 .row input.money::placeholder{color:transparent;font-size:13.5px}
 
 /* 수량 */
-.qty{display:flex;align-items:center;min-width:0;border:1px solid transparent;border-radius:6px;padding-right:7px;cursor:text}
+/* 수량: − 숫자 + (수량 칸에서 ↑/↓ 키도 돼요) */
+.qty{display:flex;align-items:center;justify-content:center;gap:1px;min-width:0;border:1px solid transparent;border-radius:6px;padding:0 1px;cursor:text}
 .qty:hover{border-color:var(--line)}
 .qty:focus-within{border-color:var(--muted);background:var(--paper)}
-.row .qty input[type="text"]{border:0;background:transparent;padding:3px 3px 3px 6px;text-align:right;font-variant-numeric:tabular-nums}
+.row .qty input[type="text"]{flex:1 1 auto;width:0;min-width:1.6ch;border:0;background:transparent;padding:3px 1px;text-align:center;font-variant-numeric:tabular-nums}
 .row .qty input[type="text"]:focus{background:transparent}
-.qty span{color:var(--muted);font-size:13px;flex:none}
+.qty button{
+  flex:none;width:18px;height:20px;padding:0;border:0;border-radius:4px;background:none;color:var(--muted);
+  display:grid;place-items:center;cursor:pointer;opacity:.5;
+}
+.qty button svg{width:10px;height:10px}
+.row:hover .qty button,.qty:focus-within button{opacity:1}
+.qty button:hover{background:var(--hover-strong);color:var(--ink)}
+.qty button:disabled{opacity:.2;cursor:default;background:none}
+@media (hover:none){.qty button{opacity:1;width:22px;height:24px}}
 
 /* Guestbook tabs: 이름 · 축의금 only */
 .cols.guest,.row.guest{grid-template-columns:18px minmax(0,1fr) 160px 32px}
@@ -561,11 +571,12 @@ a.opt-tool:hover{background:var(--accent-fill);color:#fff;filter:brightness(.9)}
   .cols:not(.guest){display:none}   /* 줄이 둘로 접히면 칸 이름은 맞출 자리가 없어서 뺍니다 */
   .cols.guest,.row.guest{grid-template-columns:18px minmax(0,1fr) 120px 28px}
   .row:not(.guest),body.show-spend .row:not(.guest){
-    grid-template-columns:18px 24px 1fr 1fr 60px;
-    grid-template-areas:"g c n m d" ". . o b q";
+    /* 마지막 두 칸(56+28)은 첫 줄에선 메모·삭제가, 둘째 줄에선 수량(− 1개 +)이 함께 써요 */
+    grid-template-columns:18px 24px minmax(0,1fr) minmax(0,1fr) 56px 28px;
+    grid-template-areas:"g c n m m d" ". . o b q q";
     row-gap:1px;
   }
-  body.show-spend .row:not(.guest){grid-template-areas:"g c n m d" ". . o o q" ". . b a ."}
+  body.show-spend .row:not(.guest){grid-template-areas:"g c n m m d" ". . o o q q" ". . b a a ."}
   .row:not(.guest) .item-grip{grid-area:g}
   .row:not(.guest) .check{grid-area:c}
   .row:not(.guest) .name{grid-area:n}

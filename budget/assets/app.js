@@ -217,7 +217,7 @@
       <input type="text" class="name" value="${esc(it.name)}" placeholder="항목 이름" aria-label="항목 이름">
       <textarea class="memo" rows="1" placeholder="메모" aria-label="메모">${esc(it.memo || "")}</textarea>
       ${pickHTML(it)}
-      <label class="qty"><input type="text" class="qty-in" inputmode="numeric" value="${qtyOf(it)}" aria-label="수량"><span aria-hidden="true">개</span></label>
+      <div class="qty"><button type="button" class="qty-down" aria-label="수량 하나 줄이기" title="하나 줄이기"${qtyOf(it) <= 1 ? " disabled" : ""}><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button><input type="text" class="qty-in" inputmode="numeric" value="${qtyOf(it)}" aria-label="수량"><button type="button" class="qty-up" aria-label="수량 하나 늘리기" title="하나 늘리기"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5 2v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>
       <input type="text" class="money budget price" inputmode="numeric" value="${plain(it.budget)}" aria-label="금액" placeholder="금액"${unitTitle(it)}>
       <input type="text" class="money actual" inputmode="numeric" value="${plain(it.actual)}" aria-label="지출" placeholder="지출">
       <button type="button" class="del-item" aria-label="항목 삭제">×</button>
@@ -339,7 +339,7 @@
             ? `<div class="cols guest" aria-hidden="true"><span></span><span>이름</span><span class="r">축의금</span><span></span></div>
           <div class="rows">${c.items.map(guestRowHTML).join("")}</div>
           <button type="button" class="add-item">+ 이름 추가</button>`
-            : `<div class="cols" aria-hidden="true"><span></span><span></span><span>항목</span><span>메모</span><span>선택지</span><span class="r">수량</span><span class="r">금액</span><span class="r">지출</span><span></span></div>
+            : `<div class="cols" aria-hidden="true"><span></span><span></span><span>항목</span><span>메모</span><span>선택지</span><span class="c">수량</span><span class="r">금액</span><span class="r">지출</span><span></span></div>
           <div class="rows">${c.items.map(rowHTML).join("")}</div>
           <button type="button" class="add-item">+ 항목 추가</button>`}
         </section>`).join("");
@@ -821,6 +821,8 @@
       if(q > 1 && it.budget) b.title = `개당 ${won(Math.round(unit || unitOf(it)))}`; else b.removeAttribute("title");
       syncSpend(it);
       rowEl.querySelector(".actual").value = plain(it.actual);
+      const dn = rowEl.querySelector(".qty-down");
+      if(dn) dn.disabled = q <= 1;
       rowEl.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
     }
     updateTotals(); save();
@@ -867,6 +869,11 @@
     if(open){ open.open = false; open.querySelector("summary").focus(); }
   });
 
+  // 수량 칸의 빈 곳을 눌러도 숫자 칸에 커서가 가요
+  catsEl.addEventListener("click", e => {
+    const box = e.target.closest(".qty");
+    if(box && !e.target.closest("button, input")) box.querySelector(".qty-in").focus();
+  });
   catsEl.addEventListener("click", e => {
     const t = e.target.closest("button");
     if(!t || !t.closest(".cat")) return;
@@ -915,6 +922,14 @@
       render(); save();
       if(hasContent(it)) toast(`'${it.name || "이름 없는 항목"}' 항목을 지웠어요`, snap);
     }
+    if(t.classList.contains("qty-up") || t.classList.contains("qty-down")){
+      const it = findItem(t, c);
+      const q = Math.min(9999, Math.max(1, qtyOf(it) + (t.classList.contains("qty-up") ? 1 : -1)));
+      if(q === qtyOf(it)) return;
+      setQty(c, it, q);
+      const input = t.closest(".qty").querySelector(".qty-in");
+      input.value = String(q);
+    }
     if(t.classList.contains("clear-items")){
       const n = c.items.filter(hasContent).length;
       if(!n){ closeMenus(); toast("지울 항목이 없어요"); return; }
@@ -942,6 +957,12 @@
   // Enter in an item name → add next item.
   // Guestbook: 이름 → 축의금 → next 이름, so a whole list can be typed without the mouse.
   catsEl.addEventListener("keydown", e => {
+    // 수량 칸에서 ↑/↓ 로 하나씩 늘리고 줄여요
+    if((e.key === "ArrowUp" || e.key === "ArrowDown") && e.target.classList.contains("qty-in")){
+      e.preventDefault();
+      e.target.closest(".qty").querySelector(e.key === "ArrowUp" ? ".qty-up" : ".qty-down").click();
+      return;
+    }
     if(e.key !== "Enter" || e.isComposing) return;
     if(isGuest(state) && e.target.classList.contains("name")){
       e.preventDefault();
