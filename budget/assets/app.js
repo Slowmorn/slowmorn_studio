@@ -1362,9 +1362,9 @@
     const t = e.target, v = parseMoney(t.value);
     t.value = plain(v);
   });
-  // 확인: 아래 칸에 적다 만 선택지가 있으면 추가하고 창을 닫아요
+  // 확인: 아래 칸에 적다 만 선택지가 있으면 추가해서 그걸로 고르고 창을 닫아요
   document.getElementById("optDone").addEventListener("click", () => {
-    if(optForm.elements.name.value.trim() && !addOptionFromForm()) return;
+    if(optForm.elements.name.value.trim() && !addOptionFromForm(true)) return;
     optDialog.close();
   });
 
@@ -1416,7 +1416,8 @@
   });
 
   // 아래 칸의 새 선택지를 추가합니다. 추가했으면 true.
-  function addOptionFromForm(){
+  // choose: 추가한 선택지를 바로 골라요 (확인으로 추가할 때). 아니면 첫 선택지일 때만 골라요.
+  function addOptionFromForm(choose){
     const it = optItem();
     if(!it) return false;
     const name = optForm.elements.name.value.trim();
@@ -1430,9 +1431,10 @@
     const first = !it.options.length;
     const o = { id: nid(), name, link, price, note };
     it.options.push(o);
-    // 첫 선택지는 바로 골라 둡니다. 이미 선택지가 있으면 지금 고른 것(또는 선택 안 함)을 그대로 둬요.
-    if(first){ it.choiceId = o.id; it.budget = price * qtyOf(it); delete it.priceManual; }
+    // 첫 선택지는 바로 골라 둡니다. '추가'로 더 넣을 때는 지금 고른 것(또는 선택 안 함)을 그대로 둬요.
+    if(first || choose){ it.choiceId = o.id; it.budget = price * qtyOf(it); delete it.priceManual; }
     render(); save();
+    if(choose) toast(price ? `'${name}' 추가 · 선택 · 금액 ${won(it.budget)}` : `'${name}' 추가 · 선택`);
     resetOptForm(); renderOptions();
     return true;
   }
