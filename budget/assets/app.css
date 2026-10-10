@@ -471,6 +471,9 @@ body:not(.kind-guestbook) .t-people{display:none}
 .opt-tool svg{width:16px;height:16px}
 .opt-tool:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
 .opt-tool.danger:hover{color:var(--warn)}
+/* 링크 열기는 색을 넣어 눈에 띄게 */
+a.opt-tool{background:var(--accent-fill);color:#fff}
+a.opt-tool:hover{background:var(--accent-fill);color:#fff;filter:brightness(.9)}
 .opt-form{border-top:1px solid var(--line);padding:14px 20px 18px;display:grid;gap:8px}
 .opt-form-title{font-size:13.5px;font-weight:600}
 .opt-form input{
