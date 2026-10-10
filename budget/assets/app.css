@@ -98,6 +98,14 @@ body[data-cols="4"]{--wrap:1640px}
 .pc-nums .t-main{display:grid;grid-template-columns:auto auto;align-items:baseline;column-gap:8px}
 .pc-nums .t-main .t-label{grid-column:1 / -1}
 .pc-nums .t-export{align-self:flex-end}
+/* 예산 구성: 누르면 선택지가 그 구성으로 한 번에 골라져요. 버튼마다 그 구성의 예산 합계가 붙어요 */
+.t-tiers{display:flex;flex-direction:column;gap:4px;min-width:0}
+.t-tiers[hidden]{display:none}
+.tier-seg{flex-wrap:wrap}
+.tier-seg button{flex-direction:column;align-items:center;gap:0;padding:4px 12px;line-height:1.25}
+.tier-seg button small{font-size:11.5px;font-variant-numeric:tabular-nums;color:var(--muted);font-weight:500}
+.tier-seg button[aria-pressed="true"] small{color:var(--ink)}
+body.kind-guestbook .t-tiers{display:none}
 @media (max-width:640px){
   .plan-card{padding:12px 14px;border-radius:18px}
   .pc-nums{gap:10px 22px}
@@ -443,6 +451,8 @@ body:not(.kind-guestbook) .t-people{display:none}
 .opt-name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .opt-price{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
 .opt-price.none{color:var(--muted);font-weight:400}
+.opt-tier{display:inline-block;vertical-align:1px;margin-left:6px;padding:0 6px;border-radius:999px;font-size:11px;font-weight:500;line-height:17px;
+  background:color-mix(in srgb, var(--ink) 7%, transparent);color:var(--muted)}
 .opt-note{grid-column:2 / -1;color:var(--ink);opacity:.75;font-size:12.5px;white-space:pre-wrap;overflow-wrap:anywhere}
 .opt-host{grid-column:2 / -1;color:var(--muted);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .opt-tool{
@@ -512,7 +522,7 @@ body:not(.kind-guestbook) .t-people{display:none}
 .foot-actions button{border:0;background:none;color:var(--muted);text-decoration:underline;padding:0;font-size:inherit}
 .foot-actions button:hover{color:var(--warn)}
 
-.t-main .t-label,.t-small .t-label{font-size:12.5px;color:var(--muted)}
+.t-main .t-label,.t-small .t-label,.t-tiers .t-label{font-size:12.5px;color:var(--muted)}
 .t-main .t-num{
   font-weight:700;
   font-size:clamp(20px,3.2vw,25px);line-height:1.15;   /* 1억 단위(123,456,789원)까지 두 개가 나란히 들어가게 */

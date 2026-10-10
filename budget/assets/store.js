@@ -59,7 +59,10 @@
 
   function fromTemplate(key){
     const t = byKey[key] || BLANK;
-    return {
+    // 예산 구성(미니멀·스탠다드·풀옵션 …): 선택지마다 들어가는 구성이 적혀 있어요 (o.tiers)
+    const tiers = t.kind === "guestbook" ? [] : (t.tiers || []).filter(r => r && r.id).map(r => ({ id: String(r.id), label: r.label || "구성" }));
+    const tierIds = tiers.map(r => r.id);
+    const plan = {
       title: t.title,
       accent: randomAccent(),
       intro: t.intro || "",
@@ -73,12 +76,59 @@
           if(src.qty > 1) it.qty = src.qty;
           if(src.memo) it.memo = src.memo;
           if(src.options && src.options.length){
-            it.options = src.options.map(o => ({ id: nid(), name: o.name, link: safeLink(o.link), price: o.price || 0, note: o.note || "" }));
+            it.options = src.options.map(o => {
+              const x = { id: nid(), name: o.name, link: safeLink(o.link), price: o.price || 0, note: o.note || "" };
+              const ot = (o.tiers || []).filter(id => tierIds.includes(id));
+              if(ot.length) x.tiers = ot;
+              return x;
+            });
           }
           return it;
         })
       }))
     };
+    if(tiers.length){
+      plan.tiers = tiers;
+      // 불러오면 기본 구성의 선택지가 미리 골라져서 예산이 바로 보여요
+      applyTier(plan, (tiers.find(r => r.id === t.defaultTier) || tiers[0]).id);
+    }
+    return plan;
+  }
+
+  // ---- 예산 구성 ----
+  // 구성이 붙은 선택지가 있는 항목만 구성을 따릅니다. 그 구성에 해당하는 선택지가 없으면 '선택 안 함'이에요.
+  const qtyOf = it => Math.max(1, parseInt(it.qty, 10) || 1);
+  const inTiers = it => (it.options || []).some(o => o.tiers && o.tiers.length);
+  const tierPick = (it, tid) => (it.options || []).find(o => (o.tiers || []).includes(tid)) || null;
+  function applyTier(p, tid){
+    (p.categories || []).forEach(c => (c.items || []).forEach(it => {
+      if(!inTiers(it)) return;
+      const o = tierPick(it, tid);
+      it.choiceId = o ? o.id : null;
+      it.budget = o ? (o.price || 0) * qtyOf(it) : 0;
+      delete it.priceManual;
+    }));
+    p.tier = tid;
+  }
+  // 지금 고른 선택지가 어느 구성과 똑같은지 (직접 바꿨으면 없음). 두 구성이 똑같으면 마지막에 고른 쪽이에요.
+  function activeTier(p){
+    const items = (p.categories || []).flatMap(c => c.items || []).filter(inTiers);
+    const same = r => items.every(it => {
+      const o = tierPick(it, r.id);
+      return (o ? o.id : null) === (it.choiceId || null) && !it.priceManual;
+    });
+    const tiers = p.tiers || [];
+    return tiers.find(r => r.id === p.tier && same(r)) || tiers.find(same) || null;
+  }
+  // 그 구성으로 바꾸면 되는 예산 합계 (구성과 상관없는 항목은 지금 금액 그대로)
+  function tierTotal(p, tid){
+    let sum = 0;
+    (p.categories || []).forEach(c => (c.items || []).forEach(it => {
+      if(!inTiers(it)){ sum += it.budget || 0; return; }
+      const o = tierPick(it, tid);
+      if(o) sum += (o.price || 0) * qtyOf(it);
+    }));
+    return sum;
   }
 
   const newPlan = data => Object.assign({ title: "새 예산표", categories: [] }, data, { id: (data && data.id) || nid() });
@@ -413,7 +463,7 @@
     data,
     get live(){ return live(); },
     get trashed(){ return trashed(); },
-    nid, newPlan, fromTemplate, accentKey, safeLink, planLabel, isGuest, summary, progress, daysLeft,
+    nid, newPlan, fromTemplate, applyTier, activeTier, tierTotal, accentKey, safeLink, planLabel, isGuest, summary, progress, daysLeft,
     find, indexOf,
     save, saveLocalNow, saveToAccount,
     addPlan, addExisting, removePlan, restorePlan, purge, purgeExpired,

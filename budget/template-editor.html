@@ -138,6 +138,24 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
 .opts{grid-column:1 / -1;margin:4px 0 6px;padding:10px 12px;border-radius:8px;background:var(--paper)}
 .opts-title{font-size:12px;color:var(--muted);margin-bottom:6px}
 .opt{display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1.1fr) minmax(0,1fr) 30px;gap:6px;align-items:center;margin-bottom:4px}
+.has-tiers .opt,.has-tiers .opt-head{grid-template-columns:minmax(0,1fr) 100px minmax(0,1fr) minmax(0,.8fr) var(--tiers-w) 30px}
+/* 선택지가 들어가는 구성: 한 항목에서 구성마다 선택지는 하나만 고를 수 있어요 */
+.opt-tiers{display:flex;gap:3px}
+.tier-tog{width:60px;overflow:hidden;text-overflow:ellipsis;height:28px;padding:0 6px;border-radius:999px;border:1px solid var(--line);background:var(--sheet);color:var(--muted);font-size:12px;white-space:nowrap}
+.tier-tog:hover{color:var(--ink);border-color:color-mix(in srgb, var(--ink) 30%, var(--line))}
+.tier-tog.on{background:var(--accent-soft);border-color:var(--accent-fill);color:var(--ink);font-weight:600}
+.opt-btn .tier-mark{color:var(--accent);font-weight:600}
+.tier-list{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.tier-chip{display:flex;align-items:center;gap:2px;border:1px solid var(--line);border-radius:10px;padding:3px 3px 3px 4px;background:var(--sheet)}
+.tier-chip.def{border-color:var(--accent-fill);box-shadow:inset 0 0 0 1px var(--accent-fill)}
+.tier-chip input{width:7.5em;border:1px solid transparent;border-radius:6px;padding:4px 6px;background:transparent;font-weight:600}
+.tier-chip input:focus{outline:none;border-color:var(--accent);background:var(--paper)}
+.tier-chip .sum{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;padding:0 4px}
+.tier-def{border:0;background:none;color:var(--muted);font-size:12px;padding:4px 6px;border-radius:6px;white-space:nowrap}
+.tier-def:hover{background:color-mix(in srgb, var(--ink) 6%, transparent);color:var(--ink)}
+.tier-chip.def .tier-def{color:var(--accent);font-weight:600}
+.tier-chip .ic{width:26px;height:26px}
+.field .note{font-size:12px;color:var(--muted);line-height:1.5}
 .opt .num{text-align:right;font-variant-numeric:tabular-nums}
 .opt-head{display:grid;grid-template-columns:minmax(0,1fr) 110px minmax(0,1.1fr) minmax(0,1fr) 30px;gap:6px;font-size:11.5px;color:var(--muted);margin:0 0 3px;padding:0 2px}
 .opt-head .r{text-align:right;padding-right:10px}
@@ -167,7 +185,8 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
   .ihead{display:none}
   .item{grid-template-columns:18px minmax(0,1fr) 64px 96px;grid-template-areas:"g n q b" ". m m m" ". o o a"}
   .guest .item{grid-template-columns:18px minmax(0,1fr) 110px 96px;grid-template-areas:"g n b a"}
-  .opt{grid-template-columns:minmax(0,1fr) 96px 30px;grid-template-areas:"on op od" "ol ol ol" "nt nt nt"}
+  .opt,.has-tiers .opt{grid-template-columns:minmax(0,1fr) 96px 30px;grid-template-areas:"on op od" "ol ol ol" "nt nt nt" "tr tr tr"}
+  .opt .opt-tiers{grid-area:tr}
   .opt-head{display:none}
   .opt [data-f=opt-name]{grid-area:on}.opt [data-f=opt-price]{grid-area:op}.opt [data-f=opt-link]{grid-area:ol}.opt [data-f=opt-note]{grid-area:nt}.opt .ic{grid-area:od}
   .item .item-grip{grid-area:g}.item .col-name{grid-area:n}.item .col-memo{grid-area:m}.item .col-qty{grid-area:q}.item .col-budget{grid-area:b}.item .col-opt{grid-area:o}.item .acts{grid-area:a}
@@ -252,6 +271,28 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
   };
   const newId = () => "tpl-" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
   const itemCount = t => t.categories.reduce((s, c) => s + c.items.length, 0);
+  // 예산 구성: t.tiers = [{ id, label }], t.defaultTier = 불러오면 먼저 골라지는 구성, 선택지마다 o.tiers = [구성 id…]
+  const tiersOf = t => t.kind === "guestbook" ? [] : (t.tiers || []);
+  const qtyOf = it => it.qty > 1 ? it.qty : 1;
+  function tierSum(t, id){
+    let sum = 0;
+    t.categories.forEach(c => c.items.forEach(it => {
+      const tiered = (it.options || []).some(o => o.tiers && o.tiers.length);
+      if(!tiered){ sum += it.budget || 0; return; }
+      const o = it.options.find(x => (x.tiers || []).includes(id));
+      if(o) sum += (o.price || 0) * qtyOf(it);
+    }));
+    return sum;
+  }
+  const wonShort = n => n >= 10000 ? Math.round(n / 10000).toLocaleString("ko-KR") + "만원" : (n || 0).toLocaleString("ko-KR") + "원";
+  function refreshTierSums(){
+    const t = tpl(); if(!t) return;
+    edEl.querySelectorAll(".tier-chip[data-ri]").forEach(el => {
+      const r = tiersOf(t)[+el.dataset.ri];
+      if(r) el.querySelector(".sum").textContent = wonShort(tierSum(t, r.id));
+    });
+  }
+  const tierId = () => "t" + Math.random().toString(36).slice(2, 7);
   function autoDesc(t){
     const names = t.categories.map(c => c.name).filter(Boolean);
     if(!names.length) return "";
@@ -307,26 +348,32 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
   function itemHTML(t, ci, ii, it){
     const opts = it.options || [];
     const open = openOpts.has(it);
+    const tiers = tiersOf(t);
+    const tierMarks = tiers.length && opts.some(o => o.tiers && o.tiers.length) ? ' <span class="tier-mark" title="구성에 들어간 선택지가 있어요">●</span>' : "";
     return `<div class="item" data-ci="${ci}" data-ii="${ii}">
       <button type="button" class="item-grip" aria-label="순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 옮기기 — 다른 카테고리로도 옮길 수 있어요"><svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg></button>
       <input class="col-name" data-f="name" value="${esc(it.name)}" placeholder="${t.kind === "guestbook" ? "이름 (비워 두면 빈 줄)" : "항목 이름"}" aria-label="항목 이름">
       <input class="col-memo" data-f="memo" value="${esc(it.memo || "")}" placeholder="메모 (선택)" aria-label="메모">
       <input class="col-qty num" data-f="qty" inputmode="numeric" value="${it.qty > 1 ? it.qty : ""}" placeholder="1" aria-label="수량">
       <input class="col-budget num" data-f="budget" inputmode="numeric" value="${plain(it.budget)}" placeholder="${t.kind === "guestbook" ? "축의금" : "예산"}" aria-label="기본 금액">
-      <button type="button" class="col-opt opt-btn${opts.length ? " has" : ""}${open ? " open" : ""}" data-act="opts">${opts.length ? `선택지 ${opts.length}개` : "+ 선택지"}</button>
+      <button type="button" class="col-opt opt-btn${opts.length ? " has" : ""}${open ? " open" : ""}" data-act="opts">${opts.length ? `선택지 ${opts.length}개${tierMarks}` : "+ 선택지"}</button>
       <span class="acts">
         <button type="button" class="ic" data-act="item-up" title="위로" aria-label="위로" ${ii === 0 ? "disabled" : ""}>${ICON.up}</button>
         <button type="button" class="ic" data-act="item-down" title="아래로" aria-label="아래로" ${ii === t.categories[ci].items.length - 1 ? "disabled" : ""}>${ICON.down}</button>
         <button type="button" class="ic danger" data-act="item-del" title="삭제" aria-label="항목 삭제">${ICON.del}</button>
       </span>
-      ${open && t.kind !== "guestbook" ? `<div class="opts">
-        <div class="opts-title">선택지 — 추천 브랜드·업체. 가격·링크·비고는 비워 둬도 돼요</div>
-        ${opts.length ? `<div class="opt-head"><span>이름</span><span class="r">가격</span><span>링크</span><span>비고</span><span></span></div>` : ""}
+      ${open && t.kind !== "guestbook" ? `<div class="opts${tiers.length ? " has-tiers" : ""}" style="--tiers-w:${tiers.length * 63 - 3}px">
+        <div class="opts-title">선택지 — 추천 브랜드·업체. 가격·링크·비고는 비워 둬도 돼요${tiers.length ? ". 오른쪽에서 그 선택지가 들어갈 구성을 눌러요 (구성마다 하나, 아무것도 안 고른 구성은 '선택 안 함')" : ""}</div>
+        ${opts.length ? `<div class="opt-head"><span>이름</span><span class="r">가격</span><span>링크</span><span>비고</span>${tiers.length ? "<span>구성</span>" : ""}<span></span></div>` : ""}
         ${opts.map((o, oi) => `<div class="opt" data-oi="${oi}">
           <input class="in" data-f="opt-name" value="${esc(o.name)}" placeholder="이름 (예: 스토케)" aria-label="선택지 이름">
           <input class="in num" data-f="opt-price" inputmode="numeric" value="${plain(o.price)}" placeholder="가격" aria-label="선택지 가격">
           <input class="in" data-f="opt-link" inputmode="url" value="${esc(o.link)}" placeholder="링크 (예: coupang.com/...)" aria-label="선택지 링크">
           <input class="in" data-f="opt-note" value="${esc(o.note)}" placeholder="비고" aria-label="선택지 비고">
+          ${tiers.length ? `<span class="opt-tiers">${tiers.map(r => {
+            const on = (o.tiers || []).includes(r.id);
+            return `<button type="button" class="tier-tog${on ? " on" : ""}" data-act="opt-tier" data-tid="${esc(r.id)}" aria-pressed="${on}" title="${esc(r.label || "구성")}에 넣기">${esc(r.label || "구성")}</button>`;
+          }).join("")}</span>` : ""}
           <button type="button" class="ic danger" data-act="opt-del" title="삭제" aria-label="선택지 삭제">${ICON.del}</button>
         </div>`).join("")}
         <button type="button" class="add-link" data-act="opt-add">+ 선택지 추가</button>
@@ -370,7 +417,24 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
               <option value="guestbook"${guest ? " selected" : ""}>방명록 (이름·축의금)</option>
             </select>
           </label>
-          <div class="field"><span>구성</span><div style="padding:8px 0;color:var(--muted)">카테고리 ${t.categories.length}개 · 항목 ${itemCount(t)}개</div></div>
+          <div class="field"><span>내용</span><div style="padding:8px 0;color:var(--muted)">카테고리 ${t.categories.length}개 · 항목 ${itemCount(t)}개</div></div>
+          ${guest ? "" : `<div class="field wide"><span>예산 구성</span>
+            ${tiersOf(t).length ? `<div class="tier-list">
+              ${tiersOf(t).map((r, ri) => {
+                const def = (t.defaultTier || tiersOf(t)[0].id) === r.id;
+                return `<div class="tier-chip${def ? " def" : ""}" data-ri="${ri}">
+                  <input data-f="tier-label" value="${esc(r.label)}" placeholder="구성 이름" aria-label="구성 이름">
+                  <span class="sum">${wonShort(tierSum(t, r.id))}</span>
+                  <button type="button" class="tier-def" data-act="tier-def" aria-pressed="${def}" title="불러오면 이 구성의 선택지가 먼저 골라져요">${def ? "기본" : "기본으로"}</button>
+                  <button type="button" class="ic danger" data-act="tier-del" title="구성 삭제" aria-label="구성 삭제">${ICON.del}</button>
+                </div>`;
+              }).join("")}
+              <button type="button" class="add-link" data-act="tier-add">+ 구성 추가</button>
+            </div>
+            <div class="note">선택지를 펼쳐서 구성마다 들어갈 선택지를 눌러요. 불러오면 '기본' 구성의 선택지가 미리 골라지고, 체크리스트에서 다른 구성으로 바꿀 수 있어요. 금액은 선택지 가격 × 수량이에요.</div>`
+            : `<div class="tier-list"><button type="button" class="btn" data-act="tier-init">+ 스탠다드 · 스탠다드+ · 디자이너픽 만들기</button></div>
+            <div class="note">구성을 만들면 선택지마다 어느 구성에 들어갈지 고를 수 있어요. 불러오면 선택지가 미리 골라져서 예산이 바로 보여요.</div>`}
+          </div>`}
         </div>
       </section>
       <div class="section-title">카테고리</div>
@@ -428,11 +492,12 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
     else if(f === "cat-name") t.categories[ci].name = v;
     else if(f === "name") it.name = v;
     else if(f === "memo"){ if(v.trim()) it.memo = v; else delete it.memo; }
-    else if(f === "qty"){ const n = Math.min(digits(v), 9999); e.target.value = n > 1 ? String(n) : v.replace(/[^\d]/g, ""); if(n > 1) it.qty = n; else delete it.qty; }
-    else if(f === "budget"){ const n = digits(v); e.target.value = plain(n); if(n) it.budget = n; else delete it.budget; }
+    else if(f === "qty"){ const n = Math.min(digits(v), 9999); e.target.value = n > 1 ? String(n) : v.replace(/[^\d]/g, ""); if(n > 1) it.qty = n; else delete it.qty; refreshTierSums(); }
+    else if(f === "budget"){ const n = digits(v); e.target.value = plain(n); if(n) it.budget = n; else delete it.budget; refreshTierSums(); }
     else if(f === "opt-name") it.options[oi].name = v;
     else if(f === "opt-note"){ if(v) it.options[oi].note = v; else delete it.options[oi].note; }
-    else if(f === "opt-price"){ const n = digits(v); e.target.value = plain(n); if(n) it.options[oi].price = n; else delete it.options[oi].price; }
+    else if(f === "opt-price"){ const n = digits(v); e.target.value = plain(n); if(n) it.options[oi].price = n; else delete it.options[oi].price; refreshTierSums(); }
+    else if(f === "tier-label"){ t.tiers[+e.target.closest("[data-ri]").dataset.ri].label = v; }
     else if(f === "opt-link"){ if(v.trim()) it.options[oi].link = v.trim(); else delete it.options[oi].link; }
     save();
   });
@@ -507,6 +572,30 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
         renderAll(); save(); focusSoon(`[data-ci="${ci}"] [data-ii="${ii}"] .opt:last-of-type [data-f="opt-name"]`); return;
       case "opt-del":
         it.options.splice(oi, 1); if(!it.options.length) delete it.options; break;
+      case "opt-tier": {
+        // 같은 항목에서 한 구성에는 선택지 하나만: 다른 선택지에서는 그 구성을 뺍니다
+        const id = b.dataset.tid, o = it.options[oi], on = (o.tiers || []).includes(id);
+        it.options.forEach(x => { if(x.tiers){ x.tiers = x.tiers.filter(y => y !== id); if(!x.tiers.length) delete x.tiers; } });
+        if(!on) o.tiers = tiersOf(t).map(r => r.id).filter(y => y === id || (o.tiers || []).includes(y));
+        break;
+      }
+      case "tier-init":
+        t.tiers = [{ id: "min", label: "스탠다드" }, { id: "std", label: "스탠다드+" }, { id: "full", label: "디자이너픽" }];
+        t.defaultTier = "std"; break;
+      case "tier-add":
+        t.tiers.push({ id: tierId(), label: "" });
+        renderAll(); save(); focusSoon(`.tier-chip[data-ri="${t.tiers.length - 1}"] input`); return;
+      case "tier-def": t.defaultTier = t.tiers[+b.closest("[data-ri]").dataset.ri].id; break;
+      case "tier-del": {
+        snap = snapshot();
+        const r = t.tiers.splice(+b.closest("[data-ri]").dataset.ri, 1)[0];
+        t.categories.forEach(c => c.items.forEach(x => (x.options || []).forEach(o => {
+          if(o.tiers){ o.tiers = o.tiers.filter(y => y !== r.id); if(!o.tiers.length) delete o.tiers; }
+        })));
+        if(!t.tiers.length){ delete t.tiers; delete t.defaultTier; }
+        else if(t.defaultTier === r.id) t.defaultTier = t.tiers[0].id;
+        renderAll(); save(); toast(`'${r.label || "이름 없는 구성"}' 구성을 삭제했어요`, snap); return;
+      }
       default: return;
     }
     renderAll(); save();
@@ -628,6 +717,10 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
       title: (t.title || "").trim() || (t.label || "새 예산표"),
       intro: (t.intro || "").trim(),
       kind: t.kind === "guestbook" ? "guestbook" : "budget",
+      ...(tiersOf(t).length ? {
+        tiers: t.tiers.map(r => ({ id: r.id, label: (r.label || "").trim() || "구성" })),
+        defaultTier: t.tiers.some(r => r.id === t.defaultTier) ? t.defaultTier : t.tiers[0].id
+      } : {}),
       categories: t.categories.map(c => ({
         name: (c.name || "").trim(),
         items: c.items.map(it => {
@@ -640,6 +733,8 @@ body.is-sorting,body.is-sorting *{cursor:grabbing !important;user-select:none;-w
             if(x.price > 0) y.price = x.price;
             if((x.link || "").trim()) y.link = x.link.trim();
             if((x.note || "").trim()) y.note = x.note.trim();
+            const ids = tiersOf(t).map(r => r.id).filter(id => (x.tiers || []).includes(id));
+            if(ids.length) y.tiers = ids;
             return y;
           });
           if(opts.length && t.kind !== "guestbook") o.options = opts;

@@ -624,8 +624,36 @@
     document.getElementById("barBudget").innerHTML = `${guest ? "축의금" : "예산"} <b>${won(b)}</b>`;
     document.getElementById("barSpend").innerHTML = guest ? "" : `지출 <b>${won(spent)}</b>`;
     document.getElementById("barDone").innerHTML = guest ? `<b>${count}</b>명` : `완료 <b>${done}</b>/${count}`;
+    renderTiers();
     showSaved();
   }
+
+  // ---- 예산 구성 (미니멀·스탠다드·풀옵션 …) ----
+  // 템플릿에서 온 구성이 있을 때만 보여요. 버튼마다 그 구성으로 바꿨을 때의 예산 합계가 붙어요.
+  // 선택지를 직접 바꾸면 어느 버튼도 눌려 있지 않아요.
+  const tiersEl = document.getElementById("tTiers"), tierSeg = document.getElementById("tierSeg");
+  const shortWon = n => n >= 10000 ? Math.round(n / 10000).toLocaleString("ko-KR") + "만" : won(n);
+  function renderTiers(){
+    const tiers = !isGuest(state) && state.tiers || [];
+    tiersEl.hidden = !tiers.length;
+    if(!tiers.length){ tierSeg.innerHTML = ""; return; }
+    const on = BS.activeTier(state);
+    tierSeg.innerHTML = tiers.map(r => `<button type="button" data-tier="${esc(r.id)}" aria-pressed="${!!on && on.id === r.id}">${esc(r.label)}<small>${shortWon(BS.tierTotal(state, r.id))}</small></button>`).join("");
+  }
+  tierSeg.addEventListener("click", e => {
+    const b = e.target.closest("[data-tier]");
+    if(!b || b.getAttribute("aria-pressed") === "true") return;
+    const r = (state.tiers || []).find(x => x.id === b.dataset.tier);
+    if(!r) return;
+    const snap = snapshot();
+    BS.applyTier(state, r.id);
+    render(); save();
+    let b2 = 0;
+    state.categories.forEach(c => c.items.forEach(i => { b2 += i.budget || 0; }));
+    toast(`'${r.label}' 구성으로 골랐어요 · 예산 ${won(b2)}`, snap);
+  });
+  const tierTagsHTML = o => (o.tiers || []).map(id => (state.tiers || []).find(r => r.id === id)).filter(Boolean)
+    .map(r => `<span class="opt-tier">${esc(r.label)}</span>`).join("");
   // 한 줄 요약의 이름·남은 날
   function updateMini(){
     document.getElementById("barTitle").textContent = planLabel(state);
@@ -1232,7 +1260,7 @@
           </div>`
         : `<button type="button" class="opt-main" aria-pressed="false">
             <span class="opt-radio" aria-hidden="true"></span>
-            <span class="opt-name">${esc(o.name)}</span>
+            <span class="opt-name">${esc(o.name)}${tierTagsHTML(o)}</span>
             <span class="opt-price${o.price ? "" : " none"}">${o.price ? won(o.price) : "가격 없음"}</span>
             ${o.note ? `<span class="opt-note">${esc(o.note)}</span>` : ""}
             ${host ? `<span class="opt-host">${esc(host)}</span>` : ""}
