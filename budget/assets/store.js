@@ -292,7 +292,11 @@
       c.id = nid();
       (c.items || []).forEach(it => {
         it.id = nid();
-        (it.options || []).forEach(o => { o.id = nid(); });
+        (it.options || []).forEach(o => {
+          const fresh = nid();
+          if(it.choiceId === o.id) it.choiceId = fresh;   // 고른 선택지도 새 id 를 따라가요
+          o.id = fresh;
+        });
       });
     });
     delete copy.pos;   // 원본 위에 겹치지 않도록 자리는 다시 잡습니다
