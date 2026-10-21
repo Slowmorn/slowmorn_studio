@@ -129,3 +129,19 @@ grant select                         on public.plan_members to authenticated;
 grant select, insert                 on public.plan_invites to authenticated;
 grant all on public.plans, public.plan_members, public.plan_invites to service_role;
 
+-- 8) 예산표 주인은 바뀌지 않게 -----------------------------------------------
+-- 같이 쓰는 사람이 저장할 때 user_id 를 자기 것으로 보내도, 원래 주인이 그대로 남게 합니다.
+-- (주인이 바뀌면 원래 주인이 그 예산표를 더 이상 저장하지 못해요: "new row violates row-level security policy")
+create or replace function public.keep_plan_owner()
+returns trigger
+language plpgsql
+as $$
+begin
+  new.user_id := old.user_id;
+  return new;
+end $$;
+
+drop trigger if exists keep_plan_owner on public.plans;
+create trigger keep_plan_owner
+  before update on public.plans
+  for each row execute function public.keep_plan_owner();

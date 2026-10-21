@@ -109,10 +109,32 @@
   async function savePlans(plans){
     const sb = await getClient();
     if(!sb || !session) return { error: "로그인이 필요해요" };
-    const rows = plans.map((p, i) => planToRow(p, i, session.user.id));
-    const { error } = await sb.from("plans").upsert(rows, { onConflict: "id" });
-    if(error){ console.warn("저장하지 못했어요:", error); return { error: error.message || String(error) }; }
-    return { ok: true };
+    const me = session.user.id;
+    const rows = plans.map((p, i) => planToRow(p, i, me));
+    // 내 예산표는 upsert(없으면 추가, 있으면 수정)로 한꺼번에 올립니다.
+    // 공유받은 예산표는 update 로만 고쳐요. upsert 는 '추가' 규칙(내가 주인일 것)도 검사해서,
+    // 주인이 아닌 사람이 올리면 "new row violates row-level security policy" 로 막혀요.
+    // 순서(position)는 주인의 버짓보드 것이라 건드리지 않습니다.
+    const mine = rows.filter(r => r.user_id === me), shared = rows.filter(r => r.user_id !== me);
+    const failed = [];
+    if(mine.length){
+      const { error } = await sb.from("plans").upsert(mine, { onConflict: "id" });
+      if(error){
+        // 하나라도 막히면 전부 저장되지 않아요. 하나씩 다시 올려서 나머지는 저장되게 합니다.
+        console.warn("저장하지 못했어요:", error);
+        for(const row of mine){
+          const r = await sb.from("plans").upsert(row, { onConflict: "id" });
+          if(r.error){ failed.push(row.id); console.warn(`'${row.title || row.id}'을(를) 저장하지 못했어요:`, r.error.message); }
+        }
+      }
+    }
+    await Promise.all(shared.map(async row => {
+      const { error } = await sb.from("plans")
+        .update({ title: row.title, kind: row.kind, data: row.data, updated_at: row.updated_at })
+        .eq("id", row.id);
+      if(error){ failed.push(row.id); console.warn(`공유받은 '${row.title || row.id}'을(를) 저장하지 못했어요:`, error.message); }
+    }));
+    return failed.length ? { error: "일부 예산표를 저장하지 못했어요", failed } : { ok: true };
   }
 
   async function removePlans(ids){

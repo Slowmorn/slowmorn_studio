@@ -2295,7 +2295,8 @@
     toast("초대 링크를 만드는 중…");
     try{
       const saved = await Auth.savePlans(store.plans); // 계정에 아직 없을 수 있으니 먼저 저장
-      if(saved && saved.error) throw new Error("저장 단계: " + saved.error);
+      // 다른 예산표가 막힌 건 초대와 상관없어요. 이 예산표가 저장되지 않았을 때만 멈춥니다.
+      if(saved && saved.error && (!saved.failed || saved.failed.includes(state.id))) throw new Error("저장 단계: " + saved.error);
       const res = await Auth.createInvite(state.id);
       if(!res || res.error) throw new Error("초대 단계: " + ((res && res.error) || "알 수 없는 오류"));
       state.shared = true; save(); ensureWatch();
