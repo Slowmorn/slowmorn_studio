@@ -118,3 +118,14 @@ end $$;
 
 revoke all on function public.delete_my_account() from public, anon;
 grant execute on function public.delete_my_account() to authenticated;
+
+-- 7) Data API 권한 ------------------------------------------------------
+-- 2026-10-30부터 Supabase는 public 스키마에 새로 만든 테이블에 Data API 권한을 저절로 주지 않아요.
+-- 지금 있는 테이블은 그대로 쓰이지만, 이 파일로 새 프로젝트를 다시 만들 때를 위해 적어 둡니다.
+-- 앱은 로그인한 사람(authenticated)만 테이블을 써요. 로그인하지 않은 사람(anon)에게는 주지 않습니다.
+-- 실제로 무엇을 볼 수 있는지는 위의 행 단위 보안(RLS) 정책이 정해요. 다시 실행해도 괜찮아요.
+grant select, insert, update, delete on public.plans        to authenticated;
+grant select                         on public.plan_members to authenticated;
+grant select, insert                 on public.plan_invites to authenticated;
+grant all on public.plans, public.plan_members, public.plan_invites to service_role;
+
