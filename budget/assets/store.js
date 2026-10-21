@@ -330,6 +330,7 @@
       });
     });
     delete copy.pos;   // 원본 위에 겹치지 않도록 자리는 다시 잡습니다
+    delete copy.ownerPos; delete copy.posBy;   // 공유받은 것을 복제해도 사본은 내 것이에요
     data.plans.splice(indexOf(id) + 1, 0, copy);
     data.activeId = copy.id;
     saveLocalNow();

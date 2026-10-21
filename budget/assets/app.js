@@ -2405,7 +2405,7 @@
     const mine = store.plans.find(p => p.id === row.id);
     const editing = Date.now() - lastTyped < 8000;
     // 내가 방금 저장한 것과 같은 내용이면 무시
-    if(payload.eventType !== "DELETE" && mine && JSON.stringify(row.data) === JSON.stringify(mine)) return;
+    if(payload.eventType !== "DELETE" && mine && Auth.sameAsMine && Auth.sameAsMine(row, mine)) return;
     if(editing){
       toast("같이 쓰는 사람이 이 예산표를 고쳤어요", null, { label: "불러오기", run: pullRemote });
     } else {

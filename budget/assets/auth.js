@@ -85,18 +85,45 @@
 
   // ---- 예산표 읽고 쓰기 ----
   // 공유받은 예산표는 주인이 따로 있으므로 주인 id를 함께 들고 다닙니다
-  const rowToPlan = row => Object.assign({}, row.data, {
-    id: row.id, title: row.title, kind: row.kind || undefined, owner: row.user_id, updatedAt: Date.parse(row.updated_at) || undefined
-  });
-  const planToRow = (plan, i, userId) => ({
-    id: plan.id,
-    user_id: plan.owner || userId,
-    title: (plan.title || "").trim(),
-    kind: plan.kind || "budget",
-    position: i,
-    data: plan,
-    updated_at: new Date().toISOString()
-  });
+  // 버짓보드 위 카드 자리(pos)는 사람마다 따로예요. data.pos 는 주인의 자리, data.posBy[사람 id] 는 같이 쓰는 사람의 자리.
+  // 앱 안에서는 늘 pos 가 '내 자리'이고, 주고받을 때만 여기서 바꿔 끼웁니다.
+  const meId = () => session && session.user && session.user.id;
+  const rowToPlan = row => {
+    const plan = Object.assign({}, row.data, {
+      id: row.id, title: row.title, kind: row.kind || undefined, owner: row.user_id, updatedAt: Date.parse(row.updated_at) || undefined
+    });
+    const me = meId();
+    if(me && row.user_id !== me){
+      plan.ownerPos = plan.pos;   // 주인의 자리는 건드리지 않고 그대로 돌려보내요
+      const mine = plan.posBy && plan.posBy[me];
+      if(mine) plan.pos = mine; else delete plan.pos;
+    }
+    return plan;
+  };
+  const planToRow = (plan, i, userId) => {
+    const owner = plan.owner || userId;
+    const data = Object.assign({}, plan);
+    delete data.ownerPos;
+    if(owner !== userId){
+      data.posBy = Object.assign({}, plan.posBy);
+      if(plan.pos) data.posBy[userId] = plan.pos; else delete data.posBy[userId];
+      if(plan.ownerPos) data.pos = plan.ownerPos; else delete data.pos;
+    }
+    return {
+      id: plan.id,
+      user_id: owner,
+      title: (plan.title || "").trim(),
+      kind: plan.kind || "budget",
+      position: i,
+      data,
+      updated_at: new Date().toISOString()
+    };
+  };
+  // 실시간으로 받은 줄이 내가 가진 것과 같은지 (내가 방금 저장한 것이면 다시 불러올 필요가 없어요)
+  const sameAsMine = (row, plan) => {
+    const strip = p => { const c = Object.assign({}, p); delete c.updatedAt; return JSON.stringify(c); };
+    return !!plan && strip(rowToPlan(row)) === strip(plan);
+  };
 
   async function listPlans(){
     const sb = await getClient();
@@ -189,7 +216,7 @@
     onChange(fn){ listeners.add(fn); return () => listeners.delete(fn); },
     hasStoredSession,
     getClient, signIn, signOut, deleteAccount,
-    listPlans, savePlans, removePlans, createInvite, acceptInvite, watchPlans, sharedPlanIds,
+    listPlans, savePlans, removePlans, sameAsMine, createInvite, acceptInvite, watchPlans, sharedPlanIds,
     // 페이지가 열릴 때: 이미 로그인한 흔적이 있으면 세션을 복구합니다
     async init(){
       if(!ENABLED || !hasStoredSession()) return null;
