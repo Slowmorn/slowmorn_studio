@@ -170,7 +170,7 @@
   }
 
   function startHTML(){
-    const picks = BS.templates.slice(0, 3);
+    const picks = BS.templates;
     return `<div class="desk-empty">
       <p>버짓보드가 비어 있어요. 무엇부터 준비하세요?</p>
       <div class="start-cards">
