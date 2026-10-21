@@ -81,9 +81,13 @@
     ensureWatch();
   }
   syncActive();
+  // 템플릿·엑셀·모두 지우기로 내용을 바꿀 때: 색, 날짜, 버짓보드 위 자리, 주인·함께 쓰기는 파일의 것이라 그대로 둡니다.
+  // (주인이 빠지면 같이 쓰는 사람이 저장할 때 자기 것으로 올라가서, 원래 주인이 저장하지 못하게 돼요)
+  const FILE_KEYS = ["accent", "dday", "pos", "owner", "shared"];
   function replaceActive(data){
-    // 색은 파일의 것이라 그대로 둡니다
-    const plan = newPlan(Object.assign(data, { id: state.id, accent: state.accent }));
+    const keep = { id: state.id };
+    FILE_KEYS.forEach(k => { if(state[k] !== undefined) keep[k] = state[k]; else delete data[k]; });
+    const plan = newPlan(Object.assign(data, keep));
     store.plans[store.plans.indexOf(state)] = plan;
     state = plan;
   }
