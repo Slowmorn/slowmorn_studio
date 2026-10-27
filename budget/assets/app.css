@@ -827,5 +827,5 @@ body:not(.show-spend) .s-spend{display:none}
   .s-panel{margin-left:0;margin-right:0}
 }
 
-/* 선택지 모두 보기는 지금 숨겨 둬요 */
-.opt-all{display:none}
+/* 선택지 모두 보기는 넓은 화면에서만. 휴대폰은 줄을 펼치면 선택지가 다 나와요 */
+body.simple-rows .opt-all{display:none}

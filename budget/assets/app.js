@@ -1274,7 +1274,7 @@
   const ALLOPTS_KEY = "prep-budget-all-options";
   const allOptsToggle = document.getElementById("allOptsToggle");
   let showAllOpts = false;
-  // 지금은 스위치를 숨겨 둬서 늘 꺼 둡니다
+  try{ showAllOpts = localStorage.getItem(ALLOPTS_KEY) === "on"; }catch(e){}
   allOptsToggle.checked = showAllOpts;
   document.body.classList.toggle("all-options", showAllOpts);
   allOptsToggle.addEventListener("change", () => {
