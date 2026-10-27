@@ -214,7 +214,60 @@
     </div>`;
   }
 
-  function rowHTML(it){
+  // ---- 단순한 줄: 체크 · 이름(고른 선택지) · 금액만 보이고, 누르면 그 자리에서 펼쳐져요 ----
+  // 펼친 줄은 화면에서만 기억해요 (저장하지 않아요).
+  const openRows = new Set();
+  const GRIP_SVG = '<svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg>';
+  const CHEV_SVG = '<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  const LINK_SVG = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M9 3h4v4M13 3L7.5 8.5M11 9.5V12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h2.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  // 이름 밑의 작은 줄: 고른 선택지 · 수량 (없으면 선택지 개수)
+  function subLineHTML(it){
+    const chosen = chosenOf(it), n = (it.options || []).length, q = qtyOf(it), parts = [];
+    if(chosen) parts.push(`<b>${esc(chosen.name)}</b>`);
+    else if(n) parts.push(`선택지 ${n}개`);
+    if(q > 1) parts.push(`${q}개`);
+    if(!parts.length && it.memo) parts.push(esc(it.memo.split("\n")[0]));
+    return parts.join(" · ");
+  }
+  function qtyHTML(it){
+    return `<div class="qty"><button type="button" class="qty-down" aria-label="수량 하나 줄이기" title="하나 줄이기"${qtyOf(it) <= 1 ? " disabled" : ""}><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button><input type="text" class="qty-in" inputmode="numeric" value="${qtyOf(it)}" aria-label="수량"><button type="button" class="qty-up" aria-label="수량 하나 늘리기" title="하나 늘리기"><svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 5h6M5 2v6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button></div>`;
+  }
+  function panelHTML(it){
+    const opts = it.options || [], chosen = chosenOf(it);
+    const none = opts.length ? `<button type="button" class="pick-opt pick-none${chosen ? "" : " on"}" data-none="1" aria-pressed="${!chosen}"><span class="pick-opt-name">선택 안 함</span></button>` : "";
+    const list = opts.map(o => {
+      const on = o.id === it.choiceId;
+      return `<div class="s-opt${on ? " on" : ""}"><button type="button" class="pick-opt${on ? " on" : ""}" data-oid="${esc(o.id)}" aria-pressed="${on}" title="${esc(o.name)}${o.note ? " · " + esc(o.note) : ""}"><span class="pick-opt-name">${esc(o.name)}</span><span class="pick-opt-price">${o.price ? won(o.price) : "가격 없음"}</span></button>${o.link ? `<a class="s-opt-link" href="${esc(o.link)}" target="_blank" rel="noopener noreferrer sponsored nofollow" aria-label="'${esc(o.name)}' 링크 열기" title="링크 열기">${LINK_SVG}</a>` : ""}</div>`;
+    }).join("");
+    return `<div class="s-panel">
+      <textarea class="memo" rows="1" placeholder="메모" aria-label="메모">${esc(it.memo || "")}</textarea>
+      <div class="s-opts" role="group" aria-label="선택지">
+        <div class="s-opts-top">${none}<button type="button" class="pick s-opt-edit" aria-haspopup="dialog">${opts.length ? "선택지 고치기" : "+ 선택지 추가"}</button></div>
+        ${list}
+      </div>
+      <div class="s-line">
+        <label class="s-field"><span>수량</span>${qtyHTML(it)}</label>
+        <label class="s-field s-spend"><span>지출</span><input type="text" class="money actual" inputmode="numeric" value="${plain(it.actual)}" aria-label="지출" placeholder="0"></label>
+        <button type="button" class="del-item s-del" aria-label="항목 삭제">항목 삭제</button>
+      </div>
+    </div>`;
+  }
+  function simpleRowHTML(it){
+    const open = openRows.has(it.id), sub = subLineHTML(it);
+    return `<div class="row s-row${it.done ? " done" : ""}${open ? " open" : ""}" data-iid="${it.id}">
+      <button type="button" class="item-grip" aria-label="순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기">${GRIP_SVG}</button>
+      <label class="check"><input type="checkbox" class="done-box" ${it.done ? "checked" : ""} aria-label="완료 표시"></label>
+      <div class="s-main">
+        <input type="text" class="name" value="${esc(it.name)}" placeholder="항목 이름" aria-label="항목 이름">
+        <span class="s-sub">${sub}</span>
+      </div>
+      <input type="text" class="money budget price" inputmode="numeric" value="${plain(it.budget)}" aria-label="금액" placeholder="금액"${unitTitle(it)}>
+      <button type="button" class="s-toggle" aria-expanded="${open}" aria-label="${open ? "접기" : "자세히 (메모·선택지·수량)"}">${CHEV_SVG}</button>
+      ${open ? panelHTML(it) : ""}
+    </div>`;
+  }
+  // 넓은 화면: 한 줄에 칸을 다 늘어놓는 표 모양
+  function fullRowHTML(it){
     return `<div class="row${it.done ? " done" : ""}" data-iid="${it.id}">
       <button type="button" class="item-grip" aria-label="순서 바꾸기 (드래그하거나 방향키)" title="드래그해서 순서 바꾸기"><svg viewBox="0 0 8 14" aria-hidden="true"><circle cx="2" cy="2" r="1.3" fill="currentColor"/><circle cx="6" cy="2" r="1.3" fill="currentColor"/><circle cx="2" cy="7" r="1.3" fill="currentColor"/><circle cx="6" cy="7" r="1.3" fill="currentColor"/><circle cx="2" cy="12" r="1.3" fill="currentColor"/><circle cx="6" cy="12" r="1.3" fill="currentColor"/></svg></button>
       <label class="check"><input type="checkbox" class="done-box" ${it.done ? "checked" : ""} aria-label="완료 표시"></label>
@@ -226,6 +279,31 @@
       <input type="text" class="money actual" inputmode="numeric" value="${plain(it.actual)}" aria-label="지출" placeholder="지출">
       <button type="button" class="del-item" aria-label="항목 삭제">×</button>
     </div>`;
+  }
+
+  // 휴대폰 폭에서만 단순한 줄을 써요
+  const simpleMQ = window.matchMedia("(max-width: 640px)");
+  const useSimple = () => simpleMQ.matches;
+  const rowHTML = it => useSimple() ? simpleRowHTML(it) : fullRowHTML(it);
+  document.body.classList.toggle("simple-rows", useSimple());
+  const onSimpleChange = () => { document.body.classList.toggle("simple-rows", useSimple()); render(); };
+  if(simpleMQ.addEventListener) simpleMQ.addEventListener("change", onSimpleChange); else simpleMQ.addListener(onSimpleChange);
+
+  // 한 줄만 다시 그려요 (펼치고 접을 때). 목록 전체를 다시 그리지 않아서 보던 자리가 그대로예요.
+  function redrawRow(it){
+    const el = catsEl.querySelector(`.row[data-iid="${CSS.escape(it.id)}"]`);
+    if(!el) return null;
+    el.insertAdjacentHTML("afterend", rowHTML(it));
+    const next = el.nextElementSibling;
+    el.remove();
+    next.querySelectorAll(".memo").forEach(fitMemo);
+    return next;
+  }
+  function toggleRow(c, it){
+    if(openRows.has(it.id)) openRows.delete(it.id); else openRows.add(it.id);
+    const el = redrawRow(it);
+    const tg = el && el.querySelector(".s-toggle");
+    if(tg) tg.focus({ preventScroll: true });
   }
 
   // 파일 이름 줄. 이름을 누르면 다른 파일로 건너뜁니다.
@@ -824,9 +902,12 @@
       b.value = plain(it.budget);
       if(q > 1 && it.budget) b.title = `개당 ${won(Math.round(unit || unitOf(it)))}`; else b.removeAttribute("title");
       syncSpend(it);
-      rowEl.querySelector(".actual").value = plain(it.actual);
+      const sp = rowEl.querySelector(".actual");
+      if(sp) sp.value = plain(it.actual);
       const dn = rowEl.querySelector(".qty-down");
       if(dn) dn.disabled = q <= 1;
+      const sub = rowEl.querySelector(".s-sub");
+      if(sub) sub.innerHTML = subLineHTML(it);
       rowEl.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
     }
     updateTotals(); save();
@@ -850,7 +931,7 @@
     const rowEl = t.closest(".row");
     rowEl.classList.toggle("done", it.done);
     const sp = rowEl.querySelector(".actual");
-    sp.value = plain(it.actual);
+    if(sp) sp.value = plain(it.actual);
     t.closest(".cat").querySelector(".cat-sum").innerHTML = catSumHTML(c);
     updateTotals(); save();
   });
@@ -873,6 +954,13 @@
     if(open){ open.open = false; open.querySelector("summary").focus(); }
   });
 
+  // 줄의 빈 곳(이름 밑 작은 줄 포함)을 누르면 펼치고 접어요
+  catsEl.addEventListener("click", e => {
+    const row = e.target.closest(".s-row");
+    if(!row || e.target.closest("button, input, textarea, a, label, .s-panel")) return;
+    const c = findCat(row), it = findItem(row, c);
+    if(it) toggleRow(c, it);
+  });
   // 수량 칸의 빈 곳을 눌러도 숫자 칸에 커서가 가요
   catsEl.addEventListener("click", e => {
     const box = e.target.closest(".qty");
@@ -883,6 +971,7 @@
     if(!t || !t.closest(".cat")) return;
     const c = findCat(t);
     if(t.classList.contains("cat-emoji")){ openCatEmoji(c, t); return; }
+    if(t.classList.contains("s-toggle")){ toggleRow(c, findItem(t, c)); return; }
     if(t.classList.contains("add-item")){
       const it = newItem();
       c.items.push(it);

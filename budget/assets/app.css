@@ -768,5 +768,64 @@ body:has(.toolbar details[open]) .hello{opacity:0;pointer-events:none}
   .dday-chip.empty{display:none}   /* 좁은 화면에서는 날짜가 있을 때만 */
 }
 
+/* ===== 단순한 줄 (newUI_simple) =====
+   목록에는 체크 · 이름(밑에 고른 선택지) · 금액만. 누르면 그 자리에서 메모·선택지·수량·지출이 펼쳐져요. */
+body.simple-rows .cols:not(.guest){display:none}
+.row.s-row,body.show-spend .row.s-row{
+  grid-template-columns:18px 24px minmax(0,1fr) 112px 28px;
+  grid-template-areas:"g c n b t" "p p p p p";
+  column-gap:6px;row-gap:0;align-items:center;padding:3px 0;
+}
+.s-row .item-grip{grid-area:g;opacity:0}
+.s-row:hover .item-grip,.s-row .item-grip:focus-visible{opacity:.6}
+@media (hover:none){.s-row .item-grip{opacity:.4}}
+.s-row .check{grid-area:c}
+.s-main{grid-area:n;min-width:0;display:flex;flex-direction:column;cursor:pointer}
+.s-sub{font-size:12px;line-height:1.35;color:var(--muted);padding:0 9px 2px;margin-top:-3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-sub:empty{display:none}
+.s-sub b{font-weight:600;color:color-mix(in srgb, var(--ink) 72%, transparent)}
+.s-row .budget{grid-area:b}
+.s-toggle{
+  grid-area:t;width:28px;height:28px;padding:0;border:0;border-radius:6px;background:none;color:var(--muted);
+  display:grid;place-items:center;cursor:pointer;
+}
+.s-toggle svg{width:12px;height:12px;transition:transform .15s}
+.s-toggle:hover{background:var(--hover);color:var(--ink)}
+.s-row.open .s-toggle svg{transform:rotate(180deg)}
+.s-row.open{background:color-mix(in srgb, var(--ink) 2.5%, transparent);border-radius:8px}
+
+.s-panel{grid-area:p;display:flex;flex-direction:column;gap:10px;min-width:0;margin:2px 4px 8px 48px;padding:10px 12px;border-radius:10px;background:var(--sheet);border:1px solid var(--line)}
+.s-panel .memo{width:100%}
+.s-opt .pick-opt{min-width:0}
+.s-opts{display:flex;flex-direction:column;gap:6px}
+/* 맨 윗줄: 선택 안 함 · 선택지 고치기. 그 아래로 선택지가 한 줄에 하나씩 */
+.s-opts-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.s-opts-top .pick-none{width:auto}
+.s-opts-top .s-opt-edit{margin-left:auto}
+.s-opt{display:flex;align-items:center;gap:6px;min-width:0}
+.s-opt .pick-opt{flex:1;min-height:32px}
+.s-opt-link{
+  flex:none;width:32px;height:32px;border-radius:6px;display:grid;place-items:center;
+  background:var(--accent-fill);color:#fff;text-decoration:none;
+}
+.s-opt-link svg{width:14px;height:14px}
+.s-opt-link:hover{filter:brightness(.9)}
+.s-opts .s-opt-edit{width:auto;height:28px;padding:0 10px;border:1px dashed var(--line);border-radius:6px;background:none;color:var(--muted);font-size:12.5px}
+.s-opts .s-opt-edit:hover{color:var(--ink);border-color:var(--muted)}
+.s-line{display:flex;flex-wrap:wrap;align-items:center;gap:8px 20px}
+.s-field{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.s-field .qty{width:84px;border-color:var(--line)}
+.s-field .actual{width:120px;border:1px solid var(--line);border-radius:6px}
+body:not(.show-spend) .s-spend{display:none}
+.row .del-item.s-del{width:auto;height:28px;margin-left:auto;padding:0 10px;font-size:12.5px}
+
+@container (max-width:620px){
+  .row.s-row,body.show-spend .row.s-row{
+    grid-template-columns:18px 24px minmax(0,1fr) 96px 28px;
+    grid-template-areas:"g c n b t" "p p p p p";
+  }
+  .s-panel{margin-left:0;margin-right:0}
+}
+
 /* 선택지 모두 보기는 지금 숨겨 둬요 */
 .opt-all{display:none}
