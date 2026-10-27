@@ -830,3 +830,8 @@ body:not(.show-spend) .s-spend{display:none}
 
 /* 선택지 모두 보기는 넓은 화면에서만. 휴대폰은 줄을 펼치면 선택지가 다 나와요 */
 body.simple-rows .opt-all{display:none}
+
+/* 휴대폰: 요약 카드를 가볍게. '자동 저장됨'과 '약 n만 원'은 넓은 화면에서만 보여요 */
+@media (max-width:640px){
+  .plan-card .saved-at,.pc-nums .t-man{display:none}
+}
