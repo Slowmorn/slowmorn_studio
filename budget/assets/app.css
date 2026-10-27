@@ -767,3 +767,6 @@ body:has(.toolbar details[open]) .hello{opacity:0;pointer-events:none}
 @media (max-width:640px){
   .dday-chip.empty{display:none}   /* 좁은 화면에서는 날짜가 있을 때만 */
 }
+
+/* 선택지 모두 보기는 지금 숨겨 둬요 */
+.opt-all{display:none}

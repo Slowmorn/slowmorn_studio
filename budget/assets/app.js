@@ -1178,26 +1178,14 @@
     toast("모두 지웠어요", snap);
   });
 
-  // ---- view: 1 / 2 / 4 columns ----
-  const VIEW_KEY = "prep-budget-view";
-  const viewBtns = document.querySelectorAll(".seg [data-cols]");
-  function setCols(n){
-    document.body.dataset.cols = n;
-    viewBtns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.cols === String(n))));
-  }
-  let cols = 1;
-  try{ const v = parseInt(localStorage.getItem(VIEW_KEY), 10); if([1, 2, 4].includes(v)) cols = v; }catch(e){}
-  setCols(cols);
-  viewBtns.forEach(b => b.addEventListener("click", () => {
-    setCols(b.dataset.cols);
-    try{ localStorage.setItem(VIEW_KEY, b.dataset.cols); }catch(e){}
-  }));
+  // 카테고리는 늘 한 줄에 하나씩 (열 개수 고르기는 없앴어요)
+  document.body.dataset.cols = 1;
 
   // ---- view: 선택지 모두 보기 ----
   const ALLOPTS_KEY = "prep-budget-all-options";
   const allOptsToggle = document.getElementById("allOptsToggle");
   let showAllOpts = false;
-  try{ showAllOpts = localStorage.getItem(ALLOPTS_KEY) === "on"; }catch(e){}
+  // 지금은 스위치를 숨겨 둬서 늘 꺼 둡니다
   allOptsToggle.checked = showAllOpts;
   document.body.classList.toggle("all-options", showAllOpts);
   allOptsToggle.addEventListener("change", () => {
