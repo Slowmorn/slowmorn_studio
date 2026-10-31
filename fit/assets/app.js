@@ -29,8 +29,18 @@ const blankCabinet = (name, from) => ({
   candidates: [], placed: [],
 });
 
-// 지금 보고 있는 수납장(state.cabinet · candidates · placed)을 목록에 적어 둬요
+// 새 수납장 이름: 수납장1, 수납장2 … 가운데 아직 안 쓴 가장 작은 번호
+function nextName(){
+  const used = new Set(state.cabinets.map(c => c.name));
+  let n = 1;
+  while(used.has(`수납장${n}`)) n++;
+  return `수납장${n}`;
+}
+
+// 지금 보고 있는 수납장(state.cabinet · candidates · placed)을 목록에 적어 둬요.
+// 수납장을 다 지운 빈 상태에서는 적을 게 없어요
 function stash(){
+  if(state.empty) return;
   const i = state.cabinets.findIndex(c => c.id === state.cabinet.id);
   const record = {
     ...state.cabinet,
@@ -47,7 +57,7 @@ const HISTORY_MAX = 80;
 
 function save(kind){
   stash();
-  const json = JSON.stringify({ cabinets: state.cabinets, active: state.cabinet.id, recMode: state.recMode });
+  const json = JSON.stringify({ cabinets: state.cabinets, active: state.empty ? null : state.cabinet.id, recMode: state.recMode });
   if(json !== timeline.last){
     if(timeline.last !== null && !timeline.restoring && !(kind === "name" && timeline.lastKind === "name")){
       timeline.past.push(timeline.last);
@@ -67,7 +77,8 @@ function travel(from, to, done, none){
   timeline.restoring = true;
   state.cabinets = data.cabinets;
   state.recMode = data.recMode || state.recMode;
-  openCabinet(state.cabinets.find(c => c.id === data.active) || state.cabinets[0]);
+  if(state.cabinets.length) openCabinet(state.cabinets.find(c => c.id === data.active) || state.cabinets[0]);
+  else showEmpty();
   timeline.restoring = false;
   timeline.lastKind = null;
   toast(done);
@@ -76,15 +87,17 @@ const undo = () => travel(timeline.past, timeline.future, "되돌렸어요", "�
 const redo = () => travel(timeline.future, timeline.past, "다시 했어요", "다시 할 게 없어요");
 
 const saved = load();
-const savedCabinets = saved && saved.cabinets && saved.cabinets.length ? saved.cabinets
-  : [{ ...blankCabinet("내 수납장"), ...(saved && saved.cabinet), candidates: (saved && saved.candidates) || [], placed: (saved && saved.placed) || [] }];
-const firstCab = savedCabinets.find(c => c.id === (saved && saved.active)) || savedCabinets[0];
+// 처음이면 '수납장1' 하나로 시작해요. 수납장을 다 지워 둔 저장본이면 빈 상태로 열어요
+const savedCabinets = saved && Array.isArray(saved.cabinets) ? saved.cabinets
+  : [{ ...blankCabinet("수납장1"), ...(saved && saved.cabinet), candidates: (saved && saved.candidates) || [], placed: (saved && saved.placed) || [] }];
+const firstCab = savedCabinets.find(c => c.id === (saved && saved.active)) || savedCabinets[0] || blankCabinet("수납장1");
 const state = {
   cabinets: savedCabinets,    // 모든 수납장 (지금 것은 save 할 때 다시 적어요)
   cabinet: null,              // 지금 수납장 { id, name, w, d, h, type }  type: shelf 선반 · drawer 서랍
   placed: [],                 // 지금 수납장에 넣은 상자 [{uid, id, item, x, y, z, rot}]
   candidates: [],             // 지금 수납장의 후보 상품 id (담은 순서). 0개여도 남아요
   naming: null,               // 수납장 이름을 적는 중: { id } (고치기) 또는 { id: null } (새로 추가)
+  empty: !savedCabinets.length,   // 수납장이 하나도 없는 상태 ('수납장을 추가해 주세요'만 보여요)
   brand: "all", fitOnly: true, sort: "fit",
   recOpen: false,             // 추천 칸을 펼쳤는지. 처음에 수납장이 비어 있으면 펼쳐요
   recMode: (saved && saved.recMode) || "one",   // one 한 종류 · two 같은 제품군 두 크기
@@ -371,6 +384,7 @@ function toast(text, action){
 // 저장해 둔 수납장 하나를 지금 수납장으로 펼쳐요. 목록에서 사라진 상품은 건너뛰어요
 function openCabinet(record){
   const { candidates, placed, ...cab } = record;
+  state.empty = false;
   state.cabinet = cab;
   state.placed = (placed || []).filter(p => byId.has(p.id))
     .map(p => ({ uid: uid(), id: p.id, item: byId.get(p.id), x: p.x, y: p.y, z: p.z, rot: p.rot ? 1 : 0 }));
@@ -380,36 +394,47 @@ function openCabinet(record){
   view.select(null);
   view.setCabinet(state.cabinet);
   for(const k of ["w", "d", "h"]) $("cab_" + k).value = state.cabinet[k];
-  $("cabName").value = state.cabinet.name;
-  fitTitle();
   if(!state.placed.length) state.recOpen = true;   // 빈 수납장이면 추천부터 보여 줘요
   commit(new Set(state.placed.map(e => e.uid)));
   renderCabinets();
 }
 
 function switchCabinet(id){
-  if(id === state.cabinet.id) return;
+  if(!state.empty && id === state.cabinet.id) return;
   stash();
   const next = state.cabinets.find(c => c.id === id);
   if(next) openCabinet(next);
 }
 
+// 수납장이 하나도 없을 때: 칩 줄과 '수납장을 추가해 주세요' 안내만 남기고 나머지는 숨겨요
+function showEmpty(){
+  state.empty = true;
+  state.cabinet = blankCabinet(nextName());
+  state.placed = [];
+  state.candidates = [];
+  view.select(null);
+  view.sync([]);
+  renderCabinets();
+  save();
+}
+
 // 새 수납장은 지금 수납장의 치수·종류를 이어받아 시작해요 (서랍 칸을 여러 개 재 볼 때 편하게)
 function addCabinet(name){
   stash();
-  const rec = blankCabinet(name || `수납장 ${state.cabinets.length + 1}`, state.cabinet);
+  const rec = blankCabinet(name || nextName(), state.empty ? null : state.cabinet);
   state.cabinets.push(rec);
   openCabinet(rec);
   $("cab_w").focus();
   $("cab_w").select();
 }
 
+// 마지막 하나도 지울 수 있어요. 그러면 빈 상태가 돼요
 function removeCabinet(id){
-  if(state.cabinets.length < 2) return;
   stash();
   const i = state.cabinets.findIndex(c => c.id === id);
   const [gone] = state.cabinets.splice(i, 1);
-  openCabinet(state.cabinets[Math.max(0, i - 1)]);
+  if(state.cabinets.length) openCabinet(state.cabinets[Math.max(0, i - 1)]);
+  else showEmpty();
   toast(`'${gone.name}'을 지웠어요`, {
     label: "되돌리기",
     run(){ stash(); state.cabinets.splice(i, 0, gone); openCabinet(gone); },
@@ -419,7 +444,7 @@ function removeCabinet(id){
 function renameCabinet(id, name){
   name = name.trim();
   if(!name) return;
-  if(id === state.cabinet.id){ state.cabinet.name = name; $("cabName").value = name; fitTitle(); }
+  if(id === state.cabinet.id) state.cabinet.name = name;
   const c = state.cabinets.find(c => c.id === id);
   if(c) c.name = name;
   save();
@@ -427,16 +452,17 @@ function renameCabinet(id, name){
 
 const addCabBtn = $("cabAdd");
 
-/* 수납장 칩: [● 내 수납장 ×] [거실 서랍] (+)
-   누르면 바꾸고, 두 번 누르면 이름 고치기, 지금 수납장에만 × (하나뿐이면 없어요) */
+/* 수납장 칩: [● 수납장1 ×] [거실 서랍] (+)
+   누르면 바꾸고, 두 번 누르면 이름 고치기, 지금 수납장에 × (마지막 하나도 지울 수 있어요) */
 function renderCabinets(){
+  document.body.classList.toggle("no-cabinet", state.empty);
   const naming = state.naming;
   const chip = c => {
-    const on = c.id === state.cabinet.id;
+    const on = !state.empty && c.id === state.cabinet.id;
     if(naming && naming.id === c.id) return nameChip(c.name);
     return `<div class="cab-item${on ? " on" : ""}" role="listitem">
-      <button type="button" class="cab-go" data-cab="${esc(c.id)}" ${on ? 'aria-current="true"' : ""} title="두 번 누르면 이름을 고쳐요">${esc(c.id === state.cabinet.id ? state.cabinet.name : c.name)}</button>
-      ${on && state.cabinets.length > 1 ? `<button type="button" class="cab-x" data-del="${esc(c.id)}" aria-label="${esc(c.name)} 지우기" title="이 수납장 지우기"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>` : ""}
+      <button type="button" class="cab-go" data-cab="${esc(c.id)}" ${on ? 'aria-current="true"' : ""} title="두 번 누르면 이름을 고쳐요">${esc(on ? state.cabinet.name : c.name)}</button>
+      ${on ? `<button type="button" class="cab-x" data-del="${esc(c.id)}" aria-label="${esc(c.name)} 지우기" title="이 수납장 지우기"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>` : ""}
     </div>`;
   };
   const nameChip = value => `<div class="cab-item naming" role="listitem"><input class="cab-input" id="cabNameInput" type="text" maxlength="24" placeholder="수납장 이름" aria-label="수납장 이름" value="${esc(value)}"></div>`;
@@ -482,31 +508,6 @@ addCabBtn.addEventListener("click", () => {
 });
 
 // ---- 입력 ----
-// 카드 제목은 지금 수납장 이름이에요. 고치면 칩도 같이 바뀌어요
-const nameInput = $("cabName");
-// 제목 칸을 글자 길이에 맞춰요 (연필이 글자 바로 뒤에 붙게).
-// 같은 글꼴의 보이지 않는 자(probe)에 글자를 넣어 재요
-const titleProbe = Object.assign(document.createElement("span"), { className: "plan-title plan-title-probe", ariaHidden: "true" });
-nameInput.after(titleProbe);
-function fitTitle(){
-  titleProbe.textContent = nameInput.value || " ";
-  nameInput.style.width = Math.ceil(titleProbe.getBoundingClientRect().width + 2) + "px";
-}
-nameInput.addEventListener("input", () => {
-  fitTitle();
-  state.cabinet.name = nameInput.value;
-  const chip = $("cabStrip").querySelector(`[data-cab="${CSS.escape(state.cabinet.id)}"]`);
-  if(chip) chip.textContent = nameInput.value;
-  save("name");
-});
-nameInput.addEventListener("change", () => {
-  if(nameInput.value.trim()) return;
-  nameInput.value = state.cabinet.name = "이름 없는 수납장";
-  fitTitle();
-  renderCabinets();
-  save();
-});
-
 for(const k of ["w", "d", "h"]){
   const input = $("cab_" + k);
   input.addEventListener("change", () => {
@@ -607,9 +608,6 @@ document.addEventListener("keydown", ev => {
 // ---- 시작 ----
 view.setCabinet(state.cabinet);
 for(const k of ["w", "d", "h"]) $("cab_" + k).value = state.cabinet[k];
-$("cabName").value = state.cabinet.name;
-fitTitle();
-document.fonts && document.fonts.ready.then(fitTitle);   // 글꼴이 늦게 오면 다시 재요
 renderCabinets();
 renderTools(null);
 // catalog 는 이 파일 옆에 있어요 (페이지 주소와 상관없이 찾도록)
@@ -617,7 +615,7 @@ fetch(new URL("catalog.json?v=20261031d", import.meta.url)).then(r => r.json()).
   items = data.items || [];
   byId = new Map(items.map(it => [it.id, it]));
   state.recOpen = false;
-  openCabinet(firstCab);
+  if(state.empty) showEmpty(); else openCabinet(firstCab);
 }).catch(() => {
   $("itemList").innerHTML = `<li class="empty">수납함 목록을 불러오지 못했어요. 새로 고쳐 주세요.</li>`;
 });

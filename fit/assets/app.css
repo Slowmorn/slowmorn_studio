@@ -49,16 +49,13 @@ body{--wrap:1480px;--shell:1480px}
    셋째 줄: [안쪽 치수 가로 × 깊이 × 높이 cm] ……… [채움 · 수납함 · 합계] */
 .cab-card{display:flex;flex-direction:column;gap:10px}
 .cab-top{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
-.pc-title{position:relative;flex:none;display:flex;align-items:center;gap:6px}
-.plan-title{
-  font-weight:700;letter-spacing:-0.02em;font-size:22px;line-height:1.2;
-  border:0;background:transparent;padding:2px 0;margin:0;border-bottom:1px solid transparent;
-  width:6em;max-width:min(60vw, 420px);min-width:3em;   /* 실제 폭은 app.js 가 글자 길이에 맞춰요 */
-}
-.plan-title:focus{outline:none;border-bottom-color:var(--ink)}
-.plan-title-probe{position:absolute;visibility:hidden;white-space:pre;left:0;top:0;width:auto;min-width:0;pointer-events:none}
-.pc-pen{flex:none;width:15px;height:15px;color:var(--muted);opacity:0;transition:opacity .15s;pointer-events:none}
-.pc-title:hover .pc-pen,.plan-title:focus + .pc-pen{opacity:.8}
+/* 카드 제목 '내 수납장'은 고정 글이에요. 수납장 이름은 아래 칩에서 (두 번 눌러) 고쳐요 */
+.plan-title{font-weight:700;letter-spacing:-0.02em;font-size:22px;line-height:1.2;margin:0;padding:2px 0}
+/* 수납장이 하나도 없을 때: 칩 줄 아래 안내만 남기고 나머지는 숨겨요 */
+.cab-empty{display:none;margin:0;font-size:13.5px;color:var(--muted)}
+.cab-empty b{color:var(--ink)}
+body.no-cabinet .cab-empty{display:block}
+body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){display:none}
 .cab-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
 .cab-strip{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
 .cab-item{
