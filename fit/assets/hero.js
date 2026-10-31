@@ -3,7 +3,7 @@
    오른쪽에 무인양품 파일박스 10 × 32 × 24cm 2개를 나란히 넣어요. 가로는 26 + 26 + 10 + 10 = 72 로 꼭 맞아요.
    보는 각도는 처음 그림처럼 앞-오른쪽 위에서 비스듬히 내려다보는 그림(원근 없음)이에요.
    상자가 하나씩 앞에서 부드럽게 들어와 자리를 잡고, 다 차면 잠시 머문 뒤 처음부터 다시 시작해요 (빠지는 움직임은 없어요).
-   3D 를 못 그리는 브라우저에서는 원래 있던 그림(svg)이 그대로 남아요. */
+   3D 를 못 그리면 그림 자리를 접어요 (index.html 의 is-loading 을 풀어요). */
 import * as THREE from "three";
 import { buildShape } from "./shapes.js";
 
@@ -134,6 +134,7 @@ async function start(){
     note.classList.toggle("on", time > fullAt);
   }
 
+  host.classList.remove("is-loading");
   host.classList.add("has-3d");
   host.append(renderer.domElement, note);
   new ResizeObserver(resize).observe(host);
@@ -150,4 +151,5 @@ async function start(){
   });
 }
 
-if(host) start().catch(() => {});   // 실패하면 원래 그림이 그대로 남아요
+// 실패하면 빈자리를 풀어 그림 자리를 접어요
+if(host) start().catch(() => host.classList.remove("is-loading"));

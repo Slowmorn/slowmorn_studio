@@ -19,17 +19,13 @@ body{--wrap:1080px;--shell:1080px}   /* 상단 바·푸터도 본문과 같은 �
 .hero-cta:active{filter:brightness(.94)}
 .hero-note{color:var(--muted);font-size:13px;margin:10px 0 0}
 
-/* 수납장 그림: 위에 얹힌 초록 상자가 살짝 떠올랐다 내려앉아요 */
-.hero-art{display:flex;justify-content:center}
-.hero-iso{width:100%;max-width:400px;height:auto;overflow:visible}
-.iso-dim{font-size:11px;font-weight:600;fill:var(--muted);font-family:var(--sans)}
-.iso-box.drop{animation:iso-drop 3.6s ease-in-out infinite}
-@keyframes iso-drop{0%,20%,100%{transform:translateY(0)}45%,60%{transform:translateY(-12px)}}
-@media (prefers-reduced-motion:reduce){.iso-box.drop{animation:none}}
-/* 3D 그림이 뜨면 svg 그림은 숨겨요 */
-.hero-art{position:relative;flex-direction:column;align-items:center}
-.hero-art.has-3d .hero-iso{display:none}
-.hero-3d{display:block;width:100%;max-width:460px;height:auto}
+/* 3D 그림: 불러오는 동안은 같은 크기의 빈자리만 잡아 두고(뜰 때 글이 밀리지 않게), 뜨면 살짝 나타나요.
+   3D 가 안 되면 그림 자리를 접어서 소개 글만 남겨요 */
+.hero-art{position:relative;display:flex;flex-direction:column;align-items:center}
+.hero-art:not(.is-loading):not(.has-3d){display:none}
+.hero-art.is-loading::before{content:"";display:block;width:100%;max-width:460px;aspect-ratio:900 / 754}
+.hero-3d{display:block;width:100%;max-width:460px;height:auto;animation:hero-in .5s ease-out}
+@keyframes hero-in{from{opacity:0}to{opacity:1}}
 /* 다 들어가면 아래에 뜨는 한 줄 */
 .hero-fit{
   margin:6px 0 0;font-size:13px;color:var(--muted);text-align:center;
@@ -91,7 +87,6 @@ footer{margin-top:40px}
 @media (max-width:860px){
   .fit-hero{grid-template-columns:minmax(0,1fr)}
   .hero-art{order:2}
-  .hero-iso{max-width:340px}
   .steps{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:640px){
