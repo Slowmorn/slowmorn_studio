@@ -27,6 +27,9 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   controls.enableDamping = true;
   controls.maxPolarAngle = Math.PI * 0.49;   // 바닥 밑으로는 못 내려가요
   controls.screenSpacePanning = true;
+  // 왼쪽 드래그(빈 곳)와 오른쪽 드래그는 돌려 보기, 휠은 확대, Shift+드래그는 화면 옮기기.
+  // 오른쪽 드래그는 상자 위에서 시작해도 돌아가요 (상자 잡기는 왼쪽 단추만)
+  controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0xe9e8e4, 2.1));
   const sun = new THREE.DirectionalLight(0xffffff, 1.6);
