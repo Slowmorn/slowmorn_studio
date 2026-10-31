@@ -163,7 +163,7 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   }
 
   /* app.js 가 가진 배치를 그대로 그려요. entries = [{uid, item, rot, x, y, z}]
-     opts.enter = 이번에 새로 넣은 uid (앞에서 미끄러져 들어와요) */
+     opts.enter = 이번에 새로 넣은 uid 하나 또는 Set (앞에서 미끄러져 들어와요) */
   function sync(entries, opts = {}){
     const seen = new Set();
     for(const e of entries){
@@ -177,7 +177,7 @@ export function createScene(host, { onSelect, onMove, onRemove }){
         meshes.set(e.uid, mesh);
         boxGroup.add(mesh);
         toWorld(box, mesh.position);
-        if(e.uid === opts.enter){
+        if(e.uid === opts.enter || (opts.enter instanceof Set && opts.enter.has(e.uid))){
           // 수납장 앞, 살짝 위에서 시작해 안으로 밀려 들어가요
           mesh.position.z = cab.d / 2 + s.d / 2 + Math.max(12, cab.d * .5);
           mesh.position.y += Math.min(6, cab.h * .2);

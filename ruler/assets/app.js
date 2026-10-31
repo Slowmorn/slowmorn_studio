@@ -1,7 +1,8 @@
-/* 룰러 화면 — 수납장 치수, 수납함 목록, 후보 수납함, 저장을 묶어요.
+/* 룰러 화면 — 수납장 치수, 추천, 수납함 목록, 후보 수납함, 저장을 묶어요.
    배치(무엇을 어디에)는 여기 state 가 정답이고, 3D 는 scene.js 가 그대로 그립니다. */
 import { createScene } from "./scene.js";
 import { sizeOf, findSpot, fits, restY, settle, whyNot, fitsEmpty, maxCount, fmt } from "./pack.js";
+import { recommend } from "./recommend.js";
 
 const KEY = "ruler:v1";
 const BRANDS = { ikea: "이케아", daiso: "다이소", muji: "무인양품" };
@@ -23,6 +24,7 @@ function save(){
     localStorage.setItem(KEY, JSON.stringify({
       cabinet: state.cabinet,
       candidates: state.candidates,
+      recMode: state.recMode,
       placed: state.placed.map(({ id, x, y, z, rot }) => ({ id, x, y, z, rot })),
     }));
   } catch(e){}
@@ -30,10 +32,13 @@ function save(){
 
 const saved = load();
 const state = {
-  cabinet: { name: "내 수납장", w: 60, d: 40, h: 30, ...(saved && saved.cabinet) },
+  cabinet: { name: "내 수납장", w: 60, d: 40, h: 30, type: "shelf", ...(saved && saved.cabinet) },   // type: shelf 선반 · drawer 서랍
   placed: [],                 // [{uid, id, item, x, y, z, rot}]
   candidates: [],             // 후보로 담아 둔 상품 id (담은 순서). 0개여도 남아요
   brand: "all", fitOnly: true, sort: "fit",
+  recOpen: false,             // 추천 칸을 펼쳤는지. 처음에 수납장이 비어 있으면 펼쳐요
+  recMode: (saved && saved.recMode) || "one",   // one 한 종류 · two 같은 제품군 두 크기
+  recApplied: null,           // 지금 수납장에 들어가 있는 추천 (그 카드에 '넣음' 표시)
 };
 let items = [], byId = new Map(), uidSeq = 0;
 const uid = () => "b" + (++uidSeq);
@@ -53,13 +58,16 @@ const view = createScene($("stage"), {
 
 const boxOf = e => ({ x: e.x, y: e.y, z: e.z, ...sizeOf(e.item, e.rot), stackable: e.item.stackable });
 
-// 바뀔 때마다: 떠 있는 상자 내리기 → 3D 다시 그리기 → 숫자·목록 → 저장
-function commit(enter){
+/* 바뀔 때마다: 떠 있는 상자 내리기 → 3D 다시 그리기 → 숫자·목록 → 저장
+   enter 는 새로 들어오는 상자 uid (하나 또는 Set). 추천을 넣을 때만 keepRec 으로 '넣음' 표시를 남겨요 */
+function commit(enter, keepRec){
+  if(!keepRec) state.recApplied = null;
   const boxes = state.placed.map(e => Object.assign(boxOf(e), { e }));
   settle(boxes).forEach(b => { b.e.y = b.y; });
   view.sync(state.placed, { enter });
   renderTools(view.selected);
   renderSummary();
+  renderRec();
   renderList();
   renderCandidates();
   save();
@@ -218,7 +226,67 @@ function renderCandidates(){
         <span class="cand-links">${item.url ? `<a href="${esc(item.url)}" target="_blank" rel="noopener">판매처</a>` : ""}<button type="button" class="cand-x" data-forget aria-label="후보에서 지우기" title="후보에서 지우기"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button></span>
       </span>
     </li>`;
-  }).join("") : `<li class="empty">오른쪽 목록에서 수납함을 눌러 후보에 담아 보세요. 개수는 여기서 늘리고 줄여요.</li>`;
+  }).join("") : `<li class="empty">아래 목록에서 수납함을 눌러 후보에 담아 보세요. 개수는 여기서 늘리고 줄여요.</li>`;
+}
+
+// ---- 추천 수납함 ----
+const REC_HINT = {
+  shelf: "앞에서 꺼내는 칸이에요. 쌓을 수 있는 함은 위로 쌓아요",
+  drawer: "위에서 내려다보는 서랍이에요. 쌓지 않고 바닥에 한 층만 깔아요",
+};
+let recCache = { key: "", list: [] };
+const recKey = () => { const c = state.cabinet; return `${c.w}x${c.d}x${c.h}|${c.type}|${state.recMode}`; };
+
+function recs(){
+  const key = recKey();
+  if(recCache.key !== key) recCache = { key, list: recommend(items, state.cabinet, { type: state.cabinet.type, mode: state.recMode }) };
+  return recCache.list;
+}
+
+function renderRec(){
+  const open = state.recOpen && items.length;
+  $("rec").hidden = !open;
+  $("recBtn").setAttribute("aria-expanded", !!open);
+  if(!open) return;
+  $("rec").querySelectorAll("[data-type]").forEach(b => b.setAttribute("aria-pressed", b.dataset.type === state.cabinet.type));
+  $("rec").querySelectorAll("[data-mode]").forEach(b => b.setAttribute("aria-pressed", b.dataset.mode === state.recMode));
+  $("recHint").textContent = REC_HINT[state.cabinet.type];
+  const list = recs();
+  $("recList").innerHTML = list.length ? list.map((r, i) => {
+    const on = state.recApplied === recKey() + "|" + r.family;
+    return `<li><button type="button" class="rec-card${on ? " on" : ""}" data-i="${i}" ${on ? 'aria-pressed="true"' : ""}>
+      <span class="rec-thumbs">${r.parts.map(p => thumb(p.item)).join("")}</span>
+      <span class="rec-body">
+        <span class="rec-name" data-brand="${esc(r.parts[0].item.brand)}"><span class="brand-dot" aria-hidden="true"></span>${esc(r.family)}</span>
+        ${r.parts.map(p => `<span class="rec-part">${fmt(p.item.w)}×${fmt(p.item.d)}×${fmt(p.item.h)}cm <b>× ${p.n}</b></span>`).join("")}
+        <span class="rec-why">${esc(r.why)}</span>
+      </span>
+      <span class="rec-foot">
+        <span class="rec-fill"><b>${Math.round(r.fill * 100)}%</b> 채움</span>
+        <span class="rec-price">${won(r.price)}</span>
+        <span class="rec-go">${on ? "넣음" : "넣어 보기"}</span>
+      </span>
+    </button></li>`;
+  }).join("") : `<li class="empty">${state.recMode === "two" ? "두 크기로 맞출 수 있는 제품군이 없어요. '한 종류'로 바꿔 보세요." : "이 크기에 맞는 수납함이 없어요."}</li>`;
+}
+
+// 추천 구성으로 수납장을 바꿔요. 이전 배치는 '되돌리기'로 살릴 수 있어요
+function applyRec(i){
+  const r = recs()[i];
+  if(!r) return;
+  const before = { placed: state.placed.slice(), candidates: state.candidates.slice() };
+  state.placed = r.boxes.map(b => ({ uid: uid(), id: b.id, item: byId.get(b.id), x: b.x, y: b.y, z: b.z, rot: b.rot }));
+  for(const p of r.parts) if(!state.candidates.includes(p.item.id)) state.candidates.push(p.item.id);
+  state.recApplied = recKey() + "|" + r.family;
+  commit(new Set(state.placed.map(e => e.uid)), true);
+  toast(`${r.family} ${state.placed.length}개를 넣었어요`, {
+    label: "되돌리기",
+    run(){
+      state.placed = before.placed;
+      state.candidates = before.candidates;
+      commit(new Set(state.placed.map(e => e.uid)));
+    },
+  });
 }
 
 // ---- 3D 위 도구 ----
@@ -228,13 +296,22 @@ function renderTools(uid){
   $("rotBtn").disabled = $("delBtn").disabled = !e;
 }
 
+// 알림 한 줄. action({label, run})을 주면 단추가 붙고 조금 더 오래 떠 있어요
 let toastTimer;
-function toast(text){
+function toast(text, action){
   const el = $("toast");
   el.textContent = text;
+  el.classList.toggle("has-action", !!action);
+  if(action){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.textContent = action.label;
+    b.addEventListener("click", () => { el.classList.remove("on"); action.run(); });
+    el.append(b);
+  }
   el.classList.add("on");
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => el.classList.remove("on"), 2400);
+  toastTimer = setTimeout(() => el.classList.remove("on"), action ? 8000 : 2400);
 }
 
 // ---- 입력 ----
@@ -281,6 +358,15 @@ $("brandChips").addEventListener("click", ev => {
 $("fitOnly").addEventListener("change", ev => { state.fitOnly = ev.target.checked; renderList(); });
 $("sortBy").addEventListener("change", ev => { state.sort = ev.target.value; renderList(); });
 
+$("recBtn").addEventListener("click", () => { state.recOpen = !state.recOpen; renderRec(); });
+$("recClose").addEventListener("click", () => { state.recOpen = false; renderRec(); $("recBtn").focus(); });
+$("rec").addEventListener("click", ev => {
+  const t = ev.target.closest("[data-type]"), m = ev.target.closest("[data-mode]"), c = ev.target.closest(".rec-card");
+  if(t){ state.cabinet.type = t.dataset.type; save(); renderRec(); }
+  else if(m){ state.recMode = m.dataset.mode; save(); renderRec(); }
+  else if(c) applyRec(+c.dataset.i);
+});
+
 $("rotBtn").addEventListener("click", () => rotateBox(view.selected));
 $("delBtn").addEventListener("click", () => view.selected && removeBox(view.selected));
 $("viewBtn").addEventListener("click", () => view.resetView());
@@ -302,7 +388,7 @@ document.addEventListener("keydown", ev => {
 // ---- 시작 ----
 view.setCabinet(state.cabinet);
 renderTools(null);
-fetch("assets/catalog.json?v=20261031c").then(r => r.json()).then(data => {
+fetch("assets/catalog.json?v=20261031d").then(r => r.json()).then(data => {
   items = data.items || [];
   byId = new Map(items.map(it => [it.id, it]));
   // 저장해 둔 배치를 되살려요. 목록에서 사라진 상품은 건너뛰어요
@@ -313,6 +399,7 @@ fetch("assets/catalog.json?v=20261031c").then(r => r.json()).then(data => {
   // 후보 목록이 없던 예전 저장본은 넣어 둔 상자로 후보를 채워요
   const ids = [...((saved && saved.candidates) || []), ...state.placed.map(p => p.id)];
   state.candidates = [...new Set(ids)].filter(id => byId.has(id));
+  state.recOpen = !state.placed.length;   // 빈 수납장이면 추천부터 보여 줘요
   commit();
 }).catch(() => {
   $("itemList").innerHTML = `<li class="empty">수납함 목록을 불러오지 못했어요. 새로 고쳐 주세요.</li>`;

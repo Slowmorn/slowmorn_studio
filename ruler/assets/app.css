@@ -14,9 +14,10 @@ body{--wrap:1480px;--shell:1480px}
 /* 큰 틀: 왼쪽에 카드 · 3D · 수납함 목록, 오른쪽에 후보 수납함 (스크롤해도 따라와요) */
 .app{
   display:grid;grid-template-columns:minmax(0,1fr) 390px;gap:16px 24px;align-items:start;
-  grid-template-areas:"card side" "stage side" "list side";
+  grid-template-areas:"card side" "rec side" "stage side" "list side";
 }
 .cab-card{grid-area:card}
+.rec{grid-area:rec;min-width:0}
 .stage-wrap{grid-area:stage}
 .catalog{grid-area:list;min-width:0;margin-top:8px}
 .side{grid-area:side;align-self:start;min-width:0}
@@ -83,6 +84,50 @@ body{--wrap:1480px;--shell:1480px}
 .stat-fill{align-items:center}
 .fill-track{width:48px;height:5px;border-radius:99px;background:var(--hover-strong);overflow:hidden;align-self:center}
 .fill-track span{display:block;height:100%;width:0;background:var(--accent-fill);border-radius:inherit;transition:width .3s}
+
+/* 추천 수납함 단추 (카드 오른쪽 끝) */
+.rec-btn{
+  flex:none;display:inline-flex;align-items:center;gap:5px;
+  border:0;border-radius:var(--radius);padding:6px 12px;font-size:13.5px;font-weight:600;
+  background:var(--ink);color:var(--sheet);white-space:nowrap;
+}
+.rec-btn svg{width:14px;height:14px}
+.rec-btn:hover{filter:brightness(1.35)}
+.rec-btn[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent-fill) 50%, transparent)}
+
+/* 추천 칸: [제목 · 선반|서랍 · 한 종류|두 크기 · 안내 ……… ×] / 카드 네 장 */
+.rec[hidden]{display:none}
+.rec{border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--sheet);padding:12px 14px 14px}
+.rec-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;margin-bottom:10px}
+.rec-head h2{margin:0;font-size:15px;font-weight:700}
+.rec-hint{font-size:12.5px;color:var(--muted)}
+.seg{display:inline-flex;padding:2px;border-radius:99px;background:var(--paper);border:1px solid var(--line)}
+.seg button{border:0;background:none;border-radius:99px;padding:3px 12px;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--sheet);color:var(--ink);font-weight:600;box-shadow:0 1px 2px rgba(40,36,32,.12)}
+.rec-x{border:0;background:none;padding:4px;border-radius:var(--radius);color:var(--muted);display:grid;place-items:center}
+.rec-x svg{width:15px;height:15px}
+.rec-x:hover{background:var(--hover);color:var(--ink)}
+.rec-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4, minmax(0,1fr));gap:10px}
+.rec-list .empty{grid-column:1 / -1;padding:12px 2px;color:var(--muted);font-size:13.5px}
+.rec-card{
+  width:100%;height:100%;display:flex;flex-direction:column;gap:8px;text-align:left;
+  border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--sheet);padding:10px;
+}
+.rec-card:hover{border-color:color-mix(in srgb, var(--ink) 35%, var(--line))}
+.rec-card.on{background:var(--accent-soft);border-color:color-mix(in srgb, var(--accent-fill) 55%, var(--line))}
+.rec-thumbs{display:flex;gap:6px}
+.rec-thumbs .item-thumb{width:52px;height:52px}
+.rec-body{display:flex;flex-direction:column;gap:1px;line-height:1.35;flex:1}
+.rec-name{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:700;margin-bottom:2px}
+.rec-part{font-size:12.5px;color:var(--muted);font-variant-numeric:tabular-nums}
+.rec-part b{color:var(--ink);font-weight:600}
+.rec-why{font-size:12px;color:var(--accent);margin-top:3px}
+.rec-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;font-variant-numeric:tabular-nums}
+.rec-fill b{font-size:15px}
+.rec-price{color:var(--muted)}
+.rec-go{margin-left:auto;font-size:12.5px;font-weight:600;padding:3px 10px;border-radius:var(--radius);background:var(--ink);color:var(--sheet)}
+.rec-card.on .rec-go{background:none;color:var(--accent);padding-right:0}
+@media (max-width:1300px){ .rec-list{grid-template-columns:repeat(2, minmax(0,1fr))} }
 
 /* 3D 무대 */
 .stage-wrap{position:relative;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--sheet);overflow:hidden}
@@ -206,6 +251,8 @@ body{--wrap:1480px;--shell:1480px}
   opacity:0;pointer-events:none;transition:opacity .2s, transform .2s;
 }
 .toast.on{opacity:1;transform:translate(-50%, 0)}
+.toast.has-action.on{pointer-events:auto;display:flex;align-items:center;gap:12px}
+.toast button{border:0;background:none;color:var(--accent-fill);font-weight:700;font-size:13.5px;padding:0;text-decoration:underline;text-underline-offset:2px}
 
 /* 카드가 한 줄에 안 들어가는 폭에서는 '위로 n cm 남음'을 접어요 */
 @media (max-width:1560px){
@@ -213,7 +260,7 @@ body{--wrap:1480px;--shell:1480px}
 }
 /* 좁은 화면: 한 줄로 쌓아요. 카드 → 3D → 후보 → 수납함 목록 */
 @media (max-width:1100px){
-  .app{grid-template-columns:minmax(0,1fr);grid-template-areas:"card" "stage" "side" "list"}
+  .app{grid-template-columns:minmax(0,1fr);grid-template-areas:"card" "rec" "stage" "side" "list"}
   .side{position:static;max-height:none}
   .cand-list{overflow:visible}
 }
@@ -225,10 +272,16 @@ body{--wrap:1480px;--shell:1480px}
   .dims{flex:1 1 100%;display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:6px}
   .dims-cap,.dims-unit,.dim-x{display:none}
   .dim{min-width:0;padding:4px 8px}
-  .dim input{width:100%;min-width:0}
+  .dim span{flex:none;white-space:nowrap}
+  .dim input{flex:1;width:auto;min-width:0}
   .cab-stats{margin-left:0;gap:4px 16px}
   .t-sub{display:none}
   .stage{height:46vh;min-height:300px}
   .item-list{grid-template-columns:minmax(0,1fr)}
+  /* 추천 카드는 옆으로 넘겨 봐요 */
+  .rec{padding:10px 12px 12px}
+  .rec-list{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -12px;padding:0 12px;scrollbar-width:none}
+  .rec-list li{flex:0 0 74%;scroll-snap-align:start}
+  .rec-hint{flex-basis:100%;order:5}
   .tool-label{display:none}
 }
