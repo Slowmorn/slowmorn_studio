@@ -106,6 +106,8 @@
     <div class="stage" id="stage"></div>
     <!-- 3D 오른쪽 위: 처음 시점 · 모두 빼기 -->
     <div class="stage-corner">
+      <button type="button" class="tool icon" id="zoomOutBtn" aria-label="축소" title="축소"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <button type="button" class="tool icon" id="zoomInBtn" aria-label="확대" title="확대"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3.5v9M3.5 8h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
       <button type="button" class="tool icon" id="viewBtn" aria-label="처음 시점으로" title="처음 시점으로"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 6V2.5H6M13.5 6V2.5H10M2.5 10v3.5H6M13.5 10v3.5H10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <button type="button" class="tool" id="emptyBtn" title="수납장에 넣은 상자를 모두 빼요 (후보는 남아요)">모두 빼기</button>
     </div>
@@ -126,13 +128,15 @@
       <h3>보기</h3>
       <dl class="help-mouse">
         <dt><kbd>빈 곳 드래그</kbd> <kbd>오른쪽 드래그</kbd></dt><dd>돌려 보기 (오른쪽 드래그는 상자 위에서도 돌아가요)</dd>
-        <dt><kbd>휠</kbd></dt><dd>확대·축소</dd>
+        <dt><kbd>+</kbd> <kbd>−</kbd> 단추 · 트랙패드 오므리기</dt><dd>확대·축소</dd>
+        <dt><kbd>휠</kbd> · <kbd>두 손가락 스크롤</kbd></dt><dd>페이지 위아래로 움직이기</dd>
         <dt><kbd>Shift</kbd> + <kbd>드래그</kbd></dt><dd>화면 옮기기</dd>
         <dt><kbd>⛶</kbd> 단추</dt><dd>처음 시점으로</dd>
       </dl>
       <dl class="help-touch">
         <dt><kbd>한 손가락</kbd></dt><dd>돌려 보기</dd>
         <dt><kbd>두 손가락</kbd></dt><dd>확대·축소, 화면 옮기기</dd>
+        <dt><kbd>+</kbd> <kbd>−</kbd> 단추</dt><dd>확대·축소</dd>
         <dt><kbd>⛶</kbd> 단추</dt><dd>처음 시점으로</dd>
       </dl>
       <h3>상자</h3>

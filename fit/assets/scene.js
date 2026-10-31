@@ -30,6 +30,9 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   // 왼쪽 드래그(빈 곳)와 오른쪽 드래그는 돌려 보기, 휠은 확대, Shift+드래그는 화면 옮기기.
   // 오른쪽 드래그는 상자 위에서 시작해도 돌아가요 (상자 잡기는 왼쪽 단추만)
   controls.mouseButtons = { LEFT: THREE.MOUSE.ROTATE, MIDDLE: THREE.MOUSE.DOLLY, RIGHT: THREE.MOUSE.ROTATE };
+  // 휠·트랙패드 두 손가락 스크롤은 3D 위에서도 페이지를 위아래로 움직여요.
+  // 컨트롤보다 먼저 받아서 넘기지 않아요. 확대·축소는 + − 단추와 트랙패드 오므리기(브라우저에서는 Ctrl+휠)로만 해요
+  host.addEventListener("wheel", ev => { if(!ev.ctrlKey) ev.stopPropagation(); }, { capture: true });
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0xe9e8e4, 2.1));
   const sun = new THREE.DirectionalLight(0xffffff, 1.6);
@@ -128,6 +131,9 @@ export function createScene(host, { onSelect, onMove, onRemove }){
     camera.position.set(cab.w * .35, cab.h * .9 + span * .55, span * 1.65 + cab.d / 2)
       .sub(controls.target).multiplyScalar(far).add(controls.target);
     camera.near = span / 100; camera.far = span * 20;
+    // 오므리기로 확대·축소할 때도 + − 단추와 같은 범위 안에서만
+    const size = Math.max(cab.w, cab.d, cab.h);
+    controls.minDistance = size * .4; controls.maxDistance = size * 8;
     camera.updateProjectionMatrix();
     controls.update();
   }
@@ -360,5 +366,14 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   resetView();
   resize();
 
-  return { setCabinet, sync, select, resetView, get selected(){ return selected; }, inside: b => inside(b, cab) };
+  // + − 단추: 바라보는 점과의 거리를 줄이거나 늘려요 (너무 붙거나 멀어지지 않게)
+  function zoom(factor){
+    const offset = camera.position.clone().sub(controls.target);
+    const span = Math.max(cab.w, cab.d, cab.h);
+    const dist = THREE.MathUtils.clamp(offset.length() * factor, span * .4, span * 8);
+    camera.position.copy(controls.target).addScaledVector(offset.normalize(), dist);
+    controls.update();
+  }
+
+  return { setCabinet, sync, select, resetView, zoom, get selected(){ return selected; }, inside: b => inside(b, cab) };
 }

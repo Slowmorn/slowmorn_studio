@@ -562,6 +562,8 @@ $("addBtn").addEventListener("click", () => {
   if(e) addItem(e.id);
 });
 $("viewBtn").addEventListener("click", () => view.resetView());
+$("zoomInBtn").addEventListener("click", () => view.zoom(.8));
+$("zoomOutBtn").addEventListener("click", () => view.zoom(1.25));
 
 // 지우는 단추는 묻지 않고 바로 지우고, 알림의 '되돌리기'로 살려요
 function undoable(text, change){
