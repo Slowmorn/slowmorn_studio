@@ -43,19 +43,34 @@ body{--wrap:1480px;--shell:1480px}
   content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;border-radius:inherit;
   background:linear-gradient(180deg, rgba(255,255,255,.5) 0%, rgba(255,255,255,.08) 10%, transparent 24%);
 }
-/* 수납장 카드는 한 줄: [이름] [안쪽 치수 가로 × 깊이 × 높이 cm] ……… [채운 부피 · 담은 수납함 · 합계] */
-.cab-card{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
-.pc-title{position:relative;min-width:0;display:flex;align-items:center;gap:6px}
-.plan-title{
-  font-weight:700;letter-spacing:-0.02em;font-size:19px;line-height:1.2;
-  border:0;background:transparent;padding:2px 0;margin:0;border-bottom:1px solid transparent;
-  width:5.5em;max-width:100%;
-  field-sizing:content;min-width:3em;   /* 이름 길이만큼만 차지해요 (지원하는 브라우저에서) */
+/* 수납장 카드
+   위 줄: [● 내 수납장 ×] [거실 서랍] (+) ……… [추천 수납함]
+   아래 줄: [안쪽 치수 가로 × 깊이 × 높이 cm] ……… [채움 · 수납함 · 합계] */
+.cab-card{display:flex;flex-direction:column;gap:10px}
+.cab-top{display:flex;align-items:flex-start;gap:6px 10px}
+.cab-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px}
+.cab-strip{display:flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0}
+.cab-item{
+  display:flex;align-items:center;border:1px solid var(--line);border-radius:99px;background:var(--sheet);
+  transition:background-color .15s, border-color .15s;
 }
-.plan-title:focus{outline:none;border-bottom-color:var(--ink)}
-.pc-pen{flex:none;width:14px;height:14px;color:var(--muted);opacity:0;transition:opacity .15s;pointer-events:none}
-.pc-title:hover .pc-pen,.plan-title:focus + .pc-pen{opacity:.8}
-
+.cab-item:hover{border-color:color-mix(in srgb, var(--ink) 20%, var(--line))}
+.cab-item.on{background:var(--accent-soft);border-color:color-mix(in srgb, var(--accent-fill) 45%, var(--line))}
+.cab-go{border:0;background:none;color:var(--ink);padding:4px 13px;border-radius:99px;font-size:13.5px;white-space:nowrap;max-width:180px;overflow:hidden;text-overflow:ellipsis}
+.cab-item.on .cab-go{font-weight:700;padding-right:4px}
+.cab-x{border:0;background:none;color:var(--muted);padding:3px;margin-right:5px;border-radius:50%;display:grid;place-items:center}
+.cab-x svg{width:12px;height:12px}
+.cab-x:hover{color:var(--warn);background:var(--hover)}
+.cab-item.naming{border-color:var(--accent-fill);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-fill) 25%, transparent)}
+.cab-input{width:140px;font-size:13.5px;font-weight:600;border:0;border-radius:99px;background:transparent;padding:4px 13px}
+.cab-input:focus{outline:none}
+.cab-add{
+  flex:none;width:30px;height:30px;padding:0;border-radius:50%;
+  border:1px dashed color-mix(in srgb, var(--ink) 25%, var(--line));background:var(--sheet);color:var(--ink);
+  display:grid;place-items:center;
+}
+.cab-add svg{width:14px;height:14px}
+.cab-add:hover{border-style:solid;border-color:var(--accent-fill);background:var(--accent-soft)}
 /* 치수 입력: 안쪽 치수 [가로 60] × [깊이 40] × [높이 30] cm */
 .dims{display:flex;align-items:center;gap:6px}
 .dims-cap,.dims-unit{font-size:12.5px;color:var(--muted);white-space:nowrap}
@@ -149,7 +164,26 @@ body{--wrap:1480px;--shell:1480px}
 .tool svg{width:14px;height:14px}
 .tool:hover:not(:disabled){background:var(--hover)}
 .tool:disabled{opacity:.4;cursor:default}
-.stage-hint{margin:0;padding:0 12px 10px;background:var(--paper);font-size:12px;color:var(--muted)}
+/* 3D 오른쪽 위 단추들 */
+.stage-corner{position:absolute;top:10px;right:10px;display:flex;gap:6px}
+.stage-corner .tool{background:rgba(255,255,255,.88);backdrop-filter:blur(4px)}
+.tool.icon{padding:5px 7px}
+/* 조작법: 회색 바탕에 작은 열쇠 모양 */
+.stage-help{
+  list-style:none;margin:0;padding:0 12px 10px;background:var(--paper);
+  display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12px;color:var(--muted);
+}
+.stage-help li{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.stage-help kbd{
+  font:inherit;font-size:11.5px;color:var(--ink);background:var(--sheet);
+  border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;padding:0 5px;
+}
+.stage-help kbd + kbd{margin-left:-1px}
+.help-touch{display:none}
+@media (hover:none) and (pointer:coarse){
+  .help-mouse{display:none}
+  .help-touch{display:flex}
+}
 
 /* 후보 수납함 (오른쪽) — 한 줄은 두 단: 위에 [사진 | 이름·치수], 아래에 [− n +  ……  금액·판매처·×] */
 .bag-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
