@@ -74,6 +74,41 @@ function less(a, b){
   return false;
 }
 
+/* 끌어서 놓을 때의 '자석'.
+   1) 벽이나 다른 상자의 모서리가 range cm 안에 있으면 그 줄에 딱 맞춰요 (옆에 붙이기, 끝선 맞추기)
+   2) 다른 상자에 걸쳤을 뿐이면(겹친 바닥이 내 바닥의 절반보다 작으면) 위로 올리지 않고 옆으로 밀어내요.
+      절반 넘게 겹치면 올려 쌓으려는 뜻으로 보고 그대로 둬요 (절반도 안 받치면 실제로도 넘어지니까요) */
+export function magnet(box, others, cab, range = 3){
+  const b = { ...box };
+  const near = (v, cands) => {
+    let best = v, gap = range;
+    for(const c of cands){ const k = Math.abs(c - v); if(k < gap){ gap = k; best = c; } }
+    return best;
+  };
+  const xs = [0, cab.w - b.w], zs = [0, cab.d - b.d];
+  for(const p of others){
+    xs.push(p.x + p.w, p.x - b.w, p.x, p.x + p.w - b.w);
+    zs.push(p.z + p.d, p.z - b.d, p.z, p.z + p.d - b.d);
+  }
+  b.x = near(b.x, xs);
+  b.z = near(b.z, zs);
+
+  for(let round = 0; round < 3; round++){
+    let pushed = false;
+    for(const p of others){
+      const ox = Math.min(b.x + b.w, p.x + p.w) - Math.max(b.x, p.x);
+      const oz = Math.min(b.z + b.d, p.z + p.d) - Math.max(b.z, p.z);
+      if(ox <= EPS || oz <= EPS || ox * oz >= b.w * b.d / 2) continue;
+      // 덜 겹친 쪽으로, 상자 가운데에서 먼 방향으로 밀어요
+      if(ox < oz) b.x += (b.x + b.w / 2 < p.x + p.w / 2) ? -ox : ox;
+      else b.z += (b.z + b.d / 2 < p.z + p.d / 2) ? -oz : oz;
+      pushed = true;
+    }
+    if(!pushed) break;
+  }
+  return b;
+}
+
 /* 상자를 빼거나 옮긴 뒤 떠 있는 상자를 아래로 내려요. 낮은 것부터 차례로 다시 얹습니다.
    여기서는 stackable 을 따지지 않아요 (떨어지는 상자는 받아 줘야 하니까요) */
 export function settle(boxes){

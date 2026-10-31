@@ -4,7 +4,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
-import { snap, sizeOf, restY, fits, inside } from "./pack.js";
+import { snap, sizeOf, restY, fits, inside, magnet } from "./pack.js";
 import { buildShape } from "./shapes.js";
 
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -261,14 +261,16 @@ export function createScene(host, { onSelect, onMove, onRemove }){
     const { mesh } = drag;
     const s = mesh.userData.size;
     const xz = fromWorldXZ(hit.sub(drag.grab), s);
-    const box = { x: snap(xz.x), z: snap(xz.z), ...s, stackable: mesh.userData.item.stackable };
-    // 수납장 안에서는 벽에 막혀 미끄러지고, 앞으로 완전히 끌어내면 '빼기'로 봐요 (흐려져요)
+    let box = { x: snap(xz.x), z: snap(xz.z), ...s, stackable: mesh.userData.item.stackable };
+    const others = othersOf(mesh);
+    // 수납장 안에서는 벽과 옆 상자에 자석처럼 붙고 벽에 막혀 미끄러져요.
+    // 앞으로 완전히 끌어내면 '빼기'로 봐요 (흐려져요)
     mesh.userData.out = !overCabinet(box);
     if(!mesh.userData.out){
+      box = magnet(box, others, cab);
       box.x = Math.min(Math.max(0, box.x), Math.max(0, cab.w - s.w));
       box.z = Math.min(Math.max(0, box.z), Math.max(0, cab.d - s.d));
     }
-    const others = othersOf(mesh);
     const y = restY(box, others);
     box.y = y == null ? Math.max(0, ...others.map(p => p.y + p.h)) : y;
     mesh.userData.box = box;
