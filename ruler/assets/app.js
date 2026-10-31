@@ -38,12 +38,41 @@ function stash(){
   };
   if(i < 0) state.cabinets.push(record); else state.cabinets[i] = record;
 }
-function save(){
+/* 되돌리기(Ctrl+Z · ⌘Z)와 다시 하기(Ctrl+Shift+Z · Ctrl+Y)
+   저장할 때마다 바로 앞의 모습을 쌓아 두고, 되돌릴 때는 그 모습 전체(모든 수납장)를 다시 펼쳐요.
+   이름을 한 글자씩 적는 것은 한 번으로 묶어요 */
+const timeline = { past: [], future: [], last: null, lastKind: null, restoring: false };
+const HISTORY_MAX = 80;
+
+function save(kind){
   stash();
-  try {
-    localStorage.setItem(KEY, JSON.stringify({ cabinets: state.cabinets, active: state.cabinet.id, recMode: state.recMode }));
-  } catch(e){}
+  const json = JSON.stringify({ cabinets: state.cabinets, active: state.cabinet.id, recMode: state.recMode });
+  if(json !== timeline.last){
+    if(timeline.last !== null && !timeline.restoring && !(kind === "name" && timeline.lastKind === "name")){
+      timeline.past.push(timeline.last);
+      if(timeline.past.length > HISTORY_MAX) timeline.past.shift();
+      timeline.future = [];
+    }
+    timeline.last = json;
+    timeline.lastKind = kind || null;
+  }
+  try { localStorage.setItem(KEY, json); } catch(e){}
 }
+
+function travel(from, to, done, none){
+  if(!from.length){ toast(none); return; }
+  to.push(timeline.last);
+  const data = JSON.parse(from.pop());
+  timeline.restoring = true;
+  state.cabinets = data.cabinets;
+  state.recMode = data.recMode || state.recMode;
+  openCabinet(state.cabinets.find(c => c.id === data.active) || state.cabinets[0]);
+  timeline.restoring = false;
+  timeline.lastKind = null;
+  toast(done);
+}
+const undo = () => travel(timeline.past, timeline.future, "되돌렸어요", "더 되돌릴 게 없어요");
+const redo = () => travel(timeline.future, timeline.past, "다시 했어요", "다시 할 게 없어요");
 
 const saved = load();
 const savedCabinets = saved && saved.cabinets && saved.cabinets.length ? saved.cabinets
@@ -350,6 +379,8 @@ function openCabinet(record){
   view.select(null);
   view.setCabinet(state.cabinet);
   for(const k of ["w", "d", "h"]) $("cab_" + k).value = state.cabinet[k];
+  $("cabName").value = state.cabinet.name;
+  fitTitle();
   if(!state.placed.length) state.recOpen = true;   // 빈 수납장이면 추천부터 보여 줘요
   commit(new Set(state.placed.map(e => e.uid)));
   renderCabinets();
@@ -387,7 +418,7 @@ function removeCabinet(id){
 function renameCabinet(id, name){
   name = name.trim();
   if(!name) return;
-  if(id === state.cabinet.id) state.cabinet.name = name;
+  if(id === state.cabinet.id){ state.cabinet.name = name; $("cabName").value = name; fitTitle(); }
   const c = state.cabinets.find(c => c.id === id);
   if(c) c.name = name;
   save();
@@ -450,6 +481,31 @@ addCabBtn.addEventListener("click", () => {
 });
 
 // ---- 입력 ----
+// 카드 제목은 지금 수납장 이름이에요. 고치면 칩도 같이 바뀌어요
+const nameInput = $("cabName");
+// 제목 칸을 글자 길이에 맞춰요 (연필이 글자 바로 뒤에 붙게).
+// 같은 글꼴의 보이지 않는 자(probe)에 글자를 넣어 재요
+const titleProbe = Object.assign(document.createElement("span"), { className: "plan-title plan-title-probe", ariaHidden: "true" });
+nameInput.after(titleProbe);
+function fitTitle(){
+  titleProbe.textContent = nameInput.value || " ";
+  nameInput.style.width = Math.ceil(titleProbe.getBoundingClientRect().width + 2) + "px";
+}
+nameInput.addEventListener("input", () => {
+  fitTitle();
+  state.cabinet.name = nameInput.value;
+  const chip = $("cabStrip").querySelector(`[data-cab="${CSS.escape(state.cabinet.id)}"]`);
+  if(chip) chip.textContent = nameInput.value;
+  save("name");
+});
+nameInput.addEventListener("change", () => {
+  if(nameInput.value.trim()) return;
+  nameInput.value = state.cabinet.name = "이름 없는 수납장";
+  fitTitle();
+  renderCabinets();
+  save();
+});
+
 for(const k of ["w", "d", "h"]){
   const input = $("cab_" + k);
   input.addEventListener("change", () => {
@@ -529,6 +585,14 @@ $("clearBtn").addEventListener("click", () => {
   if(state.candidates.length) undoable("후보를 모두 지웠어요", () => { state.candidates = []; state.placed = []; });
 });
 
+// 글자 칸 밖에서 누른 Ctrl+Z · ⌘Z 는 화면 되돌리기 (글자 칸 안에서는 글자 되돌리기를 그대로 둬요)
+document.addEventListener("keydown", ev => {
+  if(!(ev.metaKey || ev.ctrlKey) || ev.altKey || ev.target.closest("input, textarea, [contenteditable]")) return;
+  const k = ev.key.toLowerCase();
+  if(k === "z" && !ev.shiftKey){ ev.preventDefault(); undo(); }
+  else if((k === "z" && ev.shiftKey) || k === "y"){ ev.preventDefault(); redo(); }
+});
+
 document.addEventListener("keydown", ev => {
   if(ev.target.closest("input, select, textarea, button") || ev.metaKey || ev.ctrlKey) return;
   if(!view.selected) return;
@@ -540,6 +604,9 @@ document.addEventListener("keydown", ev => {
 // ---- 시작 ----
 view.setCabinet(state.cabinet);
 for(const k of ["w", "d", "h"]) $("cab_" + k).value = state.cabinet[k];
+$("cabName").value = state.cabinet.name;
+fitTitle();
+document.fonts && document.fonts.ready.then(fitTitle);   // 글꼴이 늦게 오면 다시 재요
 renderCabinets();
 renderTools(null);
 fetch("assets/catalog.json?v=20261031d").then(r => r.json()).then(data => {
