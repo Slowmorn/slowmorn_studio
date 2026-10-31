@@ -428,6 +428,22 @@ function addCabinet(name){
   $("cab_w").select();
 }
 
+/* 지금 수납장을 그대로 하나 더: 치수·종류·후보·넣은 상자까지 복사해 바로 옆에 두고 그쪽으로 옮겨 가요.
+   이름은 '수납장1 복제', 이미 있으면 '수납장1 복제 2' … */
+function duplicateCabinet(){
+  if(state.empty) return;
+  stash();
+  const i = state.cabinets.findIndex(c => c.id === state.cabinet.id);
+  const src = state.cabinets[i];
+  const used = new Set(state.cabinets.map(c => c.name));
+  let name = `${src.name} 복제`, n = 2;
+  while(used.has(name)) name = `${src.name} 복제 ${n++}`;
+  const copy = JSON.parse(JSON.stringify({ ...src, id: cabId(), name }));
+  state.cabinets.splice(i + 1, 0, copy);
+  openCabinet(copy);
+  toast(`'${src.name}'을 복제했어요`);
+}
+
 // 마지막 하나도 지울 수 있어요. 그러면 빈 상태가 돼요
 function removeCabinet(id){
   stash();
@@ -581,6 +597,7 @@ function undoable(text, change){
   });
 }
 // 3D 오른쪽 위: 수납장에 넣은 상자만 모두 빼요 (후보는 그대로)
+$("dupBtn").addEventListener("click", duplicateCabinet);
 $("emptyBtn").addEventListener("click", () => {
   if(state.placed.length) undoable(`상자 ${state.placed.length}개를 모두 뺐어요`, () => { state.placed = []; });
 });
