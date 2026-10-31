@@ -25,6 +25,17 @@ body{--wrap:1080px;--shell:1080px}   /* 상단 바·푸터도 본문과 같은 �
 .iso-box.drop{animation:iso-drop 3.6s ease-in-out infinite}
 @keyframes iso-drop{0%,20%,100%{transform:translateY(0)}45%,60%{transform:translateY(-12px)}}
 @media (prefers-reduced-motion:reduce){.iso-box.drop{animation:none}}
+/* 3D 그림이 뜨면 svg 그림은 숨겨요 */
+.hero-art{position:relative;flex-direction:column;align-items:center}
+.hero-art.has-3d .hero-iso{display:none}
+.hero-3d{display:block;width:100%;max-width:460px;height:auto}
+/* 다 들어가면 아래에 뜨는 한 줄 */
+.hero-fit{
+  margin:6px 0 0;font-size:13px;color:var(--muted);text-align:center;
+  opacity:0;transform:translateY(4px);transition:opacity .35s, transform .35s;
+}
+.hero-fit b{color:var(--ink);font-weight:700}
+.hero-fit.on{opacity:1;transform:none}
 
 /* 아래 안내 */
 .fit-main{max-width:var(--wrap);margin:0 auto;padding:8px 20px 24px}
