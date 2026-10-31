@@ -6,7 +6,8 @@ body{--wrap:1080px;--shell:1080px}   /* 상단 바·푸터도 본문과 같은 �
 .hero-inner{max-width:var(--wrap);margin:0 auto;padding:48px 20px 36px}
 .fit-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:center;gap:24px 40px}
 .hero-kicker{color:var(--muted);font-size:13.5px;font-weight:600;margin:0 0 10px}
-.hero h1{font-size:clamp(28px,4.6vw,42px);line-height:1.25;letter-spacing:-0.025em;margin:0 0 14px;max-width:16ch}
+/* 제목은 한 줄로. 글자 폭이 글자 크기의 약 11배라, 어느 화면에서도 칸 안에 들어오게 크기를 잡았어요 */
+.hero h1{font-size:clamp(26px,3.6vw,42px);line-height:1.25;letter-spacing:-0.025em;margin:0 0 14px;white-space:nowrap}
 .hero-lead{color:var(--muted);margin:0;max-width:52ch;line-height:1.75}
 .hero h1,.hero-lead{word-break:keep-all}
 .hero-cta{
