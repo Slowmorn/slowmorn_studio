@@ -9,6 +9,11 @@ const $ = id => document.getElementById(id);
 const esc = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const won = n => (n || 0).toLocaleString("ko-KR") + "원";
 
+/* 상품 사진 네모. 사진은 판매처 서버의 작은 이미지를 그대로 불러요.
+   못 불러오면 사진을 감추고 상품 색 바탕만 남겨요 */
+const thumb = it => `<span class="item-thumb" style="background:${esc(it.color || "#ddd")}" aria-hidden="true">${
+  it.img ? `<img src="${esc(it.img)}" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" onerror="this.remove()">` : ""}</span>`;
+
 // ---- 저장 (이 브라우저에만) ----
 function load(){
   try { return JSON.parse(localStorage.getItem(KEY)); } catch(e){ return null; }
@@ -156,17 +161,21 @@ function renderList(){
     .map(it => ({ it, ok: fitsEmpty(it, cab), now: !!findSpot(it, state.placed.map(boxOf), cab) }))
     .filter(r => !state.fitOnly || r.ok);
   const by = {
-    fit: (a, b) => (b.now - a.now) || (b.ok - a.ok) || (b.it.w * b.it.d * b.it.h - a.it.w * a.it.d * a.it.h),
+    // 지금 남은 자리로 정렬하면 담을 때마다 줄이 움직여요. 빈 수납장 기준으로만 정렬해 자리를 지켜요
+    fit: (a, b) => (b.ok - a.ok) || (b.it.w * b.it.d * b.it.h - a.it.w * a.it.d * a.it.h),
     price: (a, b) => (a.it.price || 0) - (b.it.price || 0),
     small: (a, b) => a.it.w * a.it.d * a.it.h - b.it.w * b.it.d * b.it.h,
   }[state.sort];
   rows.sort(by);
   $("listCount").textContent = rows.length + "개";
+  const counts = new Map();
+  for(const e of state.placed) counts.set(e.id, (counts.get(e.id) || 0) + 1);
   $("itemList").innerHTML = rows.length ? rows.map(({ it, ok, now }) => {
     const n = ok ? maxCount(it, cab) : 0;
-    const note = !ok ? whyNot(it, cab) : now ? `빈 수납장에 ${n}개` : "지금은 자리가 없어요";
-    return `<li><button type="button" class="item" data-id="${esc(it.id)}" data-brand="${esc(it.brand)}" ${ok ? "" : 'aria-disabled="true"'}>
-      <span class="item-swatch" style="background:${esc(it.color || "#ddd")}" aria-hidden="true"></span>
+    const picked = state.candidates.includes(it.id);
+    const note = !ok ? whyNot(it, cab) : picked ? `담음 · ${counts.get(it.id) || 0}개 넣음` : now ? `빈 수납장에 ${n}개` : "지금은 자리가 없어요";
+    return `<li><button type="button" class="item${picked ? " picked" : ""}" data-id="${esc(it.id)}" data-brand="${esc(it.brand)}" ${ok ? "" : 'aria-disabled="true"'} ${picked ? 'aria-pressed="true"' : ""}>
+      ${thumb(it)}
       <span class="item-main">
         <span class="item-brand"><span class="brand-dot" aria-hidden="true"></span>${BRANDS[it.brand] || esc(it.brand)}</span>
         <span class="item-name">${esc(it.name)}</span>
@@ -174,7 +183,7 @@ function renderList(){
       </span>
       <span class="item-side">
         <span class="item-price">${it.price ? won(it.price) : ""}</span>
-        <span class="item-note ${ok && now ? "" : "muted"}">${note}</span>
+        <span class="item-note ${(ok && now) || picked ? "" : "muted"}">${note}</span>
       </span>
       <span class="item-add" aria-hidden="true">${!ok ? "" : state.candidates.includes(it.id) ? (now ? "+1" : "") : "담기"}</span>
     </button></li>`;
@@ -193,7 +202,7 @@ function renderCandidates(){
     const n = counts.get(item.id) || 0;
     const room = !!findSpot(item, boxes, state.cabinet);
     return `<li class="cand${n ? "" : " zero"}" data-id="${esc(item.id)}" data-brand="${esc(item.brand)}">
-      <span class="item-swatch" style="background:${esc(item.color || "#ddd")}" aria-hidden="true"></span>
+      ${thumb(item)}
       <span class="item-main">
         <span class="item-brand"><span class="brand-dot" aria-hidden="true"></span>${BRANDS[item.brand] || esc(item.brand)}</span>
         <span class="item-name">${esc(item.name)}</span>
@@ -293,7 +302,7 @@ document.addEventListener("keydown", ev => {
 // ---- 시작 ----
 view.setCabinet(state.cabinet);
 renderTools(null);
-fetch("assets/catalog.json?v=20261031b").then(r => r.json()).then(data => {
+fetch("assets/catalog.json?v=20261031c").then(r => r.json()).then(data => {
   items = data.items || [];
   byId = new Map(items.map(it => [it.id, it]));
   // 저장해 둔 배치를 되살려요. 목록에서 사라진 상품은 건너뛰어요
