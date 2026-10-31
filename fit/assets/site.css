@@ -1,0 +1,90 @@
+/* 모두핏 소개 페이지 — assets/base.css 다음에 읽습니다.
+   소개 영역은 버짓리스트(budget/assets/site.css)의 hero 모양을 그대로 빌려 왔어요. */
+body{--wrap:1080px;--shell:1480px}
+
+/* 소개: 넓은 화면은 [글 | 그림], 좁은 화면은 글 아래 그림 */
+.hero-inner{max-width:var(--wrap);margin:0 auto;padding:48px 20px 36px}
+.fit-hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:center;gap:24px 40px}
+.hero-kicker{color:var(--muted);font-size:13.5px;font-weight:600;margin:0 0 10px}
+.hero h1{font-size:clamp(28px,4.6vw,42px);line-height:1.25;letter-spacing:-0.025em;margin:0 0 14px;max-width:16ch}
+.hero-lead{color:var(--muted);margin:0;max-width:52ch;line-height:1.75}
+.hero h1,.hero-lead{word-break:keep-all}
+.hero-cta{
+  display:inline-block;margin-top:22px;
+  background:var(--ink);color:var(--sheet);text-decoration:none;
+  font-weight:600;padding:12px 22px;border-radius:8px;
+}
+.hero-cta:hover{filter:brightness(1.18)}
+.hero-cta:active{filter:brightness(.94)}
+.hero-note{color:var(--muted);font-size:13px;margin:10px 0 0}
+
+/* 수납장 그림: 위에 얹힌 초록 상자가 살짝 떠올랐다 내려앉아요 */
+.hero-art{display:flex;justify-content:center}
+.hero-iso{width:100%;max-width:400px;height:auto;overflow:visible}
+.iso-dim{font-size:11px;font-weight:600;fill:var(--muted);font-family:var(--sans)}
+.iso-box.drop{animation:iso-drop 3.6s ease-in-out infinite}
+@keyframes iso-drop{0%,20%,100%{transform:translateY(0)}45%,60%{transform:translateY(-12px)}}
+@media (prefers-reduced-motion:reduce){.iso-box.drop{animation:none}}
+
+/* 아래 안내 */
+.fit-main{max-width:var(--wrap);margin:0 auto;padding:8px 20px 24px}
+.fit-main h2{font-size:19px;letter-spacing:-0.01em;margin:36px 0 12px}
+.note{color:var(--muted);font-size:13px;margin:10px 0 0}
+
+.steps{list-style:none;margin:0;padding:0;display:grid;gap:12px;grid-template-columns:repeat(3, minmax(0,1fr))}
+.steps li{border:1px solid var(--line);border-radius:var(--radius-lg);padding:16px 18px;background:var(--paper);display:flex;flex-direction:column;gap:4px}
+.step-no{
+  width:24px;height:24px;border-radius:50%;display:grid;place-items:center;margin-bottom:6px;
+  background:var(--ink);color:var(--sheet);font-size:12.5px;font-weight:700;
+}
+.steps b{font-size:15px}
+.steps li > span:last-child{color:var(--muted);font-size:13.5px;line-height:1.65;word-break:keep-all}
+
+/* 브랜드 색 — 앱과 같은 점 */
+[data-brand="ikea"]{--brand:#3A39FF}
+[data-brand="daiso"]{--brand:#FF5B23}
+[data-brand="muji"]{--brand:#CF2C95}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--brand, var(--muted));flex:none;display:inline-block}
+.brands{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.brands li{display:flex;align-items:baseline;gap:8px 10px;flex-wrap:wrap;padding:11px 2px;border-bottom:1px solid var(--line)}
+.brands .brand-dot{align-self:center}
+.brands b{font-size:14.5px;min-width:4.5em}
+.brands li > span:last-child{color:var(--muted);font-size:13.5px;word-break:keep-all}
+
+/* 같이 쓰면 좋은 서비스: 버짓리스트 카드 (캐릭터는 버짓리스트 홈과 같은 그림) */
+.sister{
+  display:flex;align-items:center;gap:18px;text-decoration:none;color:inherit;
+  border:1px solid var(--line);border-radius:18px;padding:18px 22px;background:var(--sheet);
+  transition:border-color .15s, box-shadow .15s;
+}
+.sister:hover{border-color:color-mix(in srgb, var(--ink) 30%, var(--line));box-shadow:0 6px 20px -10px rgba(40,36,32,.25)}
+.sister-mascot{flex:none;width:76px;height:76px}
+.sister-mascot svg{width:100%;height:100%;display:block;overflow:visible}
+.m-shadow{fill:rgba(40,36,32,.14);transform-box:fill-box;transform-origin:center;animation:m-shadow 3.2s ease-in-out infinite}
+.m-body{transform-box:fill-box;transform-origin:50% 60%;animation:m-float 3.2s ease-in-out infinite}
+.m-eyes{transform-box:fill-box;transform-origin:center;animation:m-blink 4.6s infinite}
+@keyframes m-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes m-shadow{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.82);opacity:.6}}
+@keyframes m-blink{0%,44%,50%,92%,100%{transform:scaleY(1)}47%,95%{transform:scaleY(.08)}}
+@media (prefers-reduced-motion:reduce){.m-shadow,.m-body,.m-eyes{animation:none}}
+.sister-body{display:flex;flex-direction:column;gap:3px;min-width:0}
+.sister-kicker{color:var(--muted);font-size:12.5px;font-weight:600}
+.sister-body b{font-size:18px;letter-spacing:-0.01em}
+.sister-lead{color:var(--muted);font-size:13.5px;line-height:1.65;word-break:keep-all;max-width:60ch}
+.sister-go{display:inline-flex;align-items:center;gap:2px;margin-top:6px;font-size:13.5px;font-weight:600}
+.sister-go svg{width:14px;height:14px}
+
+footer{margin-top:40px}
+
+@media (max-width:860px){
+  .fit-hero{grid-template-columns:minmax(0,1fr)}
+  .hero-art{order:2}
+  .hero-iso{max-width:340px}
+  .steps{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .hero-inner{padding:28px 16px 20px}
+  .fit-main{padding:0 16px 16px}
+  .sister{align-items:flex-start;gap:12px;padding:14px 16px}
+  .sister-mascot{width:56px;height:56px}
+}

@@ -1,10 +1,11 @@
-/* 룰러 화면 — 수납장 치수, 추천, 수납함 목록, 후보 수납함, 저장을 묶어요.
+/* 모두핏 화면 — 수납장 치수, 추천, 수납함 목록, 후보 수납함, 저장을 묶어요.
    배치(무엇을 어디에)는 여기 state 가 정답이고, 3D 는 scene.js 가 그대로 그립니다. */
 import { createScene } from "./scene.js";
 import { sizeOf, findSpot, fits, restY, settle, whyNot, fitsEmpty, maxCount, fmt } from "./pack.js";
 import { recommend } from "./recommend.js";
 
-const KEY = "ruler:v1";
+const KEY = "fit:v1";
+const OLD_KEY = "ruler:v1";   // 이름이 '룰러'이던 때의 저장 자리. 새 자리가 비어 있으면 거기서 읽어요
 const BRANDS = { ikea: "이케아", daiso: "다이소", muji: "무인양품" };
 const $ = id => document.getElementById(id);
 const esc = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -19,7 +20,7 @@ const thumb = it => `<span class="item-thumb" style="background:${esc(it.color |
    { cabinets: [{ id, name, w, d, h, type, candidates, placed: [{ id, x, y, z, rot }] }], active, recMode }
    수납장마다 치수·종류·후보·배치를 따로 가져요. 수납장 하나짜리 예전 저장본도 그대로 읽어요 */
 function load(){
-  try { return JSON.parse(localStorage.getItem(KEY)); } catch(e){ return null; }
+  try { return JSON.parse(localStorage.getItem(KEY) || localStorage.getItem(OLD_KEY)); } catch(e){ return null; }
 }
 const cabId = () => "c" + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
 const blankCabinet = (name, from) => ({
@@ -609,7 +610,8 @@ fitTitle();
 document.fonts && document.fonts.ready.then(fitTitle);   // 글꼴이 늦게 오면 다시 재요
 renderCabinets();
 renderTools(null);
-fetch("assets/catalog.json?v=20261031d").then(r => r.json()).then(data => {
+// catalog 는 이 파일 옆에 있어요 (페이지 주소와 상관없이 찾도록)
+fetch(new URL("catalog.json?v=20261031d", import.meta.url)).then(r => r.json()).then(data => {
   items = data.items || [];
   byId = new Map(items.map(it => [it.id, it]));
   state.recOpen = false;

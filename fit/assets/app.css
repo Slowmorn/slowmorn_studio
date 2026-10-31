@@ -1,4 +1,4 @@
-/* 룰러 화면 스타일 — assets/base.css 다음에 읽습니다.
+/* 모두핏 화면 스타일 — assets/base.css 다음에 읽습니다.
    요약 카드와 칩은 버짓리스트(budget/assets/app.css)의 모양을 그대로 빌려 왔어요. */
 /* 3D 와 목록을 넓게 보려고 버짓리스트보다 넓게 써요. 상단 바도 같은 폭으로 */
 body{--wrap:1480px;--shell:1480px}
