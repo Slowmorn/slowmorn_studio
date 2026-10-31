@@ -18,8 +18,8 @@
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
-<link rel="stylesheet" href="assets/base.css?v=20261031b">
-<link rel="stylesheet" href="assets/app.css?v=20261031b">
+<link rel="stylesheet" href="assets/base.css?v=20261031c">
+<link rel="stylesheet" href="assets/app.css?v=20261031c">
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
@@ -87,12 +87,13 @@
       <p class="stage-hint">드래그로 돌려 보고, 상자를 끌어 옮겨요. 앞쪽으로 끌어내면 빠져요.</p>
     </section>
 
-    <section class="bag" id="bag" hidden aria-label="담은 수납함">
+    <!-- 후보 수납함: 장바구니처럼 담아 두고 개수(0개도)를 늘리고 줄이며 넣었다 빼요 -->
+    <section class="bag" aria-label="후보 수납함">
       <div class="bag-head">
-        <h2>담은 수납함</h2>
-        <button type="button" class="link-btn" id="clearBtn">모두 빼기</button>
+        <h2>후보 수납함 <span class="count" id="candCount"></span></h2>
+        <button type="button" class="link-btn" id="clearBtn" hidden>모두 빼기</button>
       </div>
-      <ul class="bag-list" id="bagList"></ul>
+      <ul class="cand-list" id="candList"></ul>
     </section>
   </main>
 
@@ -124,6 +125,6 @@
   <div class="foot-inner"><span>© slowmorn</span></div>
 </footer>
 
-<script type="module" src="assets/app.js?v=20261031b"></script>
+<script type="module" src="assets/app.js?v=20261031c"></script>
 </body>
 </html>

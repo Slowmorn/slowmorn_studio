@@ -97,19 +97,39 @@ body{--wrap:1240px}
 .tool:disabled{opacity:.4;cursor:default}
 .stage-hint{margin:0;padding:0 12px 10px;background:var(--paper);font-size:12px;color:var(--muted)}
 
-/* 담은 수납함 */
+/* 후보 수납함 — [색 | 이름·치수 | − n + | 금액·판매처·×] */
 .bag{margin-top:18px}
-.bag[hidden]{display:none}
 .bag-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
 .bag-head h2,.side-head h2{margin:0;font-size:15px;font-weight:700}
+.bag-head .count{color:var(--muted);font-weight:500;font-size:13.5px;margin-left:2px}
 .link-btn{border:0;background:none;padding:0;color:var(--muted);font-size:13px;text-decoration:underline}
 .link-btn:hover{color:var(--warn)}
-.bag-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
-.bag-list li{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px solid var(--line);font-size:14px}
-.bag-name{flex:1;min-width:0;display:flex;align-items:center;gap:6px}
-.bag-name b{font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
-.bag-price{font-variant-numeric:tabular-nums;white-space:nowrap}
-.bag-list a{font-size:13px;color:var(--muted);white-space:nowrap}
+.link-btn[hidden]{display:none}
+.cand-list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.cand-list .empty{padding:18px 4px;color:var(--muted);font-size:13.5px;word-break:keep-all}
+.cand{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line)}
+/* 0개인 후보는 흐리게 — 남아 있지만 수납장에는 없어요 */
+.cand.zero .item-swatch,.cand.zero .item-main{opacity:.5}
+.stepper{
+  flex:none;display:inline-flex;align-items:center;
+  border:1px solid var(--line);border-radius:99px;background:var(--sheet);
+}
+.stepper button{
+  width:32px;height:30px;display:grid;place-items:center;border:0;background:none;border-radius:99px;color:var(--ink);
+}
+.stepper button svg{width:14px;height:14px}
+.stepper button:hover:not(:disabled){background:var(--hover)}
+.stepper button:disabled,.stepper button[aria-disabled="true"]{color:var(--muted);opacity:.45}
+.stepper button:disabled{cursor:default}
+.stepper output{min-width:22px;text-align:center;font-weight:700;font-variant-numeric:tabular-nums}
+.cand-side{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:2px;min-width:76px}
+.cand-sum{font-size:14px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.cand.zero .cand-sum{color:var(--muted);font-weight:400}
+.cand-links{display:flex;align-items:center;gap:6px}
+.cand-links a{font-size:12.5px;color:var(--muted);white-space:nowrap}
+.cand-x{border:0;background:none;padding:2px;border-radius:4px;color:var(--muted);display:grid;place-items:center}
+.cand-x svg{width:13px;height:13px}
+.cand-x:hover{color:var(--warn);background:var(--hover)}
 
 /* 오른쪽 목록 */
 .side-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
@@ -176,5 +196,11 @@ body{--wrap:1240px}
   .dim input{width:100%;min-width:0;font-size:18px}
   .dim-x{display:none}
   .stage{height:46vh;min-height:300px}
+  /* 후보 한 줄: 위에 색·이름, 아래에 개수 조절과 금액 */
+  .cand{display:grid;grid-template-columns:30px minmax(0,1fr) auto;grid-template-areas:"sw main main" ". step side";gap:8px 10px}
+  .cand .item-swatch{grid-area:sw}
+  .cand .item-main{grid-area:main}
+  .cand .stepper{grid-area:step;justify-self:start}
+  .cand-side{grid-area:side;flex-direction:row;align-items:center;gap:10px}
   .tool-label{display:none}
 }
