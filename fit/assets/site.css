@@ -1,6 +1,6 @@
 /* 모두핏 소개 페이지 — assets/base.css 다음에 읽습니다.
    소개 영역은 버짓리스트(budget/assets/site.css)의 hero 모양을 그대로 빌려 왔어요. */
-body{--wrap:1080px;--shell:1480px}
+body{--wrap:1080px;--shell:1080px}   /* 상단 바·푸터도 본문과 같은 폭으로 */
 
 /* 소개: 넓은 화면은 [글 | 그림], 좁은 화면은 글 아래 그림 */
 .hero-inner{max-width:var(--wrap);margin:0 auto;padding:48px 20px 36px}
