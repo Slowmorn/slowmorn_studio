@@ -3,9 +3,9 @@
    1 = 1cm. pack.js 좌표(왼쪽-앞-바닥 원점, z 는 안쪽)를 Three 좌표(가운데 원점, -Z 가 안쪽)로 바꿔 그립니다. */
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
 import { snap, sizeOf, restY, fits, inside } from "./pack.js";
+import { buildShape } from "./shapes.js";
 
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
@@ -130,24 +130,36 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   }
 
   // ---- 상자 ----
+  /* 상자 하나 = 묶음(Group). 안에 상품 모양(shapes.js)과, 골랐을 때만 보이는 바깥 테두리가 있어요.
+     묶음의 원점은 상자 한가운데라 위치 계산은 예전과 같아요 */
   function makeMesh(entry){
     const s = sizeOf(entry.item, entry.rot);
-    const r = Math.min(.8, Math.min(s.w, s.d, s.h) / 6);
-    const mat = new THREE.MeshStandardMaterial({ color: entry.item.color || "#d9d6cf", roughness: .72, metalness: 0, transparent: true });
-    const mesh = new THREE.Mesh(new RoundedBoxGeometry(s.w, s.h, s.d, 2, r), mat);
-    mesh.castShadow = mesh.receiveShadow = true;
+    const root = new THREE.Group();
+    const shape = buildShape(entry.item);
+    shape.position.y = -s.h / 2;
+    if(entry.rot) shape.rotation.y = Math.PI / 2;   // 가로와 깊이를 바꿔 놓으면 모양도 같이 돌아가요
+    root.add(shape);
+    const mats = [];
+    shape.traverse(o => { if(o.material) mats.push(o.material); });
     const outline = new THREE.LineSegments(
-      new THREE.EdgesGeometry(new THREE.BoxGeometry(s.w + .15, s.h + .15, s.d + .15)),
-      new THREE.LineBasicMaterial({ color: css("--ink"), transparent: true, opacity: .28 }));
-    mesh.add(outline);
-    mesh.userData = { uid: entry.uid, rot: entry.rot, size: s, outline, target: new THREE.Vector3(), item: entry.item, box: null };
-    return mesh;
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(s.w + .3, s.h + .3, s.d + .3)),
+      new THREE.LineBasicMaterial({ color: css("--ink"), transparent: true }));
+    outline.visible = false;
+    root.add(outline);
+    root.userData = { uid: entry.uid, rot: entry.rot, size: s, outline, mats, fade: 1, target: new THREE.Vector3(), item: entry.item, box: null };
+    return root;
   }
 
-  function dispose(mesh){
-    mesh.geometry.dispose(); mesh.material.dispose();
-    mesh.userData.outline.geometry.dispose(); mesh.userData.outline.material.dispose();
-    mesh.removeFromParent();
+  function dispose(root){
+    // 질감 그림(map)은 여러 상자가 같이 쓰니 지우지 않아요 (material.dispose 는 map 을 건드리지 않아요)
+    root.traverse(o => { o.geometry?.dispose(); o.material?.dispose(); });
+    root.removeFromParent();
+  }
+
+  // 넣고 빼는 동안 묶음 전체를 흐리게: 재질마다 원래 불투명도(base)에 fade 를 곱해요
+  function setFade(root, f){
+    root.userData.fade = f;
+    for(const m of root.userData.mats) m.opacity = (m.userData.base ?? 1) * f;
   }
 
   /* app.js 가 가진 배치를 그대로 그려요. entries = [{uid, item, rot, x, y, z}]
@@ -169,7 +181,7 @@ export function createScene(host, { onSelect, onMove, onRemove }){
           // 수납장 앞, 살짝 위에서 시작해 안으로 밀려 들어가요
           mesh.position.z = cab.d / 2 + s.d / 2 + Math.max(12, cab.d * .5);
           mesh.position.y += Math.min(6, cab.h * .2);
-          mesh.material.opacity = 0;
+          setFade(mesh, 0);
         }
       }
       mesh.userData.box = box;
@@ -197,11 +209,10 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   // 테두리 색: 고른 상자는 먹색 진하게, 놓을 수 없는 자리는 경고색
   function paint(){
     for(const [uid, mesh] of meshes){
-      const o = mesh.userData.outline.material;
-      if(mesh.userData.bad){ o.color.set(css("--warn")); o.opacity = 1; }
-      else if(uid === selected){ o.color.set(css("--ink-strong")); o.opacity = 1; }
-      else { o.color.set(css("--ink")); o.opacity = .28; }
-      mesh.material.emissive.set(uid === selected ? 0x222222 : 0x000000);
+      const outline = mesh.userData.outline;
+      outline.visible = !!mesh.userData.bad || uid === selected;
+      outline.material.color.set(css(mesh.userData.bad ? "--warn" : "--ink-strong"));
+      for(const m of mesh.userData.mats) m.emissive?.set(uid === selected ? 0x1c1c1c : 0x000000);
     }
   }
 
@@ -211,6 +222,14 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
   const hit = new THREE.Vector3();
   let drag = null;   // { mesh, grab:Vector3, start:{x,y,z}, moved }
+
+  // 눌린 곳의 상자 묶음 (모양 안 부품을 맞혀도 묶음을 돌려줘요)
+  function pick(){
+    const hit = ray.intersectObjects([...meshes.values()], true).find(h => h.object.isMesh);
+    let o = hit && hit.object;
+    while(o && !o.userData.uid) o = o.parent;
+    return o || null;
+  }
 
   function pointer(ev){
     const r = renderer.domElement.getBoundingClientRect();
@@ -222,9 +241,8 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   host.addEventListener("pointerdown", ev => {
     if(ev.button !== 0 || ev.target !== renderer.domElement) return;
     pointer(ev);
-    const target = ray.intersectObjects([...meshes.values()], false)[0];
-    if(!target){ controls.enabled = true; return; }
-    const mesh = target.object;
+    const mesh = pick();
+    if(!mesh){ controls.enabled = true; return; }
     controls.enabled = false;
     const b = mesh.userData.box;
     plane.constant = -b.y;   // 잡은 상자 바닥 높이의 평면 위로 움직여요
@@ -287,7 +305,7 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   renderer.domElement.addEventListener("click", ev => {
     if(!downAt || Math.hypot(ev.clientX - downAt[0], ev.clientY - downAt[1]) > 4) return;
     pointer(ev);
-    if(!ray.intersectObjects([...meshes.values()], false).length) select(null);
+    if(!pick()) select(null);
   });
 
   const othersOf = mesh => [...meshes.values()].filter(m => m !== mesh).map(m => m.userData.box);
@@ -313,12 +331,13 @@ export function createScene(host, { onSelect, onMove, onRemove }){
     const k = 1 - Math.exp(-clock.getDelta() * 14);   // 화면 빠르기와 상관없이 같은 속도로 따라가요
     for(const mesh of meshes.values()){
       mesh.position.lerp(mesh.userData.target, k);
-      mesh.material.opacity += ((mesh.userData.out ? .35 : 1) - mesh.material.opacity) * k;
+      const goal = mesh.userData.out ? .35 : 1;
+      if(Math.abs(goal - mesh.userData.fade) > .002) setFade(mesh, mesh.userData.fade + (goal - mesh.userData.fade) * k);
     }
     for(const mesh of leaving){
       mesh.position.lerp(mesh.userData.target, k);
-      mesh.material.opacity -= mesh.material.opacity * k;
-      if(mesh.material.opacity < .02){ leaving.delete(mesh); dispose(mesh); }
+      setFade(mesh, mesh.userData.fade * (1 - k));
+      if(mesh.userData.fade < .02){ leaving.delete(mesh); dispose(mesh); }
     }
     controls.update();
     renderer.render(scene, camera);

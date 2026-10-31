@@ -293,7 +293,7 @@ document.addEventListener("keydown", ev => {
 // ---- 시작 ----
 view.setCabinet(state.cabinet);
 renderTools(null);
-fetch("assets/catalog.json?v=20261031a").then(r => r.json()).then(data => {
+fetch("assets/catalog.json?v=20261031b").then(r => r.json()).then(data => {
   items = data.items || [];
   byId = new Map(items.map(it => [it.id, it]));
   // 저장해 둔 배치를 되살려요. 목록에서 사라진 상품은 건너뛰어요
