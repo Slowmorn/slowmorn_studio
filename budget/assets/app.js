@@ -1236,6 +1236,23 @@
     }
   });
 
+  // 지금 파일의 사본을 휴지통에 넣어요. 사본은 내 파일이라 공유·자리 정보는 빼고, 안의 id 도 새로 뽑아요.
+  function trashCopyOf(p){
+    const copy = JSON.parse(JSON.stringify(p));
+    copy.id = nid();
+    ["owner", "shared", "pos", "posBy", "ownerPos"].forEach(k => { delete copy[k]; });
+    (copy.categories || []).forEach(c => {
+      c.id = nid();
+      (c.items || []).forEach(it => {
+        it.id = nid();
+        (it.options || []).forEach(o => { const fresh = nid(); if(it.choiceId === o.id) it.choiceId = fresh; o.id = fresh; });
+      });
+    });
+    copy.deletedAt = copy.updatedAt = Date.now();
+    store.plans.push(copy);
+    return copy;
+  }
+
   document.querySelectorAll("[data-tpl]").forEach(btn => btn.addEventListener("click", () => {
     closeMenus();
     // No confirm(): some browsers/embeds block it silently, which made this do nothing. Undo is in the toast.
@@ -1245,10 +1262,12 @@
     const isDefault = !title || /^새 예산표( \d+)?$/.test(title) || title === "우리 아기 출산 준비" || BS.templates.some(t => t.title === title);
     const plan = fromTemplate(btn.dataset.tpl, btn.dataset.tier);
     if(!isDefault) plan.title = state.title;
+    // 쓰던 내용이 있으면 버리지 않고 사본을 휴지통에 넣어 둡니다 (30일 안에 버짓보드 휴지통에서 되살릴 수 있어요)
+    const kept = state.categories.some(c => c.items.some(hasContent)) ? trashCopyOf(state) : null;
     replaceActive(plan);
     render(); save();
     track("template_load", { template: btn.dataset.tpl, tier: btn.dataset.tier || "", source: "menu" });
-    toast(`'${btn.dataset.label}' 템플릿을 불러왔어요`, snap);
+    toast(kept ? `'${btn.dataset.label}' 템플릿을 불러왔어요. 쓰던 내용은 휴지통에 넣어 뒀어요` : `'${btn.dataset.label}' 템플릿을 불러왔어요`, snap);
   }));
 
   document.getElementById("clearAllItems").addEventListener("click", () => {
