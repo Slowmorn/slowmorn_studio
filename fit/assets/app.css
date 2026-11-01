@@ -295,6 +295,9 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
 }
 .chip:hover{background:var(--hover)}
 .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--sheet);font-weight:600}
+/* 브랜드 칩 앞의 판매처 로고 (공식 사이트 아이콘). 높이만 맞추고 너비는 로고 비율대로 */
+.brand-logo{height:14px;width:auto;flex:none;border-radius:3px;display:block}
+.chip[data-brand="muji"] .brand-logo{background:#fff;padding:1px 2px;box-sizing:content-box;height:12px}
 .toggle{display:flex;align-items:center;gap:7px;font-size:13.5px;color:var(--ink);cursor:pointer}
 .toggle input{accent-color:var(--ink);width:15px;height:15px;margin:0}
 .item-list{

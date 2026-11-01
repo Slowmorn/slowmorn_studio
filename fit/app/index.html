@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/base.css?v=20261102b">
-<link rel="stylesheet" href="../assets/app.css?v=20261102f">
+<link rel="stylesheet" href="../assets/app.css?v=20261102g">
 <!-- 모듈 파일 버전: assets/*.js 를 고치면 아래 ?v= 를 함께 올려 주세요 (app.js 는 맨 아래 script 태그) -->
 <script type="importmap">
 { "imports": {
@@ -166,9 +166,9 @@
       <h2>수납함 <span class="count" id="listCount"></span></h2>
       <div class="chips" id="brandChips" role="group" aria-label="브랜드">
         <button type="button" class="chip" data-brand-filter="all" aria-pressed="true">전체</button>
-        <button type="button" class="chip" data-brand-filter="ikea" data-brand="ikea" aria-pressed="false"><span class="brand-dot" aria-hidden="true"></span>이케아</button>
-        <button type="button" class="chip" data-brand-filter="muji" data-brand="muji" aria-pressed="false"><span class="brand-dot" aria-hidden="true"></span>무인양품</button>
-        <button type="button" class="chip" data-brand-filter="daiso" data-brand="daiso" aria-pressed="false"><span class="brand-dot" aria-hidden="true"></span>다이소</button>
+        <button type="button" class="chip" data-brand-filter="ikea" data-brand="ikea" aria-pressed="false"><img class="brand-logo" src="../assets/brands/ikea.svg" alt="" width="16" height="16">이케아</button>
+        <button type="button" class="chip" data-brand-filter="muji" data-brand="muji" aria-pressed="false"><img class="brand-logo" src="../assets/brands/muji.png" alt="" width="16" height="16">무인양품</button>
+        <button type="button" class="chip" data-brand-filter="daiso" data-brand="daiso" aria-pressed="false"><img class="brand-logo" src="../assets/brands/daiso.png" alt="" width="16" height="16">다이소</button>
       </div>
       <span class="spacer"></span>
       <input type="search" id="itemSearch" class="item-search" placeholder="이름으로 찾기" aria-label="수납함 이름으로 찾기">
