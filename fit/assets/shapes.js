@@ -3,7 +3,8 @@
    만든 모양은 바닥 가운데가 원점이고, 앞면(w 쪽)이 +Z 를 봐요.
 
    shape.kind
-     bin     단단한 상자 (플라스틱·투명·종이). 아래가 좁아지는 기울기, 뚜껑, 테두리, 손잡이 구멍, 앞이 낮은 모양
+     bin     단단한 상자 (플라스틱·투명·종이). 아래가 좁아지는 기울기, 뚜껑, 테두리, 손잡이 구멍, 앞이 낮은 모양,
+             안쪽 칸막이 (dividers: { x: 가로로 나눈 칸 수, z: 앞뒤로 나눈 칸 수 })
      fabric  천 상자. 접힌 윗단, 옆 손잡이 끈, 투명 창, 라벨
      drawer  서랍 케이스 (무인양품 PP 케이스)
      crate   원목 상자 (판자와 기둥) */
@@ -193,6 +194,14 @@ function body(group, it, s){
   if(s.cuff){
     const ch = bodyH * s.cuff;
     ring(group, Wt + .5, Dt + .5, Wt - 2 * t, Dt - 2 * t, bodyH - ch, ch, material(matKind, shade(it.color, s.cuffShade ?? -.04), tex));
+  }
+
+  // 안쪽 칸막이: 정리함처럼 칸이 나뉜 작은 상자. 벽보다 조금 낮게, 같은 재질로
+  if(s.dividers){
+    const nx = s.dividers.x || 1, nz = s.dividers.z || 1, dh = bodyH * .88;
+    const iw = W0 - 2 * t, id = D0 - 2 * t;
+    for(let i = 1; i < nx; i++) block(group, t * .8, dh, id, -iw / 2 + iw * i / nx, t + dh / 2, 0, mat, 0, edges);
+    for(let j = 1; j < nz; j++) block(group, iw, dh, t * .8, 0, t + dh / 2, -id / 2 + id * j / nz, mat, 0, edges);
   }
 
   // 천 상자 옆 손잡이 끈
