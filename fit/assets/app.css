@@ -250,8 +250,8 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
 .cand-x svg{width:13px;height:13px}
 .cand-x:hover{color:var(--warn);background:var(--hover)}
 
-/* 수납함 목록 (3D 아래) — [제목 · 브랜드 칩 ……… 들어가는 것만 · 정렬], 아래로 여러 칸 */
-.list-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;margin-bottom:10px}
+/* 수납함 목록 (3D 아래) — [제목 ……… 정렬] / 찾기 칸 [이름 · 사이즈] / 거르기 줄 [브랜드 | 종류 ……… 들어가는 것만] */
+.list-head{display:flex;align-items:center;gap:8px 14px;margin-bottom:10px}
 .list-head h2{margin:0;font-size:15px;font-weight:700}
 /* 칸 제목은 서비스 이름과 같은 G마켓 산스 Medium (글꼴은 base.css). 옆의 개수는 본문 글꼴 그대로 */
 .plan-title,.rec-head h2,.list-head h2,.bag-head h2{font-family:"GmarketSansMedium", var(--sans);font-weight:normal;letter-spacing:-0.01em}
@@ -259,10 +259,18 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
 .list-head .count{color:var(--muted);font-weight:500;font-size:13.5px;margin-left:2px}
 .list-head select{border:1px solid var(--line);background:var(--sheet);border-radius:var(--radius);padding:4px 8px;font-size:13px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-/* 목록 둘째 줄: 왼쪽 종류 칩, 오른쪽 사이즈로 찾기 */
-.list-sub{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;margin:-2px 0 10px}
+/* 찾기 칸: 이름과 사이즈를 옅은 바탕 한 칸에 모아요 */
+.list-find{
+  display:flex;align-items:center;flex-wrap:wrap;gap:8px 18px;margin-bottom:10px;
+  padding:8px 10px;border-radius:12px;background:var(--paper);border:1px solid var(--line);
+}
+.list-find .item-search{flex:1 1 200px;max-width:300px;width:auto}
+/* 거르기 줄: 브랜드 칩 | 종류 칩 ……… 들어가는 것만 */
+.list-filter{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;margin-bottom:12px}
+.filter-sep{width:1px;height:18px;background:var(--line);flex:none}
+.list-filter .toggle{margin-left:auto}
 .type-chips{margin:0}
-.size-find{margin-left:auto;display:flex;align-items:center;gap:4px}
+.size-find{display:flex;align-items:center;gap:4px}
 .size-cap{font-size:13px;color:var(--muted);margin-right:4px;white-space:nowrap}
 .size-find input{
   width:4.2em;border:1px solid var(--line);background:var(--sheet);border-radius:var(--radius);
@@ -276,7 +284,7 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
 .size-clear svg{width:14px;height:14px}
 .size-clear:hover{color:var(--ink)}
 .size-clear[hidden]{display:none}
-.type-chips .chip{padding:3px 11px;font-size:13px}
+.list-filter .chip{padding:3px 11px;font-size:13px}   /* 브랜드·종류 칩 크기를 맞춰요 */
 .item-search{
   width:170px;border:1px solid var(--line);background:var(--sheet);border-radius:var(--radius);
   padding:4px 10px;font-size:13px;
@@ -386,9 +394,15 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
   .item-list{grid-template-columns:minmax(0,1fr)}
   .item-size{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .item-shop{padding:0 4px 0 2px}
-  .item-search{flex:1 1 100%;width:auto;order:5}
-  .size-find{margin-left:0;flex:1 1 100%}
-  .size-find input{flex:1 1 0;width:0;min-width:0;font-size:16px;padding:3px 4px}   /* 16px: 폰에서 눌러도 화면이 커지지 않게 */
+  .list-find .item-search{flex:1 1 100%;max-width:none}
+  .size-find{flex:1 1 100%}
+  .filter-sep{display:none}
+  /* 폰에서는 칩 묶음마다 한 줄로 두고 옆으로 넘겨 봐요 (줄바꿈으로 한 칩만 떨어지지 않게) */
+  .list-filter .chips{flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;margin:0 -16px;padding:0 16px;scrollbar-width:none}
+  .list-filter .chips::-webkit-scrollbar{display:none}
+  .list-filter .chip{flex:none}
+  .list-filter .toggle{margin-left:0;flex-basis:100%}
+  .size-find input{flex:1 1 0;width:0;min-width:0}   /* 글자 크기는 이름 찾기 칸과 같게 */
   /* 추천 카드는 옆으로 넘겨 봐요 */
   .rec{padding:10px 12px 12px}
   .rec-list{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -12px;padding:0 12px;scrollbar-width:none}
