@@ -1,4 +1,4 @@
-/* 모두핏 공통 토큰 — budget/assets/base.css 를 그대로 옮겨 왔어요. 상단 바와 푸터는 site.css 에서 가져왔어요 */
+/* 셀렉트박스 공통 토큰 — budget/assets/base.css 를 그대로 옮겨 왔어요. 상단 바와 푸터는 site.css 에서 가져왔어요 */
 /* 색은 거의 쓰지 않습니다. 종이 같은 따뜻한 회색과 먹색으로 화면을 만들고,
    색(--accent 계열)은 파일 아이콘과 점처럼 '그 파일이 무엇인지' 알려 주는 곳에만 씁니다. */
 :root{
@@ -90,6 +90,13 @@ a:hover{text-decoration-color:var(--muted)}
   color:var(--ink);text-decoration:none;flex:none;
 }
 .brand svg{width:24px;height:24px;flex:none}
+/* 서비스 이름은 G마켓 산스 Medium (눈누 CDN). 글꼴이 오기 전에는 본문 글꼴로 먼저 보여요 */
+@font-face{
+  font-family:"GmarketSansMedium";
+  src:url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff") format("woff");
+  font-weight:normal;font-style:normal;font-display:swap;
+}
+.brand-name{font-family:"GmarketSansMedium", var(--sans);font-weight:normal;letter-spacing:-0.01em;padding-top:2px}
 .topbar nav{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:14px}
 .topbar nav a{color:var(--muted);text-decoration:none;padding:4px 2px}
 .topbar nav a:hover{color:var(--ink)}

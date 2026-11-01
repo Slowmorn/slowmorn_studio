@@ -1,4 +1,4 @@
-/* 모두핏 화면 — 수납장 치수, 추천, 수납함 목록, 후보 수납함, 저장을 묶어요.
+/* 셀렉트박스 화면 — 수납장 치수, 추천, 수납함 목록, 후보 수납함, 저장을 묶어요.
    배치(무엇을 어디에)는 여기 state 가 정답이고, 3D 는 scene.js 가 그대로 그립니다. */
 import { createScene } from "./scene.js";
 import { sizeOf, findSpot, fits, restY, settle, whyNot, fitsEmpty, fmt } from "./pack.js";
