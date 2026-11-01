@@ -2,7 +2,7 @@
    배치(무엇을 어디에)는 여기 state 가 정답이고, 3D 는 scene.js 가 그대로 그립니다. */
 import { createScene } from "./scene.js";
 import { sizeOf, findSpot, fits, restY, settle, whyNot, fitsEmpty, fmt } from "./pack.js";
-import { recommend, fitCount } from "./recommend.js";
+import { recommend, fitCount, manyPenalty } from "./recommend.js";
 
 const KEY = "fit:v1";
 const OLD_KEY = "ruler:v1";   // 이름이 '룰러'이던 때의 저장 자리. 새 자리가 비어 있으면 거기서 읽어요
@@ -100,7 +100,8 @@ const state = {
   empty: !savedCabinets.length,   // 수납장이 하나도 없는 상태 ('수납장을 추가해 주세요'만 보여요)
   brand: "all", fitOnly: true, sort: "fit",
   kind: "all", q: "",         // 수납함 목록: 종류 · 이름 찾기
-  listLimit: 60,              // 목록은 60개씩 보여 줘요 ('더 보기'로 늘려요)
+  size: { w: null, d: null, h: null },   // 사이즈로 찾기 (cm). 빈 칸은 따지지 않아요
+  page: 0,                    // 목록은 PAGE 개씩 쪽으로 나눠 보여 줘요. 지금 쪽 (0부터)
   recOpen: false,             // 추천 칸을 펼쳤는지. 처음에 수납장이 비어 있으면 펼쳐요
   recMode: (saved && saved.recMode) || "one",   // one 한 종류 · two 같은 제품군 두 크기
   recApplied: null,           // 지금 수납장에 들어가 있는 추천 (그 카드에 '넣음' 표시)
@@ -244,34 +245,46 @@ function emptyFit(it, cab){
 function renderList(){
   const cab = state.cabinet;
   const q = state.q.trim().toLowerCase();
+  const sizing = Object.values(state.size).some(v => v != null);
+  $("sizeClear").hidden = !sizing;
   const rows = items
     .filter(it => state.brand === "all" || it.brand === state.brand)
     .filter(it => state.kind === "all" || it.type === state.kind)
     .filter(it => !q || it.name.toLowerCase().includes(q) || (it.family || "").toLowerCase().includes(q))
-    .map(it => ({ it, ok: emptyFit(it, cab).ok }))
+    .map(it => ({ it, ok: emptyFit(it, cab).ok, gap: sizing ? sizeGap(it, state.size) : 0 }))
+    .filter(r => r.gap != null)
     .filter(r => !state.fitOnly || r.ok);
+  const vol = it => it.w * it.d * it.h;
+  /* 채움률: 빈 수납장에 줄 맞춰 넣었을 때 수납장 부피의 몇 %를 채우는지.
+     아주 작은 상자는 수백 개로 꽉 채워져 늘 1등이 되니, 추천처럼 개수가 많으면 조금씩 깎아요 */
+  const fill = r => {
+    if(!r.ok) return 0;
+    const { n } = emptyFit(r.it, cab);
+    return n * vol(r.it) / (cab.w * cab.d * cab.h) * manyPenalty(n);
+  };
   const by = {
     // 지금 남은 자리로 정렬하면 담을 때마다 줄이 움직여요. 빈 수납장 기준으로만 정렬해 자리를 지켜요
-    fit: (a, b) => (b.ok - a.ok) || (b.it.w * b.it.d * b.it.h - a.it.w * a.it.d * a.it.h),
+    fit: (a, b) => (fill(b) - fill(a)) || (vol(b.it) - vol(a.it)),
     price: (a, b) => (a.it.price || 0) - (b.it.price || 0),
-    small: (a, b) => a.it.w * a.it.d * a.it.h - b.it.w * b.it.d * b.it.h,
+    small: (a, b) => vol(a.it) - vol(b.it),
   }[state.sort];
-  rows.sort(by);
+  // 사이즈로 찾을 때는 적은 치수와 딱 맞는 것부터, 같으면 고른 정렬대로
+  rows.sort(sizing ? (a, b) => (a.gap - b.gap) || by(a, b) : by);
   $("listCount").textContent = rows.length + "개";
-  // 상품이 많아서 한 번에 다 그리지 않아요. '지금 들어가는지'는 보이는 줄만 재요
-  const shown = rows.slice(0, state.listLimit);
+  // 상품이 많아서 한 쪽씩만 그려요. '지금 들어가는지'는 보이는 줄만 재요
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE));
+  state.page = Math.min(state.page, pages - 1);
+  const shown = rows.slice(state.page * PAGE, (state.page + 1) * PAGE);
   const boxes = state.placed.map(boxOf);
   for(const r of shown) r.now = r.ok && !!findSpot(r.it, boxes, cab);
-  $("moreBtn").hidden = rows.length <= shown.length;
-  $("moreBtn").textContent = `더 보기 (${rows.length - shown.length}개 더)`;
+  renderPager(pages);
   const counts = new Map();
   for(const e of state.placed) counts.set(e.id, (counts.get(e.id) || 0) + 1);
   $("itemList").innerHTML = shown.length ? shown.map(({ it, ok, now }) => {
     const n = ok ? emptyFit(it, cab).n : 0;
     const picked = state.candidates.includes(it.id);
     const note = !ok ? whyNot(it, cab) : picked ? `담음 · ${counts.get(it.id) || 0}개 넣음` : now ? `빈 수납장에 ${n}개` : "지금은 자리가 없어요";
-    const sold = it.soldout ? `<span class="sold">품절</span>` : "";
-    return `<li><button type="button" class="item${picked ? " picked" : ""}" data-id="${esc(it.id)}" data-brand="${esc(it.brand)}" ${ok ? "" : 'aria-disabled="true"'} ${picked ? 'aria-pressed="true"' : ""}>
+    return `<li class="item-row${picked ? " picked" : ""}"><button type="button" class="item" data-id="${esc(it.id)}" data-brand="${esc(it.brand)}" ${ok ? "" : 'aria-disabled="true"'} ${picked ? 'aria-pressed="true"' : ""}>
       ${thumb(it)}
       <span class="item-main">
         <span class="item-brand"><span class="brand-dot" aria-hidden="true"></span>${BRANDS[it.brand] || esc(it.brand)}</span>
@@ -279,12 +292,27 @@ function renderList(){
         <span class="item-size">${fmt(it.w)} × ${fmt(it.d)} × ${fmt(it.h)}cm</span>
       </span>
       <span class="item-side">
-        <span class="item-price">${sold}${it.price ? won(it.price) : ""}</span>
+        <span class="item-price">${it.price ? won(it.price) : ""}</span>
         <span class="item-note ${(ok && now) || picked ? "" : "muted"}">${note}</span>
       </span>
       <span class="item-add" aria-hidden="true">${!ok ? "" : state.candidates.includes(it.id) ? (now ? "+1" : "") : "담기"}</span>
-    </button></li>`;
-  }).join("") : `<li class="empty">${q ? `'${esc(state.q)}'에 맞는 수납함이 없어요.` : state.fitOnly ? "이 크기에 들어가는 수납함이 없어요. '들어가는 것만'을 꺼 보세요." : "수납함이 없어요."}</li>`;
+    </button>${it.url ? `<a class="item-shop" href="${esc(it.url)}" target="_blank" rel="noopener">판매처</a>` : ""}</li>`;
+  }).join("") : `<li class="empty">${sizing ? `적은 사이즈와 ${SIZE_TOL}cm 안으로 비슷한 수납함이 없어요.${state.fitOnly ? " '들어가는 것만'을 꺼 보세요." : ""}` : q ? `'${esc(state.q)}'에 맞는 수납함이 없어요.` : state.fitOnly ? "이 크기에 들어가는 수납함이 없어요. '들어가는 것만'을 꺼 보세요." : "수납함이 없어요."}</li>`;
+}
+
+// 쪽 번호: ‹ 1 … 4 5 6 … 54 ›  (처음·끝과 지금 쪽 양옆만 보여요)
+function renderPager(pages){
+  const p = state.page, nav = $("pager");
+  nav.hidden = pages <= 1;
+  if(nav.hidden){ nav.innerHTML = ""; return; }
+  const nums = [...new Set([0, p - 1, p, p + 1, pages - 1])].filter(n => n >= 0 && n < pages).sort((a, b) => a - b);
+  let html = `<button type="button" data-page="${p - 1}" aria-label="이전 쪽" ${p ? "" : "disabled"}>‹</button>`;
+  nums.forEach((n, i) => {
+    if(i && n - nums[i - 1] > 1) html += `<span class="pager-gap" aria-hidden="true">…</span>`;
+    html += `<button type="button" data-page="${n}" ${n === p ? 'aria-current="page"' : ""}>${n + 1}</button>`;
+  });
+  html += `<button type="button" data-page="${p + 1}" aria-label="다음 쪽" ${p < pages - 1 ? "" : "disabled"}>›</button>`;
+  nav.innerHTML = html;
 }
 
 // ---- 후보 수납함 ----
@@ -323,12 +351,31 @@ const REC_HINT = {
   shelf: "앞에서 꺼내는 칸이에요. 쌓을 수 있는 함은 위로 쌓아요",
   drawer: "위에서 내려다보는 서랍이에요. 쌓지 않고 바닥에 한 층만 깔아요",
 };
+const PAGE = 30;
+const SIZE_TOL = 2;   // 사이즈로 찾기: 적은 치수와 이만큼(cm) 안으로 차이 나는 것만
+
+/* 사이즈로 찾기: 적은 치수와 얼마나 다른지 (차이 합, cm). 한 치수라도 SIZE_TOL 넘게 다르면 null.
+   상자는 돌려 넣을 수 있어서 가로·깊이를 바꾼 쪽도 재 보고 더 가까운 쪽을 써요 */
+function sizeGap(it, t){
+  const gap = (w, d) => {
+    let sum = 0;
+    for(const [want, have] of [[t.w, w], [t.d, d], [t.h, it.h]]){
+      if(want == null) continue;
+      const g = Math.abs(want - have);
+      if(g > SIZE_TOL + 1e-9) return null;
+      sum += g;
+    }
+    return sum;
+  };
+  const a = gap(it.w, it.d), b = gap(it.d, it.w);
+  return a == null ? b : b == null ? a : Math.min(a, b);
+}
 let recCache = { key: "", list: [] };
 const recKey = () => { const c = state.cabinet; return `${c.w}x${c.d}x${c.h}|${c.type}|${state.recMode}`; };
 
 function recs(){
   const key = recKey();
-  if(recCache.key !== key) recCache = { key, list: recommend(items.filter(it => !it.soldout), state.cabinet, { type: state.cabinet.type, mode: state.recMode }) };
+  if(recCache.key !== key) recCache = { key, list: recommend(items, state.cabinet, { type: state.cabinet.type, mode: state.recMode }) };
   return recCache.list;
 }
 
@@ -581,14 +628,25 @@ $("brandChips").addEventListener("click", ev => {
   if(!b) return;
   state.brand = b.dataset.brandFilter;
   $("brandChips").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
-  state.listLimit = 60;
-  renderList();
+  relist();
 });
-// 거르는 조건이 바뀌면 목록을 처음 60개부터 다시 보여 줘요
-const relist = () => { state.listLimit = 60; renderList(); };
+// 거르는 조건이 바뀌면 목록을 첫 쪽부터 다시 보여 줘요
+const relist = () => { state.page = 0; renderList(); };
 $("fitOnly").addEventListener("change", ev => { state.fitOnly = ev.target.checked; relist(); });
 $("sortBy").addEventListener("change", ev => { state.sort = ev.target.value; relist(); });
 $("itemSearch").addEventListener("input", ev => { state.q = ev.target.value; relist(); });
+$("sizeFind").addEventListener("input", ev => {
+  const k = ev.target.dataset.size;
+  if(!k) return;
+  const v = parseFloat(ev.target.value);
+  state.size[k] = v > 0 ? v : null;
+  relist();
+});
+$("sizeClear").addEventListener("click", () => {
+  state.size = { w: null, d: null, h: null };
+  $("sizeFind").querySelectorAll("input").forEach(i => { i.value = ""; });
+  relist();
+});
 $("typeChips").addEventListener("click", ev => {
   const b = ev.target.closest("[data-type-filter]");
   if(!b) return;
@@ -596,7 +654,14 @@ $("typeChips").addEventListener("click", ev => {
   $("typeChips").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
   relist();
 });
-$("moreBtn").addEventListener("click", () => { state.listLimit += 60; renderList(); });
+$("pager").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-page]");
+  if(!b || b.disabled) return;
+  state.page = +b.dataset.page;
+  renderList();
+  // 쪽을 넘기면 목록 맨 위가 보이게 (이미 보이면 그대로)
+  if($("itemList").getBoundingClientRect().top < 0) $("itemList").scrollIntoView({ block: "start" });
+});
 
 $("recBtn").addEventListener("click", () => { state.recOpen = !state.recOpen; renderRec(); });
 $("recClose").addEventListener("click", () => { state.recOpen = false; renderRec(); $("recBtn").focus(); });
@@ -664,7 +729,7 @@ for(const k of ["w", "d", "h"]) $("cab_" + k).value = state.cabinet[k];
 renderCabinets();
 renderTools(null);
 // catalog 는 이 파일 옆에 있어요 (페이지 주소와 상관없이 찾도록)
-fetch(new URL("catalog.json?v=20261101f", import.meta.url)).then(r => r.json()).then(data => {
+fetch(new URL("catalog.json?v=20261102b", import.meta.url)).then(r => r.json()).then(data => {
   items = data.items || [];
   byId = new Map(items.map(it => [it.id, it]));
   state.recOpen = false;

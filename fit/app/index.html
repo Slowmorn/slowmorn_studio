@@ -19,7 +19,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../assets/base.css?v=20261101i">
-<link rel="stylesheet" href="../assets/app.css?v=20261101i">
+<link rel="stylesheet" href="../assets/app.css?v=20261102c">
 <!-- 모듈 파일 버전: assets/*.js 를 고치면 아래 ?v= 를 함께 올려 주세요 (app.js 는 맨 아래 script 태그) -->
 <script type="importmap">
 { "imports": {
@@ -28,7 +28,7 @@
   "../assets/scene.js": "../assets/scene.js?v=20261101a",
   "../assets/pack.js": "../assets/pack.js?v=20261101a",
   "../assets/shapes.js": "../assets/shapes.js?v=20261101a",
-  "../assets/recommend.js": "../assets/recommend.js?v=20261101a"
+  "../assets/recommend.js": "../assets/recommend.js?v=20261101b"
 } }
 </script>
 </head>
@@ -167,8 +167,8 @@
       <div class="chips" id="brandChips" role="group" aria-label="브랜드">
         <button type="button" class="chip" data-brand-filter="all" aria-pressed="true">전체</button>
         <button type="button" class="chip" data-brand-filter="ikea" data-brand="ikea" aria-pressed="false"><span class="brand-dot" aria-hidden="true"></span>이케아</button>
-        <button type="button" class="chip" data-brand-filter="daiso" data-brand="daiso" aria-pressed="false"><span class="brand-dot" aria-hidden="true"></span>다이소</button>
         <button type="button" class="chip" data-brand-filter="muji" data-brand="muji" aria-pressed="false"><span class="brand-dot" aria-hidden="true"></span>무인양품</button>
+        <button type="button" class="chip" data-brand-filter="daiso" data-brand="daiso" aria-pressed="false"><span class="brand-dot" aria-hidden="true"></span>다이소</button>
       </div>
       <span class="spacer"></span>
       <input type="search" id="itemSearch" class="item-search" placeholder="이름으로 찾기" aria-label="수납함 이름으로 찾기">
@@ -179,16 +179,29 @@
         <option value="price">가격 낮은 순</option>
       </select>
     </div>
-    <!-- 종류: 뚜껑형 · 오픈형 · 트레이 · 패브릭 -->
-    <div class="chips type-chips" id="typeChips" role="group" aria-label="종류">
-      <button type="button" class="chip" data-type-filter="all" aria-pressed="true">모든 종류</button>
-      <button type="button" class="chip" data-type-filter="lidded" aria-pressed="false">뚜껑형</button>
-      <button type="button" class="chip" data-type-filter="open" aria-pressed="false">오픈형</button>
-      <button type="button" class="chip" data-type-filter="tray" aria-pressed="false">트레이</button>
-      <button type="button" class="chip" data-type-filter="fabric" aria-pressed="false">패브릭</button>
+    <div class="list-sub">
+      <!-- 종류: 뚜껑형 · 오픈형 · 트레이 · 패브릭 -->
+      <div class="chips type-chips" id="typeChips" role="group" aria-label="종류">
+        <button type="button" class="chip" data-type-filter="all" aria-pressed="true">모든 종류</button>
+        <button type="button" class="chip" data-type-filter="lidded" aria-pressed="false">뚜껑형</button>
+        <button type="button" class="chip" data-type-filter="open" aria-pressed="false">오픈형</button>
+        <button type="button" class="chip" data-type-filter="tray" aria-pressed="false">트레이</button>
+        <button type="button" class="chip" data-type-filter="fabric" aria-pressed="false">패브릭</button>
+      </div>
+      <!-- 사이즈로 찾기: 적은 치수와 2cm 안으로 비슷한 것만, 딱 맞는 것부터. 빈 칸은 따지지 않아요 -->
+      <div class="size-find" id="sizeFind" role="group" aria-label="사이즈로 찾기">
+        <span class="size-cap">사이즈로 찾기</span>
+        <input type="number" inputmode="decimal" min="0" step="0.5" data-size="w" placeholder="가로" aria-label="가로 (cm)">
+        <span class="dim-x" aria-hidden="true">×</span>
+        <input type="number" inputmode="decimal" min="0" step="0.5" data-size="d" placeholder="깊이" aria-label="깊이 (cm)">
+        <span class="dim-x" aria-hidden="true">×</span>
+        <input type="number" inputmode="decimal" min="0" step="0.5" data-size="h" placeholder="높이" aria-label="높이 (cm)">
+        <span class="size-unit">cm</span>
+        <button type="button" class="size-clear" id="sizeClear" aria-label="사이즈 지우기" title="사이즈 지우기" hidden><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4.5 4.5l7 7M11.5 4.5l-7 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+      </div>
     </div>
     <ul class="item-list" id="itemList"><li class="empty">불러오는 중…</li></ul>
-    <button type="button" class="more-btn" id="moreBtn" hidden>더 보기</button>
+    <nav class="pager" id="pager" aria-label="수납함 목록 쪽" hidden></nav>
     <p class="note">치수와 가격은 판매처 표기 기준이에요. 실제와 조금 다를 수 있어요.</p>
   </section>
 
@@ -209,6 +222,6 @@
   <div class="foot-inner"><span>© slowmorn</span></div>
 </footer>
 
-<script type="module" src="../assets/app.js?v=20261101m"></script>
+<script type="module" src="../assets/app.js?v=20261102d"></script>
 </body>
 </html>

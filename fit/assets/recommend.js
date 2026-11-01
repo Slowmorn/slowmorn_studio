@@ -48,6 +48,9 @@ function gridFill(item, R, stack){
   return best;
 }
 
+// 자잘한 상자를 수십 개 사는 구성은 실제로 잘 안 골라요. 12개를 넘으면 조금씩 깎는 값 (목록의 '잘 맞는 순'도 같이 써요)
+export function manyPenalty(n){ return 1 / (1 + .012 * Math.max(0, n - 12)); }
+
 // 빈 수납장에 이 상자만 줄 맞춰 넣으면 몇 개 들어가는지 (목록의 '빈 수납장에 n개'). 바로 계산돼요
 export function fitCount(item, cab){
   return gridFill(item, { x: 0, y: 0, z: 0, w: cab.w, d: cab.d, h: cab.h }, true).length;
@@ -78,7 +81,7 @@ function result(parts, boxes, cab, why, k, type){
   const price = parts.reduce((s, p) => s + (p.item.price || 0) * p.n, 0);
   const rows = new Set(boxes.filter(b => b.y === 0).map(b => b.z)).size;
   const reach = type === "drawer" ? 1 : 1 / (1 + .15 * Math.max(0, rows - 1));
-  const many = 1 / (1 + .012 * Math.max(0, boxes.length - 12));
+  const many = manyPenalty(boxes.length);
   return { family: parts[0].item.family || parts[0].item.name, parts, boxes, fill, price, why, score: fill * k * reach * many };
 }
 

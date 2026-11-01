@@ -252,23 +252,40 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
 .list-head .count{color:var(--muted);font-weight:500;font-size:13.5px;margin-left:2px}
 .list-head select{border:1px solid var(--line);background:var(--sheet);border-radius:var(--radius);padding:4px 8px;font-size:13px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.type-chips{margin:-2px 0 10px}
+/* 목록 둘째 줄: 왼쪽 종류 칩, 오른쪽 사이즈로 찾기 */
+.list-sub{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;margin:-2px 0 10px}
+.type-chips{margin:0}
+.size-find{margin-left:auto;display:flex;align-items:center;gap:4px}
+.size-cap{font-size:13px;color:var(--muted);margin-right:4px;white-space:nowrap}
+.size-find input{
+  width:4.2em;border:1px solid var(--line);background:var(--sheet);border-radius:var(--radius);
+  padding:4px 6px;font-size:13px;text-align:center;font-variant-numeric:tabular-nums;
+  -moz-appearance:textfield;appearance:textfield;
+}
+.size-find input::-webkit-inner-spin-button,.size-find input::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.size-find input:focus{outline:none;border-color:var(--ink)}
+.size-unit{font-size:12.5px;color:var(--muted)}
+.size-clear{border:0;background:none;padding:2px;color:var(--muted);display:grid;place-items:center}
+.size-clear svg{width:14px;height:14px}
+.size-clear:hover{color:var(--ink)}
+.size-clear[hidden]{display:none}
 .type-chips .chip{padding:3px 11px;font-size:13px}
 .item-search{
   width:170px;border:1px solid var(--line);background:var(--sheet);border-radius:var(--radius);
   padding:4px 10px;font-size:13px;
 }
 .item-search:focus{outline:none;border-color:var(--ink)}
-.more-btn{
-  display:block;margin:12px auto 0;border:1px solid var(--line);background:var(--sheet);
-  border-radius:99px;padding:6px 18px;font-size:13.5px;color:var(--ink);
+/* 수납함 목록 쪽 번호 */
+.pager{display:flex;justify-content:center;align-items:center;gap:4px;margin:14px 0 0}
+.pager[hidden]{display:none}
+.pager button{
+  min-width:30px;height:30px;padding:0 8px;border:1px solid transparent;border-radius:var(--radius);
+  background:none;font-size:13.5px;color:var(--ink);font-variant-numeric:tabular-nums;
 }
-.more-btn:hover{background:var(--hover)}
-.more-btn[hidden]{display:none}
-.sold{
-  display:inline-block;margin-right:5px;padding:0 5px;border-radius:4px;font-size:11px;font-weight:600;
-  background:var(--hover-strong);color:var(--muted);vertical-align:1px;
-}
+.pager button:hover:not(:disabled){background:var(--hover)}
+.pager button[aria-current="page"]{background:var(--ink);color:var(--sheet);font-weight:600}
+.pager button:disabled{opacity:.3;cursor:default}
+.pager-gap{color:var(--muted);padding:0 2px}
 .chip{
   display:inline-flex;align-items:center;gap:6px;
   border:1px solid var(--line);border-radius:99px;background:var(--sheet);
@@ -283,15 +300,19 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
   display:grid;grid-template-columns:repeat(auto-fill, minmax(340px, 1fr));column-gap:20px;
 }
 .item-list .empty{grid-column:1 / -1;padding:24px 4px;color:var(--muted);font-size:13.5px;word-break:keep-all}
-.item{
-  width:100%;display:flex;align-items:center;gap:10px;text-align:left;
-  border:0;border-bottom:1px solid var(--line);background:none;padding:10px 6px;border-radius:0;
-}
-.item:hover{background:var(--hover)}
+/* 한 줄 = [담기 단추 | 판매처 링크]. 바탕색은 줄 전체에 깔아요 */
+.item-row{display:flex;align-items:center;border-bottom:1px solid var(--line)}
+.item-row:hover{background:var(--hover)}
 /* 담은 수납함은 목록에서 빠지지 않고 바탕색으로만 표시해요 */
-.item.picked{background:var(--accent-soft)}
-.item.picked:hover{background:color-mix(in srgb, var(--accent-soft) 80%, var(--accent-fill))}
+.item-row.picked{background:var(--accent-soft)}
+.item-row.picked:hover{background:color-mix(in srgb, var(--accent-soft) 80%, var(--accent-fill))}
+.item{
+  flex:1;min-width:0;display:flex;align-items:center;gap:10px;text-align:left;
+  border:0;background:none;padding:10px 6px;border-radius:0;
+}
 .item[aria-disabled="true"]{opacity:.5}
+.item-shop{flex:none;align-self:stretch;display:flex;align-items:center;padding:0 8px 0 4px;font-size:12.5px;color:var(--muted);white-space:nowrap}
+.item-shop:hover{color:var(--ink)}
 /* 상품 사진 네모 (사진이 없으면 상품 색) */
 .item-thumb{
   width:46px;height:46px;border-radius:8px;flex:none;overflow:hidden;position:relative;
@@ -312,7 +333,7 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
   background:var(--ink);color:var(--sheet);opacity:0;transition:opacity .12s;
 }
 .item-add:empty{display:none}
-.item:hover .item-add,.item:focus-visible .item-add{opacity:1}
+.item-row:hover .item-add,.item:focus-visible .item-add{opacity:1}
 @media (hover:none){.item-add{opacity:1}}
 .note{margin:10px 0 0;font-size:12px;color:var(--muted);word-break:keep-all}
 
@@ -351,7 +372,11 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
   .t-sub{display:none}
   .stage{height:46vh;min-height:300px}
   .item-list{grid-template-columns:minmax(0,1fr)}
+  .item-size{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .item-shop{padding:0 4px 0 2px}
   .item-search{flex:1 1 100%;width:auto;order:5}
+  .size-find{margin-left:0;flex:1 1 100%}
+  .size-find input{flex:1 1 0;width:0;min-width:0;font-size:16px;padding:3px 4px}   /* 16px: 폰에서 눌러도 화면이 커지지 않게 */
   /* 추천 카드는 옆으로 넘겨 봐요 */
   .rec{padding:10px 12px 12px}
   .rec-list{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -12px;padding:0 12px;scrollbar-width:none}
