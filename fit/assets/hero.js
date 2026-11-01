@@ -24,7 +24,7 @@ const START = .4, STEP = .7, SLIDE = 1.1, HOLD = 3;
 const FROM_Z = 16, FROM_Y = 3;
 
 async function start(){
-  const data = await (await fetch(new URL("catalog.json?v=20261101f", import.meta.url))).json();
+  const data = await (await fetch(new URL("catalog.json?v=20261102b", import.meta.url))).json();
   const byId = new Map(data.items.map(it => [it.id, it]));
   if(SET.some(p => !byId.has(p.id))) return;
 
