@@ -4,7 +4,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { CSS2DRenderer, CSS2DObject } from "three/addons/renderers/CSS2DRenderer.js";
-import { snap, sizeOf, restY, fits, inside, magnet } from "./pack.js";
+import { snap, sizeOf, restY, fits, inside, magnet, fmt } from "./pack.js";
 import { buildShape } from "./shapes.js";
 
 const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
@@ -45,6 +45,8 @@ export function createScene(host, { onSelect, onMove, onRemove }){
   scene.add(cabinetGroup);
   const boxGroup = new THREE.Group();
   scene.add(boxGroup);
+  const gapGroup = new THREE.Group();   // 남는 공간 길이 (초록 선과 글자)
+  scene.add(gapGroup);
 
   let cab = { w: 60, d: 40, h: 30 };
   const meshes = new Map();   // uid → mesh
@@ -119,6 +121,58 @@ export function createScene(host, { onSelect, onMove, onRemove }){
     const o = new CSS2DObject(el);
     o.position.set(x, y, z);
     return o;
+  }
+
+  /* 남는 공간: 넣은 상자들이 차지한 범위에서 벽·천장까지 남은 길이를 선과 글자로 보여 줘요.
+     가로(왼쪽·오른쪽)는 앞 바닥 끝, 깊이(앞·뒤)는 왼쪽 벽 바닥, 높이는 가장 높은 상자 위에 그려요.
+     0.5cm 보다 짧은 틈은 꼭 맞은 걸로 보고 그리지 않아요 */
+  const GAP_MIN = .5;
+  function drawGaps(){
+    gapGroup.traverse(o => { o.geometry?.dispose(); o.material?.dispose?.(); });
+    gapGroup.clear();
+    const boxes = [...meshes.values()].filter(m => !m.userData.out && m.userData.box).map(m => m.userData.box);
+    if(!boxes.length) return;
+    const { w, d, h } = cab;
+    const minX = Math.min(...boxes.map(b => b.x)), maxX = Math.max(...boxes.map(b => b.x + b.w));
+    const minZ = Math.min(...boxes.map(b => b.z)), maxZ = Math.max(...boxes.map(b => b.z + b.d));
+    const tall = boxes.reduce((a, b) => (b.y + b.h > a.y + a.h ? b : a));
+    const top = tall.y + tall.h;
+    // pack 좌표(왼쪽-앞-바닥 원점) → Three 좌표
+    const P = (x, y, z) => new THREE.Vector3(x - w / 2, y, d / 2 - z);
+    const pts = [], tick = Math.max(.8, Math.min(w, d, h) * .025);
+    const seg = (a, b) => pts.push(a.x, a.y, a.z, b.x, b.y, b.z);
+    // 선 하나 = 본선 + 양 끝 짧은 눈금. along 은 선 방향, side 는 눈금 방향
+    function measure(a, b, side, text){
+      seg(a, b);
+      for(const p of [a, b]) seg(p.clone().addScaledVector(side, -tick), p.clone().addScaledVector(side, tick));
+      const mid = a.clone().add(b).multiplyScalar(.5);
+      gapGroup.add(label(text, mid.x, mid.y, mid.z, "gap"));
+    }
+    const lift = .15, X = new THREE.Vector3(1, 0, 0), Z = new THREE.Vector3(0, 0, 1);
+    // 빈 바닥은 옅은 초록으로 칠해 어디가 남는지 보이게 해요
+    const tint = new THREE.MeshBasicMaterial({ color: css("--accent-fill"), transparent: true, opacity: .14, depthWrite: false, side: THREE.DoubleSide });
+    function area(x0, x1, z0, z1){
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(x1 - x0, z1 - z0), tint);
+      m.rotation.x = -Math.PI / 2;
+      m.position.copy(P((x0 + x1) / 2, .08, (z0 + z1) / 2));
+      gapGroup.add(m);
+    }
+    const left = minX >= GAP_MIN, right = w - maxX >= GAP_MIN;
+    if(left){ area(0, minX, 0, d); measure(P(0, lift, .6), P(minX, lift, .6), Z, `왼쪽 ${fmt(minX)}cm`); }
+    if(right){ area(maxX, w, 0, d); measure(P(maxX, lift, .6), P(w, lift, .6), Z, `오른쪽 ${fmt(w - maxX)}cm`); }
+    // 깊이 선은 비어 있는 옆 칸 위로 지나가게 (가려지지 않게). 옆이 꽉 찼으면 왼쪽 벽을 따라
+    const zx = right && (!left || w - maxX >= minX) ? (maxX + w) / 2 : left ? minX / 2 : .6;
+    if(minZ >= GAP_MIN){ area(minX, maxX, 0, minZ); measure(P(zx, lift, 0), P(zx, lift, minZ), X, `앞 ${fmt(minZ)}cm`); }
+    if(d - maxZ >= GAP_MIN){ area(minX, maxX, maxZ, d); measure(P(zx, lift, maxZ), P(zx, lift, d), X, `뒤 ${fmt(d - maxZ)}cm`); }
+    if(h - top >= GAP_MIN){
+      const cx = tall.x + tall.w / 2, cz = tall.z + Math.min(1, tall.d / 2);
+      measure(P(cx, top, cz), P(cx, h, cz), X, `위 ${fmt(h - top)}cm`);
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(pts, 3));
+    const line = new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: css("--accent"), transparent: true, opacity: .9, depthTest: false }));
+    line.renderOrder = 2;
+    gapGroup.add(line);
   }
 
   // 처음 시점: 앞에서 살짝 위·오른쪽. 폰처럼 좁은 화면이면 가로가 다 보이도록 더 물러나요
@@ -199,6 +253,7 @@ export function createScene(host, { onSelect, onMove, onRemove }){
     for(const [uid, mesh] of meshes) if(!seen.has(uid)) leave(uid, mesh);
     if(selected && !meshes.has(selected)) select(null);
     paint();
+    drawGaps();
   }
 
   // 빠질 때는 앞으로 미끄러져 나가며 흐려져요
@@ -287,6 +342,7 @@ export function createScene(host, { onSelect, onMove, onRemove }){
     toWorld(box, mesh.userData.target);
     mesh.userData.target.y += 1.2;   // 들고 있는 동안 살짝 떠 있어요
     paint();
+    drawGaps();   // 끄는 동안에도 남는 길이가 따라 바뀌어요
   });
 
   function endDrag(){
@@ -359,6 +415,7 @@ export function createScene(host, { onSelect, onMove, onRemove }){
     const changed = next.w !== cab.w || next.d !== cab.d || next.h !== cab.h;
     cab = { ...next };
     buildCabinet();
+    drawGaps();
     if(changed) resetView();
   }
 
