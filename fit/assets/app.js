@@ -7,6 +7,9 @@ import { recommend, fitCount, manyPenalty } from "./recommend.js";
 const KEY = "fit:v1";
 const OLD_KEY = "ruler:v1";   // 이름이 '룰러'이던 때의 저장 자리. 새 자리가 비어 있으면 거기서 읽어요
 const BRANDS = { ikea: "이케아", daiso: "다이소", muji: "무인양품" };
+// 판매처 로고 (assets/brands, 공식 사이트 아이콘). 목록 줄 · 후보 · 추천 카드에서 같이 써요
+const BRAND_LOGO = { ikea: "ikea.svg", muji: "muji.png", daiso: "daiso.png" };
+const brandLogo = b => BRAND_LOGO[b] ? `<img class="brand-logo" src="${new URL("brands/" + BRAND_LOGO[b], import.meta.url)}" alt="" width="16" height="16">` : `<span class="brand-dot" aria-hidden="true"></span>`;
 const $ = id => document.getElementById(id);
 const esc = v => String(v == null ? "" : v).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const won = n => (n || 0).toLocaleString("ko-KR") + "원";
@@ -288,7 +291,7 @@ function renderList(){
     return `<li class="item-row${picked ? " picked" : ""}"><button type="button" class="item" data-id="${esc(it.id)}" data-brand="${esc(it.brand)}" ${ok ? "" : 'aria-disabled="true"'} ${picked ? 'aria-pressed="true"' : ""}>
       ${thumb(it)}
       <span class="item-main">
-        <span class="item-brand"><span class="brand-dot" aria-hidden="true"></span>${BRANDS[it.brand] || esc(it.brand)}</span>
+        <span class="item-brand">${brandLogo(it.brand)}${BRANDS[it.brand] || esc(it.brand)}</span>
         <span class="item-name">${esc(it.name)}</span>
         <span class="item-size">${fmt(it.w)} × ${fmt(it.d)} × ${fmt(it.h)}cm</span>
       </span>
@@ -340,7 +343,7 @@ function renderCandidates(){
     return `<li class="cand${n ? "" : " zero"}" data-id="${esc(item.id)}" data-brand="${esc(item.brand)}">
       ${thumb(item)}
       <span class="item-main">
-        <span class="item-brand"><span class="brand-dot" aria-hidden="true"></span>${BRANDS[item.brand] || esc(item.brand)}</span>
+        <span class="item-brand">${brandLogo(item.brand)}${BRANDS[item.brand] || esc(item.brand)}</span>
         <span class="item-name">${esc(item.name)}</span>
         <span class="item-size">${fmt(item.w)} × ${fmt(item.d)} × ${fmt(item.h)}cm${item.price ? ` · 개당 ${won(item.price)}` : ""}</span>
       </span>
@@ -404,7 +407,7 @@ function renderRec(){
     return `<li><button type="button" class="rec-card${on ? " on" : ""}" data-i="${i}" ${on ? 'aria-pressed="true"' : ""}>
       <span class="rec-thumbs">${r.parts.map(p => thumb(p.item)).join("")}</span>
       <span class="rec-body">
-        <span class="rec-name" data-brand="${esc(r.parts[0].item.brand)}"><span class="brand-dot" aria-hidden="true"></span>${esc(r.parts.length > 1 ? r.family : r.parts[0].item.name)}</span>
+        <span class="rec-name" data-brand="${esc(r.parts[0].item.brand)}">${brandLogo(r.parts[0].item.brand)}${esc(r.parts.length > 1 ? r.family : r.parts[0].item.name)}</span>
         ${r.parts.map(p => `<span class="rec-part">${fmt(p.item.w)}×${fmt(p.item.d)}×${fmt(p.item.h)}cm <b>× ${p.n}</b></span>`).join("")}
         <span class="rec-why">${esc(r.why)}</span>
       </span>
