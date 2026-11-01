@@ -252,6 +252,23 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
 .list-head .count{color:var(--muted);font-weight:500;font-size:13.5px;margin-left:2px}
 .list-head select{border:1px solid var(--line);background:var(--sheet);border-radius:var(--radius);padding:4px 8px;font-size:13px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
+.type-chips{margin:-2px 0 10px}
+.type-chips .chip{padding:3px 11px;font-size:13px}
+.item-search{
+  width:170px;border:1px solid var(--line);background:var(--sheet);border-radius:var(--radius);
+  padding:4px 10px;font-size:13px;
+}
+.item-search:focus{outline:none;border-color:var(--ink)}
+.more-btn{
+  display:block;margin:12px auto 0;border:1px solid var(--line);background:var(--sheet);
+  border-radius:99px;padding:6px 18px;font-size:13.5px;color:var(--ink);
+}
+.more-btn:hover{background:var(--hover)}
+.more-btn[hidden]{display:none}
+.sold{
+  display:inline-block;margin-right:5px;padding:0 5px;border-radius:4px;font-size:11px;font-weight:600;
+  background:var(--hover-strong);color:var(--muted);vertical-align:1px;
+}
 .chip{
   display:inline-flex;align-items:center;gap:6px;
   border:1px solid var(--line);border-radius:99px;background:var(--sheet);
@@ -334,6 +351,7 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
   .t-sub{display:none}
   .stage{height:46vh;min-height:300px}
   .item-list{grid-template-columns:minmax(0,1fr)}
+  .item-search{flex:1 1 100%;width:auto;order:5}
   /* 추천 카드는 옆으로 넘겨 봐요 */
   .rec{padding:10px 12px 12px}
   .rec-list{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -12px;padding:0 12px;scrollbar-width:none}

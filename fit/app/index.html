@@ -18,12 +18,17 @@
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
-<link rel="stylesheet" href="../assets/base.css?v=20261101f">
-<link rel="stylesheet" href="../assets/app.css?v=20261101f">
+<link rel="stylesheet" href="../assets/base.css?v=20261101i">
+<link rel="stylesheet" href="../assets/app.css?v=20261101i">
+<!-- 모듈 파일 버전: assets/*.js 를 고치면 아래 ?v= 를 함께 올려 주세요 (app.js 는 맨 아래 script 태그) -->
 <script type="importmap">
 { "imports": {
   "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
-  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/",
+  "../assets/scene.js": "../assets/scene.js?v=20261101a",
+  "../assets/pack.js": "../assets/pack.js?v=20261101a",
+  "../assets/shapes.js": "../assets/shapes.js?v=20261101a",
+  "../assets/recommend.js": "../assets/recommend.js?v=20261101a"
 } }
 </script>
 </head>
@@ -166,6 +171,7 @@
         <button type="button" class="chip" data-brand-filter="muji" data-brand="muji" aria-pressed="false"><span class="brand-dot" aria-hidden="true"></span>무인양품</button>
       </div>
       <span class="spacer"></span>
+      <input type="search" id="itemSearch" class="item-search" placeholder="이름으로 찾기" aria-label="수납함 이름으로 찾기">
       <label class="toggle"><input type="checkbox" id="fitOnly" checked><span>이 수납장에 들어가는 것만</span></label>
       <select id="sortBy" aria-label="정렬">
         <option value="fit">잘 맞는 순</option>
@@ -173,7 +179,16 @@
         <option value="price">가격 낮은 순</option>
       </select>
     </div>
+    <!-- 종류: 뚜껑형 · 오픈형 · 트레이 · 패브릭 -->
+    <div class="chips type-chips" id="typeChips" role="group" aria-label="종류">
+      <button type="button" class="chip" data-type-filter="all" aria-pressed="true">모든 종류</button>
+      <button type="button" class="chip" data-type-filter="lidded" aria-pressed="false">뚜껑형</button>
+      <button type="button" class="chip" data-type-filter="open" aria-pressed="false">오픈형</button>
+      <button type="button" class="chip" data-type-filter="tray" aria-pressed="false">트레이</button>
+      <button type="button" class="chip" data-type-filter="fabric" aria-pressed="false">패브릭</button>
+    </div>
     <ul class="item-list" id="itemList"><li class="empty">불러오는 중…</li></ul>
+    <button type="button" class="more-btn" id="moreBtn" hidden>더 보기</button>
     <p class="note">치수와 가격은 판매처 표기 기준이에요. 실제와 조금 다를 수 있어요.</p>
   </section>
 
@@ -194,6 +209,6 @@
   <div class="foot-inner"><span>© slowmorn</span></div>
 </footer>
 
-<script type="module" src="../assets/app.js?v=20261101f"></script>
+<script type="module" src="../assets/app.js?v=20261101m"></script>
 </body>
 </html>

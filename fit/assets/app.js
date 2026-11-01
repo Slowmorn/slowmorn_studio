@@ -1,8 +1,8 @@
 /* 모두핏 화면 — 수납장 치수, 추천, 수납함 목록, 후보 수납함, 저장을 묶어요.
    배치(무엇을 어디에)는 여기 state 가 정답이고, 3D 는 scene.js 가 그대로 그립니다. */
 import { createScene } from "./scene.js";
-import { sizeOf, findSpot, fits, restY, settle, whyNot, fitsEmpty, maxCount, fmt } from "./pack.js";
-import { recommend } from "./recommend.js";
+import { sizeOf, findSpot, fits, restY, settle, whyNot, fitsEmpty, fmt } from "./pack.js";
+import { recommend, fitCount } from "./recommend.js";
 
 const KEY = "fit:v1";
 const OLD_KEY = "ruler:v1";   // 이름이 '룰러'이던 때의 저장 자리. 새 자리가 비어 있으면 거기서 읽어요
@@ -99,6 +99,8 @@ const state = {
   naming: null,               // 수납장 이름을 적는 중: { id } (고치기) 또는 { id: null } (새로 추가)
   empty: !savedCabinets.length,   // 수납장이 하나도 없는 상태 ('수납장을 추가해 주세요'만 보여요)
   brand: "all", fitOnly: true, sort: "fit",
+  kind: "all", q: "",         // 수납함 목록: 종류 · 이름 찾기
+  listLimit: 60,              // 목록은 60개씩 보여 줘요 ('더 보기'로 늘려요)
   recOpen: false,             // 추천 칸을 펼쳤는지. 처음에 수납장이 비어 있으면 펼쳐요
   recMode: (saved && saved.recMode) || "one",   // one 한 종류 · two 같은 제품군 두 크기
   recApplied: null,           // 지금 수납장에 들어가 있는 추천 (그 카드에 '넣음' 표시)
@@ -227,11 +229,26 @@ function renderSummary(){
 }
 
 // ---- 수납함 목록 ----
+// '빈 수납장에 들어가는지 · 몇 개 들어가는지'는 상품과 수납장 치수만 보면 돼요. 한 번 잰 값은 기억해 둬요
+const emptyFitCache = new Map();
+function emptyFit(it, cab){
+  const key = `${it.id}|${cab.w}x${cab.d}x${cab.h}`;
+  let v = emptyFitCache.get(key);
+  if(!v){
+    const ok = fitsEmpty(it, cab);
+    v = { ok, n: ok ? Math.max(1, fitCount(it, cab)) : 0 };   // 한 칸씩 찾는 것보다 훨씬 빨라요 (상품이 많아서)
+    emptyFitCache.set(key, v);
+  }
+  return v;
+}
 function renderList(){
   const cab = state.cabinet;
+  const q = state.q.trim().toLowerCase();
   const rows = items
     .filter(it => state.brand === "all" || it.brand === state.brand)
-    .map(it => ({ it, ok: fitsEmpty(it, cab), now: !!findSpot(it, state.placed.map(boxOf), cab) }))
+    .filter(it => state.kind === "all" || it.type === state.kind)
+    .filter(it => !q || it.name.toLowerCase().includes(q) || (it.family || "").toLowerCase().includes(q))
+    .map(it => ({ it, ok: emptyFit(it, cab).ok }))
     .filter(r => !state.fitOnly || r.ok);
   const by = {
     // 지금 남은 자리로 정렬하면 담을 때마다 줄이 움직여요. 빈 수납장 기준으로만 정렬해 자리를 지켜요
@@ -241,12 +258,19 @@ function renderList(){
   }[state.sort];
   rows.sort(by);
   $("listCount").textContent = rows.length + "개";
+  // 상품이 많아서 한 번에 다 그리지 않아요. '지금 들어가는지'는 보이는 줄만 재요
+  const shown = rows.slice(0, state.listLimit);
+  const boxes = state.placed.map(boxOf);
+  for(const r of shown) r.now = r.ok && !!findSpot(r.it, boxes, cab);
+  $("moreBtn").hidden = rows.length <= shown.length;
+  $("moreBtn").textContent = `더 보기 (${rows.length - shown.length}개 더)`;
   const counts = new Map();
   for(const e of state.placed) counts.set(e.id, (counts.get(e.id) || 0) + 1);
-  $("itemList").innerHTML = rows.length ? rows.map(({ it, ok, now }) => {
-    const n = ok ? maxCount(it, cab) : 0;
+  $("itemList").innerHTML = shown.length ? shown.map(({ it, ok, now }) => {
+    const n = ok ? emptyFit(it, cab).n : 0;
     const picked = state.candidates.includes(it.id);
     const note = !ok ? whyNot(it, cab) : picked ? `담음 · ${counts.get(it.id) || 0}개 넣음` : now ? `빈 수납장에 ${n}개` : "지금은 자리가 없어요";
+    const sold = it.soldout ? `<span class="sold">품절</span>` : "";
     return `<li><button type="button" class="item${picked ? " picked" : ""}" data-id="${esc(it.id)}" data-brand="${esc(it.brand)}" ${ok ? "" : 'aria-disabled="true"'} ${picked ? 'aria-pressed="true"' : ""}>
       ${thumb(it)}
       <span class="item-main">
@@ -255,12 +279,12 @@ function renderList(){
         <span class="item-size">${fmt(it.w)} × ${fmt(it.d)} × ${fmt(it.h)}cm</span>
       </span>
       <span class="item-side">
-        <span class="item-price">${it.price ? won(it.price) : ""}</span>
+        <span class="item-price">${sold}${it.price ? won(it.price) : ""}</span>
         <span class="item-note ${(ok && now) || picked ? "" : "muted"}">${note}</span>
       </span>
       <span class="item-add" aria-hidden="true">${!ok ? "" : state.candidates.includes(it.id) ? (now ? "+1" : "") : "담기"}</span>
     </button></li>`;
-  }).join("") : `<li class="empty">${state.fitOnly ? "이 크기에 들어가는 수납함이 없어요. '모두 보기'로 바꿔 보세요." : "수납함이 없어요."}</li>`;
+  }).join("") : `<li class="empty">${q ? `'${esc(state.q)}'에 맞는 수납함이 없어요.` : state.fitOnly ? "이 크기에 들어가는 수납함이 없어요. '들어가는 것만'을 꺼 보세요." : "수납함이 없어요."}</li>`;
 }
 
 // ---- 후보 수납함 ----
@@ -304,7 +328,7 @@ const recKey = () => { const c = state.cabinet; return `${c.w}x${c.d}x${c.h}|${c
 
 function recs(){
   const key = recKey();
-  if(recCache.key !== key) recCache = { key, list: recommend(items, state.cabinet, { type: state.cabinet.type, mode: state.recMode }) };
+  if(recCache.key !== key) recCache = { key, list: recommend(items.filter(it => !it.soldout), state.cabinet, { type: state.cabinet.type, mode: state.recMode }) };
   return recCache.list;
 }
 
@@ -322,7 +346,7 @@ function renderRec(){
     return `<li><button type="button" class="rec-card${on ? " on" : ""}" data-i="${i}" ${on ? 'aria-pressed="true"' : ""}>
       <span class="rec-thumbs">${r.parts.map(p => thumb(p.item)).join("")}</span>
       <span class="rec-body">
-        <span class="rec-name" data-brand="${esc(r.parts[0].item.brand)}"><span class="brand-dot" aria-hidden="true"></span>${esc(r.family)}</span>
+        <span class="rec-name" data-brand="${esc(r.parts[0].item.brand)}"><span class="brand-dot" aria-hidden="true"></span>${esc(r.parts.length > 1 ? r.family : r.parts[0].item.name)}</span>
         ${r.parts.map(p => `<span class="rec-part">${fmt(p.item.w)}×${fmt(p.item.d)}×${fmt(p.item.h)}cm <b>× ${p.n}</b></span>`).join("")}
         <span class="rec-why">${esc(r.why)}</span>
       </span>
@@ -557,10 +581,22 @@ $("brandChips").addEventListener("click", ev => {
   if(!b) return;
   state.brand = b.dataset.brandFilter;
   $("brandChips").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  state.listLimit = 60;
   renderList();
 });
-$("fitOnly").addEventListener("change", ev => { state.fitOnly = ev.target.checked; renderList(); });
-$("sortBy").addEventListener("change", ev => { state.sort = ev.target.value; renderList(); });
+// 거르는 조건이 바뀌면 목록을 처음 60개부터 다시 보여 줘요
+const relist = () => { state.listLimit = 60; renderList(); };
+$("fitOnly").addEventListener("change", ev => { state.fitOnly = ev.target.checked; relist(); });
+$("sortBy").addEventListener("change", ev => { state.sort = ev.target.value; relist(); });
+$("itemSearch").addEventListener("input", ev => { state.q = ev.target.value; relist(); });
+$("typeChips").addEventListener("click", ev => {
+  const b = ev.target.closest("[data-type-filter]");
+  if(!b) return;
+  state.kind = b.dataset.typeFilter;
+  $("typeChips").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  relist();
+});
+$("moreBtn").addEventListener("click", () => { state.listLimit += 60; renderList(); });
 
 $("recBtn").addEventListener("click", () => { state.recOpen = !state.recOpen; renderRec(); });
 $("recClose").addEventListener("click", () => { state.recOpen = false; renderRec(); $("recBtn").focus(); });
@@ -628,7 +664,7 @@ for(const k of ["w", "d", "h"]) $("cab_" + k).value = state.cabinet[k];
 renderCabinets();
 renderTools(null);
 // catalog 는 이 파일 옆에 있어요 (페이지 주소와 상관없이 찾도록)
-fetch(new URL("catalog.json?v=20261031d", import.meta.url)).then(r => r.json()).then(data => {
+fetch(new URL("catalog.json?v=20261101f", import.meta.url)).then(r => r.json()).then(data => {
   items = data.items || [];
   byId = new Map(items.map(it => [it.id, it]));
   state.recOpen = false;

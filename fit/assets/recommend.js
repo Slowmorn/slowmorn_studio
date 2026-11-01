@@ -48,6 +48,11 @@ function gridFill(item, R, stack){
   return best;
 }
 
+// 빈 수납장에 이 상자만 줄 맞춰 넣으면 몇 개 들어가는지 (목록의 '빈 수납장에 n개'). 바로 계산돼요
+export function fitCount(item, cab){
+  return gridFill(item, { x: 0, y: 0, z: 0, w: cab.w, d: cab.d, h: cab.h }, true).length;
+}
+
 // 수납장 종류에 얼마나 어울리는지 (점수에 곱하는 값)와 한 줄 이유. 안 어울리면 null
 function suits(item, type){
   const s = item.shape || {};
