@@ -265,8 +265,8 @@ function renderList(){
   const by = {
     // 지금 남은 자리로 정렬하면 담을 때마다 줄이 움직여요. 빈 수납장 기준으로만 정렬해 자리를 지켜요
     fit: (a, b) => (fill(b) - fill(a)) || (vol(b.it) - vol(a.it)),
-    price: (a, b) => (a.it.price || 0) - (b.it.price || 0),
     small: (a, b) => vol(a.it) - vol(b.it),
+    big: (a, b) => vol(b.it) - vol(a.it),
   }[state.sort];
   // 사이즈로 찾을 때는 적은 치수와 딱 맞는 것부터, 같으면 고른 정렬대로
   rows.sort(sizing ? (a, b) => (a.gap - b.gap) || by(a, b) : by);
