@@ -277,6 +277,7 @@ function renderList(){
   const shown = rows.slice(state.page * PAGE, (state.page + 1) * PAGE);
   const boxes = state.placed.map(boxOf);
   for(const r of shown) r.now = r.ok && !!findSpot(r.it, boxes, cab);
+  holdListHeight();
   renderPager(pages);
   const counts = new Map();
   for(const e of state.placed) counts.set(e.id, (counts.get(e.id) || 0) + 1);
@@ -298,6 +299,16 @@ function renderList(){
       <span class="item-add" aria-hidden="true">${!ok ? "" : state.candidates.includes(it.id) ? (now ? "+1" : "") : "담기"}</span>
     </button>${it.url ? `<a class="item-shop" href="${esc(it.url)}" target="_blank" rel="noopener">판매처</a>` : ""}</li>`;
   }).join("") : `<li class="empty">${sizing ? `적은 사이즈와 ${SIZE_TOL}cm 안으로 비슷한 수납함이 없어요.${state.fitOnly ? " '들어가는 것만'을 꺼 보세요." : ""}` : q ? `'${esc(state.q)}'에 맞는 수납함이 없어요.` : state.fitOnly ? "이 크기에 들어가는 수납함이 없어요. '들어가는 것만'을 꺼 보세요." : "수납함이 없어요."}</li>`;
+}
+
+/* 거르는 조건을 바꿔 목록이 확 짧아지면 페이지가 줄어 화면이 위로 튀어요.
+   지금 보고 있는 자리까지는 목록 칸 높이를 잡아 둬서 화면이 그대로 있게 해요 (남는 건 목록 아래 빈칸) */
+function holdListHeight(){
+  const sec = document.querySelector(".catalog");
+  const top = sec.getBoundingClientRect().top + scrollY;
+  const below = document.documentElement.scrollHeight - (sec.getBoundingClientRect().bottom + scrollY);
+  const need = scrollY + innerHeight - top - below;
+  sec.style.minHeight = need > 0 ? need + "px" : "";
 }
 
 // 쪽 번호: ‹ 1 … 4 5 6 … 54 ›  (처음·끝과 지금 쪽 양옆만 보여요)
