@@ -3,3 +3,4 @@ Allow: /
 
 Sitemap: https://slowmorn.com/sitemap.xml
 Sitemap: https://slowmorn.com/budget/sitemap.xml
+Sitemap: https://slowmorn.com/fit/sitemap.xml
