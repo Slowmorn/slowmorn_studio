@@ -119,4 +119,5 @@ footer{border-top:1px solid var(--line);background:var(--sheet);margin-top:56px}
 }
 footer a{text-decoration:none}
 footer a:hover{text-decoration:underline}
+.foot-copy{margin-left:auto;font-size:12px}   /* 버짓리스트처럼 링크는 왼쪽, 저작권은 오른쪽 */
 .foot-note{max-width:var(--shell);margin:0 auto;padding:22px 20px 14px;color:var(--muted);font-size:12px;line-height:1.6;word-break:keep-all}
