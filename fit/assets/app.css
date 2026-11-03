@@ -253,9 +253,6 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
 /* 수납함 목록 (3D 아래) — [제목 ……… 정렬] / 찾기 칸 [이름 · 사이즈] / 거르기 줄 [브랜드 | 종류 ……… 들어가는 것만] */
 .list-head{display:flex;align-items:center;gap:8px 14px;margin-bottom:10px}
 .list-head h2{margin:0;font-size:15px;font-weight:700}
-/* 칸 제목은 서비스 이름과 같은 G마켓 산스 Medium (글꼴은 base.css). 옆의 개수는 본문 글꼴 그대로 */
-.plan-title,.rec-head h2,.list-head h2,.bag-head h2{font-family:"GmarketSansMedium", var(--sans);font-weight:normal;letter-spacing:-0.01em}
-.list-head h2 .count,.bag-head h2 .count{font-family:var(--sans)}
 .list-head .count{color:var(--muted);font-weight:500;font-size:13.5px;margin-left:2px}
 .list-head select{border:1px solid var(--line);background:var(--sheet);border-radius:var(--radius);padding:4px 8px;font-size:13px}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
