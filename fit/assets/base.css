@@ -12,9 +12,9 @@
   --hover:rgba(55,53,47,.06);      /* 테두리 대신 쓰는 배경 */
   --hover-strong:rgba(55,53,47,.11);
   --link:#37352F;
-  --accent:#00804A;
-  --accent-soft:#D9F9EB;
-  --accent-fill:#00DF82;
+  --accent:#A86A00;       /* 글자·선에 쓰는 진한 노랑 (메인 색은 흰 바탕 글자로는 안 읽혀서 같은 색을 진하게) */
+  --accent-soft:#FEF4DE;  /* 고른 줄·카드 바탕 */
+  --accent-fill:#FACB66;  /* 메인 색: 채우는 곳 (막대, 빈 바닥 칠, 이름표, 테두리) */
   --on-accent:#FFFFFF;
   --warn:#B4423A;
   --bar:#37352F;
@@ -30,14 +30,14 @@
   :root:not([data-theme="light"]){
     --page:#141413; --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --ink-strong:#FFFFFF; --muted:#989690; --line:#2E2E2C;
     --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
-    --accent:#4FEBA8; --accent-soft:#103A28; --accent-fill:#4FEBA8; --on-accent:#191918; --warn:#EE8B82;
+    --accent:#FACB66; --accent-soft:#3A2E12; --accent-fill:#FACB66; --on-accent:#191918; --warn:#EE8B82;
     --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
   }
 }
 :root[data-theme="dark"]{
   --page:#141413; --paper:#191918; --sheet:#202020; --ink:#E3E2DE; --ink-strong:#FFFFFF; --muted:#989690; --line:#2E2E2C;
   --hover:rgba(255,255,255,.055); --hover-strong:rgba(255,255,255,.1); --link:#E3E2DE;
-  --accent:#4FEBA8; --accent-soft:#103A28; --accent-fill:#4FEBA8; --on-accent:#191918; --warn:#EE8B82;
+  --accent:#FACB66; --accent-soft:#3A2E12; --accent-fill:#FACB66; --on-accent:#191918; --warn:#EE8B82;
   --bar:#E3E2DE; --bar-ink:#191918; --bar-muted:#575652;
 }
 /* --swatch: brighter display color for the picker and tab dots only. */

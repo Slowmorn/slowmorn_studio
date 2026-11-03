@@ -163,7 +163,7 @@ body.no-cabinet :is(.cab-row, .rec-btn, .rec, .stage-wrap, .catalog, .side){disp
 .scene-label{font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .scene-label.dim{background:rgba(255,255,255,.85);padding:1px 6px;border-radius:99px}
 /* 남는 공간 길이 */
-.scene-label.gap{background:var(--accent);color:var(--on-accent);padding:1px 6px;border-radius:99px;font-size:11.5px}
+.scene-label.gap{background:var(--accent-fill);color:var(--ink);padding:1px 6px;border-radius:99px;font-size:11.5px}
 .stage-tools{
   display:flex;align-items:center;gap:6px;padding:8px 10px;border-top:1px solid var(--line);background:var(--paper);
 }
