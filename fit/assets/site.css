@@ -82,6 +82,19 @@ body{--wrap:1080px;--shell:1080px}   /* 상단 바·푸터도 본문과 같은 �
 .sister-go{display:inline-flex;align-items:center;gap:2px;margin-top:6px;font-size:13.5px;font-weight:600}
 .sister-go svg{width:14px;height:14px}
 
+/* 개인정보 처리방침처럼 글로 된 페이지 (버짓리스트 처리방침과 같은 모양) */
+.doc-hero{display:block}
+.doc{max-width:var(--wrap);margin:0 auto;padding:8px 20px 24px}
+.doc h2{font-size:17px;letter-spacing:-0.01em;margin:32px 0 10px}
+.doc p{color:var(--muted);margin:0 0 10px;max-width:66ch;line-height:1.75;word-break:keep-all}
+.doc ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-height:1.85;max-width:66ch;word-break:keep-all}
+.doc b{color:var(--ink)}
+.cat-table{width:100%;max-width:760px;border-collapse:collapse;margin-top:14px;font-size:14px;background:var(--sheet)}
+.cat-table th,.cat-table td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top;word-break:keep-all}
+.cat-table th{background:var(--paper);font-weight:600;white-space:nowrap}
+.cat-table td{color:var(--muted)}
+.foot-inner a[aria-current="page"]{color:var(--ink)}
+
 footer{margin-top:40px}
 
 @media (max-width:860px){
