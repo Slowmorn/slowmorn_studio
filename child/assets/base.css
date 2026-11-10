@@ -1,0 +1,84 @@
+/* 미리 키움 공통 토큰 — 셀렉트박스(fit/assets/base.css)와 같은 구조에 메인 색만 바꿨어요.
+   종이 같은 따뜻한 회색과 먹색으로 화면을 만들고, 메인 색(살구색)은 지금 위치·고른 것처럼 '여기' 를 알려 주는 곳에만 씁니다. */
+:root{
+  --page:#FFFFFF;
+  --paper:#F7F6F3;
+  --sheet:#FFFFFF;
+  --ink:#37352F;
+  --ink-strong:#111110;
+  --muted:#787774;
+  --line:#E9E8E4;
+  --hover:rgba(55,53,47,.06);
+  --hover-strong:rgba(55,53,47,.11);
+  --link:#37352F;
+  --accent:#B4541C;       /* 글자·선에 쓰는 진한 살구색 */
+  --accent-soft:#FFF0E6;  /* 고른 줄·카드 바탕 */
+  --accent-fill:#FFB38A;  /* 메인 색: 막대, 점, 지금 위치 */
+  --on-accent:#3A1A08;
+  --good:#2F7D4F; --good-soft:#E3F4EA;   /* 합의 */
+  --hold:#9A6B00; --hold-soft:#FFF4D6;   /* 보류 */
+  --warn:#B4423A;
+  --radius:6px;
+  --radius-lg:10px;
+  --wrap:1080px;
+  --shell:1080px;
+  --sans:"Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+}
+/* 늘 밝은 화면으로 보여요. 기기나 보는 곳이 다크 모드여도 위 색을 그대로 써요 */
+:root,:root[data-theme="dark"]{color-scheme:light}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--page); color:var(--ink);
+  font-family:var(--sans); font-size:15.5px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--link);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:2px}
+a:hover{text-decoration-color:var(--muted)}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;border-radius:4px}
+[hidden]{display:none !important}
+
+/* 상단 바 */
+.topbar{border-bottom:1px solid var(--line);background:var(--sheet)}
+.topbar-inner{
+  max-width:var(--shell);margin:0 auto;padding:12px 20px;
+  display:flex;align-items:center;gap:10px 20px;
+}
+.brand{
+  display:inline-flex;align-items:center;gap:5px;
+  font-weight:700;font-size:16px;letter-spacing:-0.02em;
+  color:var(--ink);text-decoration:none;flex:none;
+}
+.brand svg{width:24px;height:24px;flex:none}
+@font-face{
+  font-family:"GmarketSansMedium";
+  src:url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff") format("woff");
+  font-weight:normal;font-style:normal;font-display:swap;
+}
+.brand-name{font-family:"GmarketSansMedium", var(--sans);font-weight:normal;letter-spacing:-0.01em;padding-top:2px}
+.topbar .spacer{flex:1}
+.topbar .top-cta{
+  flex:none;background:var(--ink);color:var(--sheet);text-decoration:none;
+  font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:7px;white-space:nowrap;border:0;
+}
+.topbar .top-cta:hover{filter:brightness(1.18)}
+.topbar .top-link{color:var(--muted);text-decoration:none;font-size:14px;background:none;border:0;padding:4px 2px}
+.topbar .top-link:hover{color:var(--ink)}
+
+/* 푸터 */
+footer{border-top:1px solid var(--line);background:var(--sheet);margin-top:56px}
+.foot-inner{
+  max-width:var(--shell);margin:0 auto;padding:0 20px 32px;
+  color:var(--muted);font-size:13.5px;display:flex;flex-wrap:wrap;align-items:baseline;gap:8px 18px;
+}
+footer a{text-decoration:none}
+footer a:hover{text-decoration:underline}
+.foot-copy{margin-left:auto;font-size:12px}
+.foot-note{max-width:var(--shell);margin:0 auto;padding:22px 20px 14px;color:var(--muted);font-size:12px;line-height:1.6;word-break:keep-all}
+
+@media (max-width:640px){
+  .topbar-inner{padding:10px 16px}
+  .foot-inner,.foot-note{padding-left:16px;padding-right:16px}
+}
