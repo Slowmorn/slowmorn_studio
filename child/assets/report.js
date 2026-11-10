@@ -1,33 +1,38 @@
 // 정리 화면 — 우리 부부의 육아 계획서. 인쇄(PDF 저장)와 텍스트 복사를 지원해요.
-import { EVENTS, DECISIONS, PHASES, MODE_LABEL } from './events.js';
-import { totals, optionOf, optionTotal, won, savings, afterMonthly, BASE_COSTS } from './budget.js';
-import { stageLabel, dateText } from './time.js';
+import { EVENTS, DECISIONS, PHASES, MODE_LABEL, END_T, evTitle, byId } from './events.js?v=20261111p';
+import { sceneImage } from './pixel.js?v=20261111p';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261111p';
+import { totals, optionOf, optionTotal, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261111p';
+import { stageLabel, dateText } from './time.js?v=20261111p';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const statusText = s => s === 'hold' ? '보류' : '합의';
 
 export function renderReport(root, state, { readonly, onOpen, onPromise, onBack, toast }){
   const tt = totals(state);
-  const sv = savings(state);
   const after = afterMonthly(state);
   const rec = id => state.decisions[id];
   const when = t => `${stageLabel(t)}${state.due ? ` <span class="r-date">${dateText(state.due, t)}</span>` : ''}`;
   const holds = DECISIONS.filter(ev => rec(ev.id)?.status === 'hold');
   const undecided = DECISIONS.filter(ev => !rec(ev.id));
-  const agreed = type => DECISIONS.filter(ev => ev.type === type && rec(ev.id)?.status === 'agree' && optionOf(ev, rec(ev.id).choice));
+  const agreed = type => DECISIONS.filter(ev => ev.type === type && rec(ev.id)?.status === 'agree' && eff(ev, optionOf(ev, rec(ev.id).choice), state.twins));
   const edu = agreed('edu');
   const bigChoices = agreed('choice');
-  const principle = ev => { const r = rec(ev.id); const o = optionOf(ev, r.choice);
-    return `<li><span class="r-q">${esc(ev.title)}</span><b>${esc(o.label)}</b>${o.once || o.monthly ? `<span class="r-meta">${won(optionTotal(o))}</span>` : ''}${r.memo ? `<em>“${esc(r.memo)}”</em>` : ''}</li>`; };
-  const buys = DECISIONS.filter(ev => ev.type === 'buy');
+  const cares = agreed('care');
+  const husband = state.names[1] || '남편';
+  const principle = ev => { const r = rec(ev.id); const o = eff(ev, optionOf(ev, r.choice), state.twins);
+    return `<li><span class="r-q">${esc(evTitle(ev, state.twins))}</span><b>${esc(o.label)}</b>${o.once || o.monthly ? `<span class="r-meta">${won(optionTotal(o))}</span>` : ''}${r.memo ? `<em>“${esc(r.memo)}”</em>` : ''}</li>`; };
+  const gearEv = byId.gear, gearRec = rec('gear');
+  const gear = gearRec && eff(gearEv, optionOf(gearEv, gearRec.choice), state.twins);
   const todos = EVENTS.filter(ev => ev.type === 'todo');
-  const monthlyRows = DECISIONS.map(ev => ({ ev, opt:optionOf(ev, rec(ev.id)?.choice) })).filter(x => x.opt?.monthly);
+  const monthlyRows = DECISIONS.map(ev => ({ ev, opt:eff(ev, optionOf(ev, rec(ev.id)?.choice), state.twins) })).filter(x => x.opt?.monthly);
   const reached = state.finished ? '만 3세까지' : `${stageLabel(state.t)}까지`;
 
   root.innerHTML = `
   <div class="r-wrap">
     <header class="r-head">
-      <p class="kicker">${esc(state.names.join(' · '))}${state.baby ? ` · ${esc(state.baby)}` : ''}의 육아 계획</p>
+      <img class="r-scene" alt="" src="${sceneImage(Math.min(state.t, END_T - 1), state.twins)}">
+      <p class="kicker">${esc(state.names.join(' · '))}${state.baby ? ` · ${esc(state.baby)}` : ''}${state.twins ? ' · 쌍둥이' : ''}의 육아 계획</p>
       <h1>${state.finished ? '만 3세까지 같이 살아 봤어요' : `${esc(stageLabel(state.t))}까지 살아 봤어요`}</h1>
       <p class="lead">${new Date(state.createdAt).toLocaleDateString('ko-KR')}에 시작 · 결정 ${DECISIONS.length - undecided.length}/${DECISIONS.length}개${holds.length ? ` · 보류 ${holds.length}개` : ''}</p>
       <div class="r-actions no-print">
@@ -44,11 +49,19 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
         ${PHASES.map(p => `<div><dt>${p.label}</dt><dd>${won(tt.phases[p.id].cost - tt.phases[p.id].support)}</dd></div>`).join('')}
       </dl>
       <p class="note">
-        ${sv > 0 ? `당근·물려받기로 약 <b>${won(sv)}</b> 아꼈어요. ` : ''}
         ${after ? `만 3세 이후에는 고른 기관 기준으로 매달 약 <b>${won(after)}</b>이 더 들 거예요. ` : ''}
         ${undecided.length || holds.length ? `정하지 않았거나 보류한 ${undecided.length + holds.length}개는 금액에서 빠져 있어요.` : ''}
       </p>
     </section>
+
+    ${state.t >= 2 ? `
+    <section class="r-sec">
+      <h2>초음파 앨범</h2>
+      <div class="r-album">${['sac', 'nt', 'detail'].filter(k => state.t >= ULTRA_WEEK[k] - 4).map(k => `
+        <figure><img alt="${ULTRA_LABEL[k]} (그림)" src="${ultrasound(k, { seed:state.id, twins:state.twins, week:ULTRA_WEEK[k], name:state.baby })}"><figcaption>${ULTRA_LABEL[k]}</figcaption></figure>`).join('')}
+      </div>
+      <p class="note">실제 초음파 사진이 아니라 시기에 맞춰 그려 본 그림이에요.</p>
+    </section>` : ''}
 
     <section class="r-sec">
       <h2>우리가 정한 키우는 방향</h2>
@@ -67,11 +80,19 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
       <ul class="r-principles">${bigChoices.map(principle).join('')}</ul>
     </section>` : ''}
 
+    ${cares.length ? `
+    <section class="r-sec">
+      <h2>${esc(husband)}의 약속</h2>
+      <p class="note">아내가 힘들 때 ${esc(husband)} 님이 하기로 한 일이에요.</p>
+      <ul class="r-principles">${cares.map(ev => { const rr = rec(ev.id); const o = optionOf(ev, rr.choice);
+        return `<li><span class="r-q">${esc(evTitle(ev, state.twins))}</span><ul class="r-picks">${(o.labels || [o.label]).map(l => `<li>${esc(l)}</li>`).join('')}</ul>${rr.memo ? `<em>“${esc(rr.memo)}”</em>` : ''}</li>`; }).join('')}</ul>
+    </section>` : ''}
+
     ${holds.length || undecided.length ? `
     <section class="r-sec">
       <h2>아직 이야기가 더 필요해요</h2>
       <ul class="r-holds">${[...holds, ...undecided].map(ev => `
-        <li><span class="r-when">${when(ev.t)}</span><b>${esc(ev.title)}</b>
+        <li><span class="r-when">${when(ev.t)}</span><b>${esc(evTitle(ev, state.twins))}</b>
           <span class="status ${rec(ev.id) ? 'hold' : 'none'}">${rec(ev.id) ? '보류' : '안 정함'}</span>
           ${rec(ev.id)?.memo ? `<em>“${esc(rec(ev.id).memo)}”</em>` : ''}
           ${readonly ? '' : `<button type="button" class="btn-small no-print" data-open="${ev.id}">지금 이야기하기</button>`}</li>`).join('')}
@@ -79,17 +100,15 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
     </section>` : ''}
 
     <section class="r-sec">
-      <h2>살 것 리스트</h2>
-      <table class="r-table">
-        <thead><tr><th>시기</th><th>물건</th><th>방법</th><th>선택</th><th class="num">금액</th></tr></thead>
-        <tbody>${buys.map(ev => {
-          const r = rec(ev.id); const o = optionOf(ev, r?.choice);
-          return `<tr><td>${when(ev.t)}</td><td>${esc(ev.title)}</td>
-            <td>${o?.mode ? `<span class="mode mode-${o.mode}">${MODE_LABEL[o.mode]}</span>` : '<span class="note">—</span>'}</td>
-            <td>${o ? esc(o.label) : `<span class="note">${r ? '보류' : '안 정함'}</span>`}</td>
-            <td class="num">${o ? won(optionTotal(o)) : ''}</td></tr>`;
-        }).join('')}</tbody>
-      </table>
+      <h2>육아용품 예산</h2>
+      ${gear ? `<div class="r-gear">
+        <b>${won(gear.once)}</b>
+        <span class="mode mode-${gear.mode}">${MODE_LABEL[gear.mode]}</span>${gearRec.status === 'hold' ? '<span class="status hold">보류</span>' : ''}
+        <p>${esc(gear.note)}</p>
+        ${gearRec.memo ? `<em>“${esc(gearRec.memo)}”</em>` : ''}
+        <small>임신 30주쯤 55%, 생후 4개월 20%, 생후 14개월 25%로 나눠 쓰는 걸로 잡았어요.</small>
+      </div>` : `<p class="note">${gearRec ? '보류했어요' : '아직 정하지 않았어요'}.</p>`}
+      <a class="ext-link no-print" href="${esc(gearEv.link.href)}" target="_blank" rel="noopener">${esc(gearEv.link.label)} <span aria-hidden="true">→</span></a>
     </section>
 
     <section class="r-sec">
@@ -97,8 +116,8 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
       <table class="r-table">
         <thead><tr><th>항목</th><th>선택</th><th>기간</th><th class="num">한 달</th><th class="num">합계</th></tr></thead>
         <tbody>${BASE_COSTS.map(b => `<tr><td>${esc(b.label)}</td><td class="note">${esc(b.note)}</td>
-          <td>생후 ${b.span[0]}~${b.span[1]}개월</td><td class="num">${won(b.monthly)}</td><td class="num">${won(b.monthly * (b.span[1] - b.span[0] + 1))}</td></tr>`).join('')}${monthlyRows.map(({ ev, opt }) => `<tr><td>${esc(ev.title)}</td><td>${esc(opt.label)}</td>
-          <td>생후 ${opt.span[0]}~${opt.span[1]}개월</td><td class="num">${won(opt.monthly)}</td><td class="num">${won(opt.monthly * (opt.span[1] - opt.span[0] + 1))}</td></tr>`).join('')}
+          <td>생후 ${b.span[0]}~${b.span[1]}개월</td><td class="num">${won(b.monthly * (state.twins ? BASE_TWIN : 1))}</td><td class="num">${won(b.monthly * (state.twins ? BASE_TWIN : 1) * (b.span[1] - b.span[0] + 1))}</td></tr>`).join('')}${monthlyRows.map(({ ev, opt }) => `<tr><td>${esc(evTitle(ev, state.twins))}</td><td>${esc(opt.label)}</td>
+          <td>${spanText(opt)}</td><td class="num">${won(opt.monthly)}</td><td class="num">${won(opt.monthly * monthCount(opt))}</td></tr>`).join('')}
         </tbody>
       </table>
     </section>
@@ -111,14 +130,16 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
           <tr class="sum"><td>합계</td><td class="num">${won(tt.cost)}</td><td class="num good">−${won(tt.support)}</td><td class="num"><b>${won(tt.net)}</b></td></tr>
         </tbody>
       </table>
-      <p class="note">지원금: 국민행복카드 100만 원, 첫만남이용권 200만 원, 부모급여(0세 월 100만 원 · 1세 월 50만 원, 어린이집 이용 시 보육료로 대신 지급), 아동수당 월 10만 원을 넣었어요. 지출에는 기본 육아 생활비(0세 월 25만 · 1~2세 월 35만 원)가 들어 있어요.</p>
+      <p class="note">지원금: 국민행복카드 100만 원, 첫만남이용권 200만 원, 부모급여(0세 월 100만 원 · 1세 월 50만 원, 어린이집 이용 시 보육료로 대신 지급), 아동수당 월 10만 원을 넣었어요. 지출에는 ${BASE_NOTE}가 들어 있어요.${state.twins ? ` 쌍둥이라 지원금은 아이마다, 생활비는 ${BASE_TWIN}배로 잡았어요.` : ''}</p>
     </section>
 
     <section class="r-sec">
       <h2>시기별 할 일</h2>
-      <ul class="r-todos">${todos.map(ev => `<li class="${state.todos[ev.id] ? 'done' : ''}">
+      <ul class="r-todos">${todos.map(ev => ev.items ? ev.items.map(([k, label]) => { const on = state.todos[`${ev.id}:${k}`];
+          return `<li class="${on ? 'done' : ''}"><span class="box" aria-hidden="true">${on ? '✓' : ''}</span>
+        <span class="r-when">${when(ev.t)} · 아빠</span><b>${esc(label)}</b></li>`; }).join('') : `<li class="${state.todos[ev.id] ? 'done' : ''}">
         <span class="box" aria-hidden="true">${state.todos[ev.id] ? '✓' : ''}</span>
-        <span class="r-when">${when(ev.t)}</span><b>${esc(ev.title)}</b></li>`).join('')}
+        <span class="r-when">${when(ev.t)}</span><b>${esc(evTitle(ev, state.twins))}</b></li>`).join('')}
       </ul>
     </section>
 
@@ -126,8 +147,8 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
       <h2>선택 기록 전체</h2>
       <ol class="r-log">${DECISIONS.filter(ev => rec(ev.id)).map(ev => {
         const r = rec(ev.id);
-        return `<li><div class="r-log-head"><span class="r-when">${when(ev.t)}</span><b>${esc(ev.title)}</b></div>
-          <ol>${r.history.map(h => { const o = optionOf(ev, h.choice); return `<li>
+        return `<li><div class="r-log-head"><span class="r-when">${when(ev.t)}</span><b>${esc(evTitle(ev, state.twins))}</b></div>
+          <ol>${r.history.map(h => { const o = eff(ev, optionOf(ev, h.choice), state.twins); return `<li>
             <span class="status ${h.status}">${statusText(h.status)}</span>${o ? esc(o.label) : '고르지 않음'}
             <span class="r-meta">${new Date(h.ts).toLocaleString('ko-KR', { year:'numeric', month:'numeric', day:'numeric', hour:'2-digit', minute:'2-digit' })} · ${stageLabel(h.t)}에 기록</span>
             ${h.memo ? `<em>“${esc(h.memo)}”</em>` : ''}</li>`; }).join('')}</ol></li>`;
@@ -153,25 +174,35 @@ export function plainText(state){
   const tt = totals(state);
   const rec = id => state.decisions[id];
   const L = [];
-  L.push(`[미리 키움] ${state.names.join(' · ')}${state.baby ? ` · ${state.baby}` : ''}의 육아 계획`);
+  L.push(`[미리 키움] ${state.names.join(' · ')}${state.baby ? ` · ${state.baby}` : ''}${state.twins ? ' · 쌍둥이' : ''}의 육아 계획`);
   L.push(`만 3세까지 실제 부담(예상): ${won(tt.net)} (지출 ${won(tt.cost)} − 지원금 ${won(tt.support)})`);
   L.push('');
   L.push('■ 키우는 방향');
   for(const ev of DECISIONS.filter(e => e.type === 'edu' || e.type === 'choice')){
-    const r = rec(ev.id); const o = r && optionOf(ev, r.choice);
-    L.push(`- ${ev.title}: ${o ? o.label : '미정'}${r?.status === 'hold' ? ' (보류)' : ''}${r?.memo ? ` — ${r.memo}` : ''}`);
+    const r = rec(ev.id); const o = r && eff(ev, optionOf(ev, r.choice), state.twins);
+    L.push(`- ${evTitle(ev, state.twins)}: ${o ? o.label : '미정'}${r?.status === 'hold' ? ' (보류)' : ''}${r?.memo ? ` — ${r.memo}` : ''}`);
   }
   if(state.promise) L.push(`- 우리 둘의 약속: ${state.promise}`);
   L.push('');
-  L.push('■ 살 것');
-  for(const ev of DECISIONS.filter(e => e.type === 'buy')){
-    const r = rec(ev.id); const o = r && optionOf(ev, r.choice);
-    L.push(`- [${stageLabel(ev.t)}] ${ev.title}: ${o ? `${o.label} (${MODE_LABEL[o.mode] || ''}, ${won(optionTotal(o))})` : '미정'}`);
+  const gr = rec('gear'); const go = gr && eff(byId.gear, optionOf(byId.gear, gr.choice), state.twins);
+  L.push(`■ 육아용품 예산: ${go ? `${won(go.once)} (${MODE_LABEL[go.mode]})${gr.status === 'hold' ? ' (보류)' : ''}` : '미정'}`);
+  const careList = DECISIONS.filter(e => e.type === 'care');
+  if(careList.some(e => rec(e.id))){
+    L.push('');
+    L.push(`■ ${state.names[1] || '남편'}의 약속`);
+    for(const ev of careList){
+      const r = rec(ev.id); const o = r && eff(ev, optionOf(ev, r.choice), state.twins);
+      if(o) L.push(`- ${evTitle(ev, state.twins)}: ${o.label}${r.memo ? ` — ${r.memo}` : ''}`);
+    }
   }
   L.push('');
   L.push('■ 시기별 할 일');
   for(const ev of EVENTS.filter(e => e.type === 'todo')){
-    L.push(`${state.todos[ev.id] ? '[v]' : '[ ]'} ${stageLabel(ev.t)}${state.due ? ` (${dateText(state.due, ev.t)})` : ''} ${ev.title}`);
+    const at = `${stageLabel(ev.t)}${state.due ? ` (${dateText(state.due, ev.t)})` : ''}`;
+    if(ev.items){
+      L.push(`    ${at} ${evTitle(ev, state.twins)}`);
+      for(const [k, label] of ev.items) L.push(`${state.todos[`${ev.id}:${k}`] ? '[v]' : '[ ]'}   - ${label}`);
+    } else L.push(`${state.todos[ev.id] ? '[v]' : '[ ]'} ${at} ${evTitle(ev, state.twins)}`);
   }
   L.push('');
   L.push('금액은 2026년 기준 참고용 추정치 · slowmorn.com/child');

@@ -1,27 +1,51 @@
 // 예산 계산 — 고른 선택지로 지출·지원 장부(ledger)를 만들고 합계를 내요.
-import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js';
+import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js?v=20261111p';
 
 // 매달 들어오는 지원금 (생후 개월 기준, 끝 포함)
 //   부모급여: 0세 월 100만, 1세 월 50만. 어린이집을 다니면 1세 부모급여는 보육료 바우처로 나가서 현금은 0원으로 봐요.
 //   아동수당: 만 3세까지 월 10만 (실제로는 더 오래 받아요)
+//   쌍둥이면 아이마다 받아서 × 2
 function monthlySupports(state){
   const care = state.decisions.care?.choice;
+  const k = state.twins ? 2 : 1;
   const list = [];
   for(let m = 0; m <= 35; m++){
-    if(m <= 11) list.push({ m, amount:1000000, label:'부모급여' });
-    else if(m <= 23 && !(care === 'daycare' && m >= 13)) list.push({ m, amount:500000, label:'부모급여' });
-    list.push({ m, amount:100000, label:'아동수당' });
+    if(m <= 11) list.push({ m, amount:1000000 * k, label:'부모급여' });
+    else if(m <= 23 && !(care === 'daycare' && m >= 13)) list.push({ m, amount:500000 * k, label:'부모급여' });
+    list.push({ m, amount:100000 * k, label:'아동수당' });
   }
   return list;
 }
 
-// 고르지 않아도 매달 드는 기본 육아 생활비 (물티슈·세제·위생용품, 병원·약값, 먹거리·간식 등)
+// 쌍둥이를 반영한 선택지 (금액·이름). 화면에 보이는 값은 모두 이걸 거쳐요
+export function eff(ev, opt, twins){
+  if(!opt || !twins) return opt;
+  const k = ev.perChild ? 2 : 1;
+  return {
+    ...opt,
+    label: opt.twinLabel || opt.label,
+    once: opt.twinOnce ?? (opt.once ? opt.once * k : opt.once),
+    monthly: opt.twinMonthly ?? (opt.monthly ? opt.monthly * k : opt.monthly),
+    after: opt.after ? opt.after * k : opt.after,
+  };
+}
+export const BASE_TWIN = 1.8;   // 쌍둥이 기본 생활비 배수 (물려 쓰고 같이 쓰는 게 있어서 2배보다 조금 적게)
+
+// 고르지 않아도 매달 드는 기본 육아 생활비 (기저귀·물티슈·위생용품, 병원·약값, 먹거리·간식 등)
 export const BASE_COSTS = [
-  { label:'기본 육아 생활비 (0세)', note:'물티슈·세제·위생용품, 병원·약값', monthly:250000, span:[0,11] },
-  { label:'기본 육아 생활비 (1~2세)', note:'먹거리·간식, 위생용품, 병원·약값', monthly:350000, span:[12,35] },
+  { label:'기본 육아 생활비 (0세)', note:'기저귀·물티슈·위생용품, 병원·약값', monthly:330000, span:[0,11] },
+  { label:'기본 육아 생활비 (1세)', note:'기저귀, 먹거리·간식, 병원·약값', monthly:410000, span:[12,23] },
+  { label:'기본 육아 생활비 (2세)', note:'먹거리·간식, 위생용품, 병원·약값', monthly:350000, span:[24,35] },
 ];
+export const BASE_NOTE = '기본 육아 생활비(기저귀 포함, 0세 월 33만 · 1세 월 41만 · 2세 월 35만 원)';
 
 export function optionOf(ev, choiceId){
+  // 여러 개 고르는 결정(남편 차례)은 고른 것들을 한 줄로 묶어서 돌려줘요
+  if(Array.isArray(choiceId)){
+    const picked = ev.options?.filter(o => choiceId.includes(o.id)) || [];
+    if(!picked.length) return null;
+    return { id:choiceId.join(','), label:picked.map(o => o.label).join(' · '), labels:picked.map(o => o.label), note:'' };
+  }
   return ev.options?.find(o => o.id === choiceId) || null;
 }
 
@@ -30,14 +54,29 @@ export function ledger(state){
   const rows = [];
   for(const ev of EVENTS){
     if(ev.cost) rows.push({ t:ev.t, amount:ev.cost, kind:'cost', label:ev.title, eventId:ev.id });
-    if(ev.support) rows.push({ t:ev.t, amount:ev.support.amount, kind:'support', label:ev.support.label, eventId:ev.id });
+    if(ev.support) rows.push({ t:ev.t, amount:state.twins && ev.support.twinAmount ? ev.support.twinAmount : ev.support.amount, kind:'support', label:ev.support.label, eventId:ev.id });
   }
   for(const ev of DECISIONS){
     const rec = state.decisions[ev.id];
-    const opt = rec && optionOf(ev, rec.choice);
+    const opt = rec && eff(ev, optionOf(ev, rec.choice), state.twins);
     if(!opt) continue;
     const payT = ev.payAt ? atToT(ev.payAt) : ev.t;
-    if(opt.once) rows.push({ t:payT, amount:opt.once, kind:'cost', label:`${ev.title} · ${opt.label}`, eventId:ev.id, mode:opt.mode });
+    if(opt.once && ev.payPlan){
+      // 오래 걸쳐 사는 것은 나눠서: 마지막 몫에 반올림 차이를 몰아요
+      let left = opt.once;
+      ev.payPlan.forEach(([at, ratio], k) => {
+        const amount = k === ev.payPlan.length - 1 ? left : Math.round(opt.once * ratio);
+        left -= amount;
+        rows.push({ t:atToT(at), amount, kind:'cost', label:`${ev.title} · ${opt.label}`, eventId:ev.id, mode:opt.mode });
+      });
+    } else if(opt.once) rows.push({ t:payT, amount:opt.once, kind:'cost', label:`${ev.title} · ${opt.label}`, eventId:ev.id, mode:opt.mode });
+    if(opt.monthly && opt.pre){
+      // 임신 중에도 매달 나가는 돈 (태아보험처럼 가입한 달부터): 결정 시점에서 출산까지 고르게 나눠요
+      const step = (BIRTH_T - ev.t) / opt.pre;
+      for(let k = 0; k < opt.pre; k++){
+        rows.push({ t:ev.t + k * step, amount:opt.monthly, kind:'cost', label:`${ev.title} · ${opt.label}`, eventId:ev.id, mode:opt.mode, monthly:true });
+      }
+    }
     if(opt.monthly && opt.span){
       for(let m = opt.span[0]; m <= opt.span[1]; m++){
         rows.push({ t:BIRTH_T + m, amount:opt.monthly, kind:'cost', label:`${ev.title} · ${opt.label}`, eventId:ev.id, mode:opt.mode, monthly:true });
@@ -45,7 +84,8 @@ export function ledger(state){
     }
   }
   for(const b of BASE_COSTS){
-    for(let m = b.span[0]; m <= b.span[1]; m++) rows.push({ t:BIRTH_T + m, amount:b.monthly, kind:'cost', label:b.label, monthly:true, base:true });
+    const amount = state.twins ? Math.round(b.monthly * BASE_TWIN) : b.monthly;
+    for(let m = b.span[0]; m <= b.span[1]; m++) rows.push({ t:BIRTH_T + m, amount, kind:'cost', label:b.label, monthly:true, base:true });
   }
   for(const s of monthlySupports(state)){
     rows.push({ t:BIRTH_T + s.m, amount:s.amount, kind:'support', label:s.label, monthly:true });
@@ -55,20 +95,13 @@ export function ledger(state){
 
 export function totals(state, upToT = END_T){
   const rows = ledger(state);
-  const out = { cost:0, support:0, costNow:0, supportNow:0, phases:{}, modes:{ new:0, used:0, gift:0 }, modeCount:{ new:0, used:0, gift:0 } };
+  const out = { cost:0, support:0, costNow:0, supportNow:0, phases:{} };
   for(const p of PHASES) out.phases[p.id] = { cost:0, support:0 };
   for(const r of rows){
     const ph = phaseOf(r.t).id;
     out[r.kind] += r.amount;
     out.phases[ph][r.kind] += r.amount;
     if(r.t <= upToT) out[r.kind + 'Now'] += r.amount;
-    if(r.kind === 'cost' && r.mode && out.modes[r.mode] !== undefined) out.modes[r.mode] += r.amount;
-  }
-  // 새것/당근/물려받기 개수는 '살 것' 결정만 셉니다
-  for(const ev of DECISIONS){
-    if(ev.type !== 'buy') continue;
-    const opt = optionOf(ev, state.decisions[ev.id]?.choice);
-    if(opt?.mode && out.modeCount[opt.mode] !== undefined) out.modeCount[opt.mode]++;
   }
   out.net = out.cost - out.support;
   out.netNow = out.costNow - out.supportNow;
@@ -79,7 +112,7 @@ export function totals(state, upToT = END_T){
 export function priceText(opt){
   const parts = [];
   if(opt.once) parts.push(won(opt.once));
-  if(opt.monthly) parts.push(`월 ${won(opt.monthly)} (생후 ${opt.span[0]}~${opt.span[1]}개월)`);
+  if(opt.monthly) parts.push(`월 ${won(opt.monthly)} (${spanText(opt)})`);
   if(opt.after) parts.push(`만 3세 이후 월 ${won(opt.after)}`);
   if(!parts.length) return opt.once === 0 ? '0원' : '추가 비용 없음';
   return parts.join(' + ');
@@ -89,8 +122,16 @@ export function priceText(opt){
 export function optionTotal(opt){
   if(!opt) return 0;
   let s = opt.once || 0;
-  if(opt.monthly && opt.span) s += opt.monthly * (opt.span[1] - opt.span[0] + 1);
+  if(opt.monthly) s += opt.monthly * monthCount(opt);
   return s;
+}
+// 매달 나가는 기간: 임신 중 개월(pre) + 생후 개월(span)
+export function monthCount(opt){
+  return (opt.pre || 0) + (opt.span ? opt.span[1] - opt.span[0] + 1 : 0);
+}
+export function spanText(opt){
+  const after = opt.span ? `생후 ${opt.span[0]}~${opt.span[1]}개월` : '';
+  return opt.pre ? `임신 중 ${opt.pre}개월 + ${after}` : after;
 }
 
 // 금액 표기: 1,234,000 → "123만 4천 원" 대신 읽기 쉽게 "123.4만 원"
@@ -114,21 +155,8 @@ export function won(n, unit = true){
 export function afterMonthly(state){
   let s = 0;
   for(const ev of DECISIONS){
-    const opt = optionOf(ev, state.decisions[ev.id]?.choice);
+    const opt = eff(ev, optionOf(ev, state.decisions[ev.id]?.choice), state.twins);
     if(opt?.after) s += opt.after;
-  }
-  return s;
-}
-
-// 당근·물려받기로 아낀 돈: 같은 물건의 가장 싼 새것과 비교해요
-export function savings(state){
-  let s = 0;
-  for(const ev of DECISIONS){
-    if(ev.type !== 'buy') continue;
-    const opt = optionOf(ev, state.decisions[ev.id]?.choice);
-    if(!opt || (opt.mode !== 'used' && opt.mode !== 'gift')) continue;
-    const news = ev.options.filter(o => o.mode === 'new').map(optionTotal);
-    if(news.length) s += Math.max(0, Math.min(...news) - optionTotal(opt));
   }
   return s;
 }
