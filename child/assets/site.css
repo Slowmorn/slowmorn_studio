@@ -22,13 +22,8 @@
 }
 .mini-now{display:flex;flex-direction:column}
 .mini-now span{font-size:12.5px;color:var(--muted);font-weight:600}
-.mini-now b{font-size:22px;letter-spacing:-0.02em}
-.mini-track{position:relative;height:6px;border-radius:3px;background:var(--paper);border:1px solid var(--line)}
-.mini-track i{position:absolute;left:0;top:-1px;bottom:-1px;border-radius:3px;background:var(--accent-fill);animation:mini-grow 2.4s ease-out}
-.mini-track s{position:absolute;top:-7px;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:var(--sheet);border:3px solid var(--accent);animation:mini-move 2.4s ease-out}
-@keyframes mini-grow{from{width:0}}
-@keyframes mini-move{from{left:0}}
-@media (prefers-reduced-motion:reduce){.mini-track i,.mini-track s{animation:none}}
+.mini-now b{font-size:17px;letter-spacing:-0.02em;word-break:keep-all}
+.hero-scene{width:100%;height:auto;aspect-ratio:3 / 2;image-rendering:pixelated;border-radius:12px;background:var(--paper)}
 .mini-opts{display:flex;flex-direction:column;gap:6px;margin-top:4px}
 .mini-opts div{display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14px}
 .mini-opts span{color:var(--muted)}
