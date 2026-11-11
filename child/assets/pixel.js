@@ -1,7 +1,7 @@
 // 도트 그림 — 임신기에는 아내·남편과 아내 배 속의 태아, 출산 뒤에는 만 3세 아이까지, 시기에 맞는 장면을 그려요.
 // 96×64 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
 // 캐릭터는 따로 그린 뒤 테두리(외곽선)를 한 겹 둘러서 도트 느낌을 살려요.
-import { BIRTH_T, PREG_START } from './events.js?v=20261111s';
+import { BIRTH_T, PREG_START } from './events.js?v=20261112a';
 
 export const W = 96, H = 64;
 
@@ -114,12 +114,13 @@ function couple(m, week, twins, now){
   m.rect(85, 11, 2, 1, C.heart); m.rect(88, 11, 2, 1, C.heart); m.rect(85, 12, 5, 1, C.heart); m.rect(86, 13, 3, 1, C.heart); m.px(87, 14, C.heart);
 
   const g = Math.min(1, Math.max(0, (week - 4) / 36));
-  const R = Math.round(6 + g * 7 + (twins ? g * 1.5 : 0));     // 배 반지름 6 → 13
+  const R = Math.min(11, Math.round(6 + g * 5 + (twins ? g * .8 : 0)));   // 배 반지름 6 → 11, 치마 아랫단을 넘지 않게 (쌍둥이는 조금 일찍 커져요)
   const wx = 32, wy = 15;                                       // 아내 머리
-  const bx = wx + 2, by = 40;                                   // 배 가운데
+  const bx = wx + 2, by = 39;                                   // 배 가운데
   const ir = R - 3;                                             // 배 속 창 반지름
+  const hx = bx + R + 21, hy = 12;                              // 남편 머리 (배가 커지면 같이 물러나서 팔 길이가 그대로예요)
   const { char, tmp, p2 } = layers();
-  m.ell(wx, 60, 11, 2, C.floorD); m.ell(70, 60, 10, 2, C.floorD);
+  m.ell(wx, 60, 11, 2, C.floorD); m.ell(hx, 60, 10, 2, C.floorD);
 
   // ── 아내
   char.clear();
@@ -141,43 +142,53 @@ function couple(m, week, twins, now){
   face(char, wx, wy - 1, 9);
   // 배 속 태아 (탯줄은 창 안에만)
   const inside = (x, y) => Math.hypot(x - bx, y - by) < ir - .5;
-  tmp.clear();
-  if(twins){
-    babyInWomb(tmp, char, bx - ir * .45, by + 1, week, now, fitK(week, ir * .55), 0, inside);
-    babyInWomb(tmp, char, bx + ir * .45, by - 1, week, now + 700, fitK(week, ir * .55), 1, inside);
-  } else {
-    babyInWomb(tmp, char, bx, by, week, now, fitK(week, ir), 0, inside);
+  // 쌍둥이는 나란히, 좁은 배 속이라 살짝 겹치게 붙여요. 한 명씩 따로 테두리를 둘러서 겹쳐도 구분돼요.
+  const twinK = fitK(week, ir * .62);
+  const fetuses = twins
+    ? [[bx - ir * .3, by + 1, now, twinK, 0], [bx + ir * .3, by - 1, now + 700, twinK, 1]]
+    : [[bx, by, now, fitK(week, ir), 0]];
+  for(const [fx, fy, fnow, k, seed] of fetuses){
+    tmp.clear();
+    babyInWomb(tmp, char, fx, fy, week, fnow, k, seed, inside);
+    tmp.outline();
+    char.x.drawImage(tmp.c, 0, 0);
   }
-  tmp.outline();
-  char.x.drawImage(tmp.c, 0, 0);
   if(week >= 6 && week < 12 && (now % 900) < 300){             // 콩닥콩닥 심장
-    const hs = twins ? [[bx - ir * .45, by + 1], [bx + ir * .45, by - 1]] : [[bx, by]];
+    const hs = fetuses.map(([fx, fy]) => [fx, fy]);
     for(const [hx, hy] of hs) char.px(hx, hy, C.heart);
   }
   char.outline();
   m.x.drawImage(char.c, 0, 0);
 
   // ── 남편: 아내 배에 손을 얹고 토닥토닥
-  const hx = 70, hy = 12;
   const pat = Math.floor(now / 380) % 4 === 1 ? 1 : 0;
   p2.clear();
-  p2.rect(hx - 5, 47, 4, 11, C.pantsM); p2.rect(hx + 1, 47, 4, 11, C.pantsM);
+  p2.rect(hx - 6, 40, 13, 3, C.pantsM);                         // 허리 (셔츠는 짧게, 다리는 길게)
+  p2.rect(hx - 5, 42, 4, 16, C.pantsM); p2.rect(hx + 1, 42, 4, 16, C.pantsM);
   p2.rect(hx - 6, 58, 6, 2, C.shoe); p2.rect(hx + 1, 58, 6, 2, C.shoe);
-  p2.rect(hx - 7, 22, 15, 26, C.shirt);
-  p2.rect(hx - 7, 45, 15, 2, C.shirtS);
-  p2.rect(hx + 8, 24, 3, 14, C.shirt); p2.rect(hx + 8, 38, 3, 3, C.skin);      // 오른팔
-  // 왼팔: 어깨에서 아내 배 오른쪽까지
-  const ax0 = hx - 7, ay0 = 25, ax1 = bx + R - 2, ay1 = by - 3 + pat;
-  for(let s2 = 0; s2 <= 1; s2 += .02){
-    const x = ax0 + (ax1 - ax0) * s2, y = ay0 + (ay1 - ay0) * s2 + Math.sin(s2 * Math.PI) * 2;
-    p2.rect(x, y - 1, 2, 3, s2 > .8 ? C.skin : C.shirt);
+  p2.rect(hx - 7, 22, 15, 19, C.shirt);
+  p2.rect(hx - 7, 39, 15, 2, C.shirtS);
+  p2.rect(hx + 8, 24, 3, 11, C.shirt); p2.rect(hx + 8, 35, 3, 3, C.skin);      // 오른팔
+  // 왼팔: 위팔은 몸 옆으로 내리고, 팔꿈치에서 굽혀 아내 배에 손을 얹어요 (오른팔과 길이를 맞췄어요)
+  p2.rect(hx - 10, 24, 3, 9, C.shirt);                          // 위팔
+  const ex = hx - 10, ey = 33, ax1 = bx + R - 1, ay1 = by - 3 + pat;
+  for(let s2 = 0; s2 <= 1; s2 += .05){                          // 아래팔
+    const x = ex + (ax1 - ex) * s2, y = ey + (ay1 - ey) * s2;
+    p2.rect(x, y - 1, 2, 3, s2 > .75 ? C.skin : C.shirt);
+  }
+  // 짧은 머리: 얼굴보다 한 칸 큰 동그라미를 뒤에 깔아서 두상이 동그랗게 보여요
+  const hcY = hy - 1;
+  for(let y = hcY - 9; y <= hy + 2; y++){
+    const half = Math.floor(Math.sqrt(Math.max(0, 100.5 - (y - hcY) ** 2)));
+    p2.rect(hx - half, y, half * 2 + 1, 1, C.hair);
   }
   p2.disc(hx, hy, 9, C.skin);
-  for(let y = hy - 9; y <= hy - 5; y++){                        // 짧은 머리
-    const half = Math.floor(Math.sqrt(Math.max(0, 81 - (y - hy) ** 2)));
-    p2.rect(hx - half, y, half * 2 + 1, 1, y % 2 ? C.hairL : C.hair);
+  for(let y = hcY - 9; y <= hy - 5; y++){                      // 앞머리: 가르마 쪽이 살짝 더 내려와요
+    const half = Math.floor(Math.sqrt(Math.max(0, 100.5 - (y - hcY) ** 2)));
+    p2.rect(hx - half, y, half * 2 + 1, 1, C.hair);
   }
-  p2.rect(hx - 9, hy - 5, 2, 3, C.hair); p2.rect(hx + 8, hy - 5, 2, 3, C.hair);
+  p2.rect(hx - 8, hy - 4, 7, 1, C.hair); p2.rect(hx - 6, hy - 3, 3, 1, C.hair);
+  p2.rect(hx + 1, hy - 8, 4, 1, C.hairL); p2.rect(hx + 3, hy - 9, 3, 1, C.hairL);   // 윤기
   face(p2, hx, hy, 9);
   p2.outline();
   m.x.drawImage(p2.c, 0, 0);
