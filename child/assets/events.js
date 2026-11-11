@@ -93,8 +93,9 @@ export const EVENTS = [
     payAt:'m0',
     options:[
       { id:'center2', label:'산후조리원 2주', once:3800000, twinOnce:4800000, note:'전국 평균 2주 일반실 기준이에요. 서울은 더 비싸요.' },
+      { id:'center2-helper', label:'산후조리원 2주 + 산후도우미', once:4500000, twinOnce:6000000, note:'조리원에서 2주 충분히 쉬고, 집에 와서도 도우미 도움을 받아요. 가장 든든하지만 비용도 가장 커요.' },
       { id:'center1-helper', label:'조리원 1주 + 산후도우미', once:2600000, twinOnce:3600000, note:'조리원에서 회복한 뒤 집에서 도우미와 아기 리듬을 만들어요.' },
-      { id:'helper', label:'정부지원 산후도우미만', once:700000, twinOnce:1200000, note:'산모·신생아 건강관리 바우처로 본인 부담이 줄어요. 소득·지역에 따라 달라요.' },
+      { id:'helper', label:'정부지원 산후도우미만', once:700000, twinOnce:1200000, note:'산모·신생아 건강관리 바우처로 본인 부담이 줄어요. 소득에 따라 본인 부담이 10만~150만 원까지 달라요.' },
       { id:'family', label:'가족 도움', once:500000, twinOnce:800000, note:'돈은 덜 들지만 서로의 기대를 미리 맞춰 두는 게 중요해요. (감사 비용만 잡았어요)' },
     ] },
   { at:'w18', type:'care', id:'care-back', title:'허리와 골반이 아파요',
