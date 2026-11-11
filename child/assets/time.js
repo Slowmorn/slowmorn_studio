@@ -1,5 +1,5 @@
 // 시점 표기: t → "임신 23주" / "생후 7개월" / "첫돌", 출산 예정일이 있으면 실제 날짜
-import { PREG_START, BIRTH_T, END_T } from './events.js?v=20261111s';
+import { PREG_START, BIRTH_T, END_T, TWIN_BIRTH_T } from './events.js?v=20261112a';
 
 export function stageLabel(t){
   const i = Math.floor(t + 1e-6);
@@ -12,16 +12,18 @@ export function stageLabel(t){
   return `생후 ${m}개월`;
 }
 
-// due: 'YYYY-MM-DD'. 임신 N주 = 예정일 − (40−N)주, 생후 N개월 = 예정일 + N개월
-export function dateAt(due, t){
+// due: 'YYYY-MM-DD'. 임신 N주 = 예정일 − (40−N)주, 생후 N개월 = 태어난 날 + N개월
+// 쌍둥이는 37주에 태어나서, 태어난 날이 예정일보다 3주 빨라요
+export function dateAt(due, t, twins){
   const [y, mo, d] = due.split('-').map(Number);
   const i = Math.floor(t + 1e-6);
-  if(i <= BIRTH_T) return new Date(y, mo - 1, d - (BIRTH_T - i) * 7);
-  return new Date(y, mo - 1 + (i - BIRTH_T), d);
+  const early = twins ? (BIRTH_T - TWIN_BIRTH_T) * 7 : 0;
+  if(i < BIRTH_T) return new Date(y, mo - 1, d - (BIRTH_T - i) * 7);
+  return new Date(y, mo - 1 + (i - BIRTH_T), d - early);
 }
-export function dateText(due, t){
+export function dateText(due, t, twins){
   if(!due) return '';
-  const dt = dateAt(due, t);
+  const dt = dateAt(due, t, twins);
   if(isNaN(dt)) return '';
   return `${dt.getFullYear()}.${dt.getMonth() + 1}.${dt.getDate()}`;
 }

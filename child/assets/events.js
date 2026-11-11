@@ -33,6 +33,8 @@
 
 export const PREG_START = 4;   // 임신 4주부터 시작
 export const BIRTH_T = 36;     // 40주 - 4
+export const TWIN_BIRTH_WEEK = 37;   // 쌍둥이는 보통 37주 무렵으로 제왕절개 날짜를 잡아요
+export const TWIN_BIRTH_T = TWIN_BIRTH_WEEK - PREG_START;
 export const END_T = 72;       // 생후 36개월
 
 export function atToT(at){
@@ -174,6 +176,7 @@ export const EVENTS = [
     ] },
   { at:'w33', type:'todo', title:'출산 가방 싸기',
     body:'산모 패드, 수유 브라, 세면도구, 아기 퇴원복, 손수건을 챙겨요. 32~36주쯤 미리 현관에 두면 마음이 편해요.',
+    twinNote:'쌍둥이는 보통 37주 무렵으로 제왕절개 날짜를 잡아요. 그보다 일찍 나오기도 하니 가방은 지금 싸 두세요.',
     cost:150000 },
   { at:'w36', type:'todo', id:'dad-before', dad:true, title:'출산 전에 아빠가 챙길 일',
     body:'진통은 예고 없이 와요. 미리 해 두면 그날 아내 옆에만 있으면 돼요.',
@@ -190,7 +193,7 @@ export const EVENTS = [
   { at:'w40', type:'milestone', title:'아기가 태어났어요',
     body:'긴 기다림 끝에 셋이 되었어요. 이제부터는 주가 아니라 달로 시간이 흘러요.',
     twinTitle:'쌍둥이가 태어났어요',
-    twinBody:'긴 기다림 끝에 넷이 되었어요. 이제부터는 주가 아니라 달로 시간이 흘러요.' },
+    twinBody:'37주에 잡아 둔 제왕절개 날, 둘을 만났어요. 예정일보다 3주쯤 일찍 넷이 되었어요. 이제부터는 주가 아니라 달로 시간이 흘러요.' },
   { at:'m0', type:'todo', id:'dad-hospital', dad:true, title:'출산 직후 병원에서 아빠가 할 일',
     body:'버짓리스트 예비 아빠 체크리스트에서 가져왔어요. 기한이 있는 일이 많아요.',
     items:[

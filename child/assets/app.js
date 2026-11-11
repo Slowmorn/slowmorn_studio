@@ -1,12 +1,12 @@
 // 미리 키움 — 출산·육아 시뮬레이터
 // 화면 세 개(시작 설정 · 시뮬레이션 · 정리)와 결정 카드를 다뤄요. 상태는 localStorage 에 저장해요.
-import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261111s';
-import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261111s';
-import { mountScene, caption } from './pixel.js?v=20261111s';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261111s';
-import { Clock } from './clock.js?v=20261111s';
-import { renderReport } from './report.js?v=20261111s';
-import { stageLabel, dateText } from './time.js?v=20261111s';
+import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261112a';
+import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261112a';
+import { mountScene, caption } from './pixel.js?v=20261112a';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261112a';
+import { Clock } from './clock.js?v=20261112a';
+import { renderReport } from './report.js?v=20261112a';
+import { stageLabel, dateText } from './time.js?v=20261112a';
 
 const KEY = 'child-sim-v1';
 const ARCHIVE_KEY = 'child-sim-archive-v1';
@@ -131,6 +131,7 @@ $('#btnRestart').addEventListener('click', async () => {
 const clock = new Clock({
   getT:() => state.t,
   setT:t => { state.t = t; onTime(); },
+  birthT:() => state?.twins ? TWIN_BIRTH_T : BIRTH_T,
   nextStop:(from, to) => STOPS.find(ev => ev.t <= to && isOpenStop(ev)) || null,
   onStop:ev => openStop(ev, { fromClock:true }),
   onEnd:() => { state.finished = true; save(true); toast('만 36개월이 되었어요. 둘의 계획을 정리해 볼게요.'); setTimeout(() => openReport(state), 900); },
@@ -139,6 +140,7 @@ const clock = new Clock({
 
 function startSim(autoplay){
   show('sim');
+  if(state.twins && state.t >= TWIN_BIRTH_T && state.t < BIRTH_T) state.t = BIRTH_T;   // 쌍둥이는 37주에 태어나요
   clock.speed = state.speed;
   const r = document.querySelector(`input[name="simSpeed"][value="${state.speed}"]`);
   if(r) r.checked = true;
@@ -178,7 +180,7 @@ function onTime(force = false){
   if(i !== lastInt || force){
     lastInt = i;
     $('#nowLabel').textContent = stageLabel(t);
-    $('#nowDate').textContent = state.due ? dateText(state.due, t) : '';
+    $('#nowDate').textContent = state.due ? dateText(state.due, t, state.twins) : '';
     $('#nowCaption').textContent = caption(t, state.baby, state.twins);
     const next = DECISIONS.find(ev => !state.decisions[ev.id] && ev.t >= t - 1e-6);
     $('#upNext').innerHTML = next ? `다음 · <b>${esc(evTitle(next, state.twins))}</b> <span>${stageLabel(next.t)}</span>` : (t >= END_T ? '' : '정할 건 다 정했어요. 끝까지 흘러가 볼까요?');
@@ -201,7 +203,7 @@ function renderFeed(newFrom){
 
 function card(ev, isNew){
   const tw = state.twins;
-  const when = `${stageLabel(ev.t)}${state.due ? ' · ' + dateText(state.due, ev.t) : ''}`;
+  const when = `${stageLabel(ev.t)}${state.due ? ' · ' + dateText(state.due, ev.t, state.twins) : ''}`;
   const cls = `card card-${ev.type}${isNew ? ' is-new' : ''}`;
   const title = esc(evTitle(ev, tw));
   const body = evBody(ev, tw);
@@ -345,7 +347,7 @@ function openDecision(ev, { fromClock = false } = {}){
   dlg.innerHTML = `
     <form method="dialog" class="decide-inner">
       ${fromClock ? `<p class="pause-note">시간이 잠시 멈췄어요. 둘이 이야기해 보고 정해요.</p>` : ''}
-      <p class="card-when">${stageLabel(ev.t)}${state.due ? ' · ' + dateText(state.due, ev.t) : ''} · ${typeLabel(ev)}</p>
+      <p class="card-when">${stageLabel(ev.t)}${state.due ? ' · ' + dateText(state.due, ev.t, state.twins) : ''} · ${typeLabel(ev)}</p>
       <h2>${esc(evTitle(ev, state.twins))}</h2>
       <p class="decide-body">${esc(evBody(ev, state.twins))}</p>
       ${linkHtml(ev)}
@@ -389,7 +391,7 @@ function openChecklist(ev, { fromClock = false } = {}){
   dlg.innerHTML = `
     <form method="dialog" class="decide-inner">
       ${fromClock ? `<p class="pause-note">시간이 잠시 멈췄어요. ${esc(state.names[1] || '남편')} 님이 챙길 일이에요.</p>` : ''}
-      <p class="card-when">${stageLabel(ev.t)}${state.due ? ' · ' + dateText(state.due, ev.t) : ''} · 아빠 할 일</p>
+      <p class="card-when">${stageLabel(ev.t)}${state.due ? ' · ' + dateText(state.due, ev.t, state.twins) : ''} · 아빠 할 일</p>
       <h2>${esc(evTitle(ev, tw))}</h2>
       <p class="decide-body">${esc(evBody(ev, tw))}</p>
       ${ev.support ? `<div class="chips"><span class="chip chip-good">+${won(amount)} ${esc(ev.support.label)}</span></div>` : ''}
