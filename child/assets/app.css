@@ -392,12 +392,33 @@ html:has(dialog[open]){overflow:hidden}
 }
 
 /* 인쇄: 정리 화면만 */
+/* PDF 저장본: 요약 + 처음부터 차례로 읽는 타임라인 */
+.print-only{display:none}
+.tl{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:0}
+.tl-phase{font-size:14px;margin:14px 0 4px;padding-bottom:4px;border-bottom:1.5px solid var(--ink)}
+.tl-item{padding:8px 0;border-bottom:1px solid var(--line);break-inside:avoid}
+.tl-item h3{font-size:14px;margin:0;display:flex;align-items:center;gap:6px;word-break:keep-all}
+.tl-when{font-size:11.5px;color:var(--muted);margin:0 0 2px}
+.tl-milestone h3{color:var(--accent-ink, var(--ink))}
+.tl-pick{margin:4px 0 0;display:flex;flex-wrap:wrap;align-items:baseline;gap:6px;font-size:13px}
+.tl-pick.pending{color:var(--muted)}
+.tl-memo{margin:2px 0 0;font-size:12.5px;color:var(--muted);font-style:italic}
+.tl-list{list-style:none;margin:4px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2px 12px;font-size:12.5px}
+.tl-list li{display:flex;align-items:center;gap:6px}
+.tl-box{flex:none;display:inline-grid;place-items:center;width:12px;height:12px;border:1.2px solid var(--muted);border-radius:3px;font-size:10px;line-height:1}
+.tl-box.on{border-color:var(--ink)}
+.tl-ultra{display:block;width:150px;height:auto;margin-top:6px;border-radius:6px;background:#000}
 @media print{
+  @page{size:A4;margin:14mm 12mm}
   .topbar,footer,.no-print,.toast,#setup,#sim{display:none !important}
   .report{padding:0;max-width:none}
-  .r-sec{break-inside:avoid-page}
-  .r-summary{background:none}
-  body{font-size:12.5px}
+  .r-summary{background:none;break-inside:avoid}
+  /* 저장본에는 요약과 타임라인만 담아요 */
+  .r-wrap > .r-sec:not(.r-summary):not(.r-timeline){display:none}
+  .print-only{display:block}
+  .r-scene{width:120px}
+  body{font-size:12.5px;background:#fff}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 
 /* 정리 화면: 지금 아이 모습과 초음파 앨범 */

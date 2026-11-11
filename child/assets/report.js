@@ -1,9 +1,9 @@
-// 정리 화면 — 우리 부부의 육아 계획서. 인쇄(PDF 저장)와 텍스트 복사를 지원해요.
-import { EVENTS, DECISIONS, PHASES, MODE_LABEL, END_T, evTitle, byId } from './events.js?v=20261111s';
-import { sceneImage } from './pixel.js?v=20261111s';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261111s';
-import { totals, optionOf, optionTotal, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261111s';
-import { stageLabel, dateText } from './time.js?v=20261111s';
+// 정리 화면 — 우리 부부의 육아 계획서. PDF로 저장하면 요약과 함께 타임라인이 처음(임신 4주)부터 차례로 담겨요.
+import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, evTitle, byId } from './events.js?v=20261112a';
+import { sceneImage } from './pixel.js?v=20261112a';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261112a';
+import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261112a';
+import { stageLabel, dateText } from './time.js?v=20261112a';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const statusText = s => s === 'hold' ? '보류' : '합의';
@@ -12,7 +12,7 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
   const tt = totals(state);
   const after = afterMonthly(state);
   const rec = id => state.decisions[id];
-  const when = t => `${stageLabel(t)}${state.due ? ` <span class="r-date">${dateText(state.due, t)}</span>` : ''}`;
+  const when = t => `${stageLabel(t)}${state.due ? ` <span class="r-date">${dateText(state.due, t, state.twins)}</span>` : ''}`;
   const holds = DECISIONS.filter(ev => rec(ev.id)?.status === 'hold');
   const undecided = DECISIONS.filter(ev => !rec(ev.id));
   const agreed = type => DECISIONS.filter(ev => ev.type === type && rec(ev.id)?.status === 'agree' && eff(ev, optionOf(ev, rec(ev.id).choice), state.twins));
@@ -36,8 +36,7 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
       <h1>${state.finished ? '만 3세까지 같이 살아 봤어요' : `${esc(stageLabel(state.t))}까지 살아 봤어요`}</h1>
       <p class="lead">${new Date(state.createdAt).toLocaleDateString('ko-KR')}에 시작 · 결정 ${DECISIONS.length - undecided.length}/${DECISIONS.length}개${holds.length ? ` · 보류 ${holds.length}개` : ''}</p>
       <div class="r-actions no-print">
-        <button type="button" class="btn-primary" data-r="print">인쇄 · PDF로 저장</button>
-        <button type="button" class="btn-ghost" data-r="copy">텍스트로 복사</button>
+        <button type="button" class="btn-primary" data-r="print">PDF로 저장</button>
         <button type="button" class="btn-ghost" data-r="back">${readonly ? '돌아가기' : state.finished ? '시뮬레이션 다시 보기' : '이어서 하기'}</button>
       </div>
     </header>
@@ -155,56 +154,55 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
       }).join('') || '<li class="note">아직 기록이 없어요.</li>'}</ol>
     </section>
 
+    ${timelineHtml(state, when)}
+
     <p class="note r-foot">금액과 제도는 2026년 기준 참고용 추정치예요. 지역·병원·브랜드에 따라 달라요. · 미리 키움 slowmorn.com/child</p>
   </div>`;
 
-  root.querySelector('[data-r="print"]').onclick = () => window.print();
-  root.querySelector('[data-r="back"]').onclick = onBack;
-  root.querySelector('[data-r="copy"]').onclick = async () => {
-    const text = plainText(state);
-    try { await navigator.clipboard.writeText(text); toast('복사했어요. 메모 앱이나 메신저에 붙여 넣으세요.'); }
-    catch(e){ toast('복사하지 못했어요. 인쇄 · PDF로 저장을 이용해 주세요.'); }
+  // 인쇄 창에서 'PDF로 저장'을 고르면 돼요. 파일 이름은 문서 제목을 따라가요.
+  root.querySelector('[data-r="print"]').onclick = () => {
+    const title = document.title;
+    document.title = `미리 키움 · ${state.names.join(' · ')}의 육아 타임라인`;
+    const restore = () => { document.title = title; window.removeEventListener('afterprint', restore); };
+    window.addEventListener('afterprint', restore);
+    window.print();
+    setTimeout(restore, 1000);
   };
+  root.querySelector('[data-r="back"]').onclick = onBack;
   const ta = root.querySelector('.promise textarea');
   if(ta) ta.addEventListener('input', () => onPromise(ta.value));
   // 보류 항목 다시 이야기하기는 app.js 의 공통 [data-open] 클릭 처리로 열려요
 }
 
-export function plainText(state){
-  const tt = totals(state);
-  const rec = id => state.decisions[id];
-  const L = [];
-  L.push(`[미리 키움] ${state.names.join(' · ')}${state.baby ? ` · ${state.baby}` : ''}${state.twins ? ' · 쌍둥이' : ''}의 육아 계획`);
-  L.push(`만 3세까지 실제 부담(예상): ${won(tt.net)} (지출 ${won(tt.cost)} − 지원금 ${won(tt.support)})`);
-  L.push('');
-  L.push('■ 키우는 방향');
-  for(const ev of DECISIONS.filter(e => e.type === 'edu' || e.type === 'choice')){
-    const r = rec(ev.id); const o = r && eff(ev, optionOf(ev, r.choice), state.twins);
-    L.push(`- ${evTitle(ev, state.twins)}: ${o ? o.label : '미정'}${r?.status === 'hold' ? ' (보류)' : ''}${r?.memo ? ` — ${r.memo}` : ''}`);
-  }
-  if(state.promise) L.push(`- 우리 둘의 약속: ${state.promise}`);
-  L.push('');
-  const gr = rec('gear'); const go = gr && eff(byId.gear, optionOf(byId.gear, gr.choice), state.twins);
-  L.push(`■ 육아용품 예산: ${go ? `${won(go.once)} (${MODE_LABEL[go.mode]})${gr.status === 'hold' ? ' (보류)' : ''}` : '미정'}`);
-  const careList = DECISIONS.filter(e => e.type === 'care');
-  if(careList.some(e => rec(e.id))){
-    L.push('');
-    L.push(`■ ${state.names[1] || '남편'}의 약속`);
-    for(const ev of careList){
-      const r = rec(ev.id); const o = r && eff(ev, optionOf(ev, r.choice), state.twins);
-      if(o) L.push(`- ${evTitle(ev, state.twins)}: ${o.label}${r.memo ? ` — ${r.memo}` : ''}`);
+// PDF(인쇄)에만 나오는 타임라인 — 시뮬레이터 화면은 최신이 위지만, 저장본은 임신 4주부터 차례로 읽혀요
+function timelineHtml(state, when){
+  const tw = state.twins, husband = state.names[1] || '남편';
+  const seen = EVENTS.filter(ev => ev.t <= state.t + 1e-6);
+  const mark = on => `<span class="tl-box${on ? ' on' : ''}" aria-label="${on ? '했어요' : '아직'}">${on ? '✓' : ''}</span>`;
+  const item = ev => {
+    const title = esc(evTitle(ev, tw));
+    const head = label => `<p class="tl-when">${when(ev.t)}${label ? ` · ${label}` : ''}</p>`;
+    if(ev.type === 'milestone') return `<li class="tl-item tl-milestone">${head('')}<h3>${title}</h3></li>`;
+    if(ev.type === 'todo' && ev.items){
+      return `<li class="tl-item">${head('아빠 할 일')}<h3>${title}</h3>
+        <ul class="tl-list">${ev.items.map(([k, label]) => `<li>${mark(state.todos[`${ev.id}:${k}`])}${esc(label)}</li>`).join('')}</ul></li>`;
     }
-  }
-  L.push('');
-  L.push('■ 시기별 할 일');
-  for(const ev of EVENTS.filter(e => e.type === 'todo')){
-    const at = `${stageLabel(ev.t)}${state.due ? ` (${dateText(state.due, ev.t)})` : ''}`;
-    if(ev.items){
-      L.push(`    ${at} ${evTitle(ev, state.twins)}`);
-      for(const [k, label] of ev.items) L.push(`${state.todos[`${ev.id}:${k}`] ? '[v]' : '[ ]'}   - ${label}`);
-    } else L.push(`${state.todos[ev.id] ? '[v]' : '[ ]'} ${at} ${evTitle(ev, state.twins)}`);
-  }
-  L.push('');
-  L.push('금액은 2026년 기준 참고용 추정치 · slowmorn.com/child');
-  return L.join('\n');
+    if(ev.type === 'todo'){
+      const img = ev.ultra ? `<img class="tl-ultra" alt="" src="${ultrasound(ev.ultra, { seed:state.id, twins:tw, week:ULTRA_WEEK[ev.ultra], name:state.baby })}">` : '';
+      return `<li class="tl-item">${head('할 일')}<h3>${mark(state.todos[ev.id])}${title}</h3>${img}</li>`;
+    }
+    const r = state.decisions[ev.id];
+    const o = r && eff(ev, optionOf(ev, r.choice), tw);
+    const label = ev.type === 'care' ? `${esc(husband)} 차례` : TYPE_LABEL[ev.type];
+    const pick = !r ? '<p class="tl-pick pending">아직 정하지 않았어요</p>'
+      : `<p class="tl-pick"><span class="status ${r.status}">${statusText(r.status)}</span><b>${o ? esc(o.label) : '고르지 않음'}</b>${o && ev.type !== 'care' ? ` <span class="r-meta">${priceText(o)}</span>` : ''}</p>${r.memo ? `<p class="tl-memo">“${esc(r.memo)}”</p>` : ''}`;
+    return `<li class="tl-item">${head(label)}<h3>${title}</h3>${pick}</li>`;
+  };
+  return `<section class="r-sec r-timeline print-only">
+    <h2>우리의 타임라인</h2>
+    ${PHASES.map(p => {
+      const list = seen.filter(ev => ev.t >= p.from && ev.t < p.to + (p.to === END_T ? 1 : 0));
+      return list.length ? `<h3 class="tl-phase">${p.label}</h3><ol class="tl">${list.map(item).join('')}</ol>` : '';
+    }).join('')}
+  </section>`;
 }
