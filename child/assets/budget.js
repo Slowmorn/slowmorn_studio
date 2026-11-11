@@ -1,5 +1,5 @@
 // 예산 계산 — 고른 선택지로 지출·지원 장부(ledger)를 만들고 합계를 내요.
-import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js?v=20261111p';
+import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js?v=20261111q';
 
 // 매달 들어오는 지원금 (생후 개월 기준, 끝 포함)
 //   부모급여: 0세 월 100만, 1세 월 50만. 어린이집을 다니면 1세 부모급여는 보육료 바우처로 나가서 현금은 0원으로 봐요.
@@ -27,6 +27,7 @@ export function eff(ev, opt, twins){
     once: opt.twinOnce ?? (opt.once ? opt.once * k : opt.once),
     monthly: opt.twinMonthly ?? (opt.monthly ? opt.monthly * k : opt.monthly),
     after: opt.after ? opt.after * k : opt.after,
+    pre: opt.twinPre ?? opt.pre,
   };
 }
 export const BASE_TWIN = 1.8;   // 쌍둥이 기본 생활비 배수 (물려 쓰고 같이 쓰는 게 있어서 2배보다 조금 적게)

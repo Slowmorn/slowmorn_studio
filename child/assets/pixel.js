@@ -1,7 +1,7 @@
 // 도트 그림 — 임신기에는 아내·남편과 아내 배 속의 태아, 출산 뒤에는 만 3세 아이까지, 시기에 맞는 장면을 그려요.
 // 96×64 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
 // 캐릭터는 따로 그린 뒤 테두리(외곽선)를 한 겹 둘러서 도트 느낌을 살려요.
-import { BIRTH_T, PREG_START } from './events.js?v=20261111p';
+import { BIRTH_T, PREG_START } from './events.js?v=20261111q';
 
 export const W = 96, H = 64;
 

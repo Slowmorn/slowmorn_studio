@@ -171,5 +171,5 @@ export function ultrasound(kind, { seed = 'x', twins = false, week = 12, name = 
   return url;
 }
 
-export const ULTRA_LABEL = { sac:'첫 초음파 · 아기집', nt:'1차 기형아 검사 · 젤리곰', detail:'정밀 초음파 · 입체 얼굴' };
+export const ULTRA_LABEL = { sac:'첫 초음파 · 아기집', nt:'1차 정밀 초음파 · 젤리곰', detail:'2차 정밀 초음파 · 입체 얼굴' };
 export const ULTRA_WEEK = { sac:6, nt:12, detail:21 };

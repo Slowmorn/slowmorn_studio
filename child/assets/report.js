@@ -1,9 +1,9 @@
 // 정리 화면 — 우리 부부의 육아 계획서. 인쇄(PDF 저장)와 텍스트 복사를 지원해요.
-import { EVENTS, DECISIONS, PHASES, MODE_LABEL, END_T, evTitle, byId } from './events.js?v=20261111p';
-import { sceneImage } from './pixel.js?v=20261111p';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261111p';
-import { totals, optionOf, optionTotal, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261111p';
-import { stageLabel, dateText } from './time.js?v=20261111p';
+import { EVENTS, DECISIONS, PHASES, MODE_LABEL, END_T, evTitle, byId } from './events.js?v=20261111q';
+import { sceneImage } from './pixel.js?v=20261111q';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261111q';
+import { totals, optionOf, optionTotal, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261111q';
+import { stageLabel, dateText } from './time.js?v=20261111q';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const statusText = s => s === 'hold' ? '보류' : '합의';
