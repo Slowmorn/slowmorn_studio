@@ -8,7 +8,19 @@
   --xm-pink:#E9B9B3;    /* 빨간 판 위 옅은 글자 */
   --xm-gold:#E9A93C;    /* 타이틀 */
   --xm-board:#FBF4F2;   /* 빨간 판 위의 크림색 판 */
+  --xm-green:#7A8A52;   /* 나무 줄과 같은 초록 */
 }
+/* 메인 색(평소 노랑)을 시즌 동안 나무 초록으로.
+   막대·이름표·3D 바닥 칠은 --accent-fill, 글자·선은 크림 판에서도 읽히게 진한 초록 */
+:root[data-theme="light"]{
+  --accent:#4F5E2C;
+  --accent-soft:#ECF0DF;
+  --accent-fill:var(--xm-green);
+}
+/* 남은 공간 이름표: 초록 바탕에 흰 글자 */
+.scene-label.gap{color:#fff;font-weight:600}
+/* 검은 알림 위 '되돌리기'는 밝은 초록 */
+.toast button{color:#B9CC8C}
 
 /* ── 소개 페이지 ──
    상단 바 아래부터 푸터 위까지 빨간 니트 판. 위에는 지그재그 띠, 푸터 바로 위에는 나무 줄 */
