@@ -1,0 +1,49 @@
+/* 크리스마스 시즌 꾸밈 — site.css 다음에 읽습니다.
+   시즌이 끝나면 이 파일을 읽는 <link> 한 줄만 지우면 원래 화면으로 돌아가요.
+   (merry.svg 워드마크와 캐릭터 모자는 site.css 에서 기본으로 숨겨 둡니다) */
+:root{
+  --xm-red:#7A2228;     /* 니트 바탕 */
+  --xm-cream:#F6E4E1;   /* 지그재그 띠, 하트 */
+  --xm-gold:#E9A93C;    /* 타이틀 */
+  --xm-green:#7A8A52;   /* 나무 */
+}
+
+/* 소개 영역부터 버짓보드 아래, 푸터 위까지 빨간 판으로.
+   위에는 지그재그 띠, 푸터 바로 위에는 나무 줄을 둡니다. */
+html{background:var(--sheet)}
+body.desk-page{background:url(xmas/fabric.svg) 0 0 / 9px 9px repeat, var(--xm-red)}
+.hero{position:relative;color:var(--xm-cream);background:none}
+.hero::before{
+  content:"";position:absolute;left:0;right:0;top:14px;height:13px;pointer-events:none;
+  background:url(xmas/band.svg) center top / 26px 13px repeat-x;
+}
+.hero-inner{padding-top:52px;padding-bottom:12px}
+.desk{padding-top:20px}
+footer{position:relative;margin-top:96px}
+footer::before{
+  content:"";position:absolute;left:0;right:0;bottom:100%;height:40px;pointer-events:none;
+  background:url(xmas/trees.svg) center bottom / 66px 40px repeat-x;
+}
+
+/* 버짓보드: 빨간 판 위의 크림색 판 */
+.desk-head h2{color:var(--xm-cream)}
+.desk .trash-btn{color:#E9B9B3}
+.desk .trash-btn:hover{background:rgba(255,255,255,.1);color:var(--xm-cream)}
+.desk .btn-ink{background:var(--xm-cream);color:var(--xm-red)}
+.desk .btn-ink:hover{filter:brightness(.96)}
+.desk-board{background:#FBF4F2;border-color:rgba(0,0,0,.08)}
+.desk-note{color:#E9B9B3}
+
+/* MERRY CHRISTMAS 워드마크 */
+.xmas-mark{display:block;width:min(100%, 520px);height:auto;margin:0 0 18px}
+
+.hero .hero-kicker{color:#E9B9B3}
+/* 제목은 니트 코 모양으로만 보이게 (글자 위에 코 무늬 마스크) */
+.hero h1{
+  color:var(--xm-gold);font-weight:800;margin-bottom:24px;
+  -webkit-mask:url(xmas/stitch.svg) 0 0 / 4px 4px repeat;
+          mask:url(xmas/stitch.svg) 0 0 / 4px 4px repeat;
+}
+.hero .hero-lead{color:var(--xm-cream)}
+.m-shadow{fill:rgba(0,0,0,.22)}
+.m-hat{display:inline}

@@ -59,6 +59,8 @@ footer a:hover{text-decoration:underline}
 .m-body{transform-box:fill-box;transform-origin:50% 60%;animation:m-float 3.2s ease-in-out infinite}
 .m-eyes{transform-box:fill-box;transform-origin:center;animation:m-blink 4.6s infinite}
 .m-pupil{animation:m-look 7s ease-in-out infinite}
+/* 시즌 꾸밈(xmas.css)에서만 보여요 */
+.m-hat,.xmas-mark{display:none}
 /* 한 바퀴: 살짝 웅크렸다가 돌고 착지 */
 .mascot.spin .m-body{animation:m-spin .9s cubic-bezier(.45,.05,.3,1)}
 @keyframes m-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
