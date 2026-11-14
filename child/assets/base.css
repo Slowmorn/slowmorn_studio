@@ -82,3 +82,5 @@ footer a:hover{text-decoration:underline}
   .topbar-inner{padding:10px 16px}
   .foot-inner,.foot-note{padding-left:16px;padding-right:16px}
 }
+/* 크리스마스 워드마크는 xmas.css 를 읽을 때만 보여요 */
+.xmas-mark{display:none}

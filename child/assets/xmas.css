@@ -1,0 +1,86 @@
+/* 크리스마스 시즌 꾸밈 — 버짓리스트·셀렉트박스와 같은 빨간 니트 테마.
+   site.css / app.css 다음에 읽어요.
+   시즌이 끝나면 이 파일을 읽는 <link> 한 줄만 지우면 원래 화면으로 돌아가요.
+   (merry.svg 워드마크는 base.css 에서 기본으로 숨겨 둬요. 도트 그림의 크리스마스 거실은 pixel.js 의 XMAS 한 줄로 켜고 꺼요) */
+:root{
+  --xm-red:#7A2228;     /* 니트 바탕 */
+  --xm-cream:#F6E4E1;   /* 지그재그 띠, 빨간 판 위 글자 */
+  --xm-pink:#E9B9B3;    /* 빨간 판 위 옅은 글자 */
+  --xm-gold:#E9A93C;    /* 타이틀 */
+  --xm-board:#FBF4F2;   /* 빨간 판 위의 크림색 판 */
+  --xm-green:#7A8A52;   /* 나무 줄과 같은 초록 */
+  /* 메인 색(평소 살구색)을 시즌 동안 나무 초록으로. 글자·선은 크림 판에서도 읽히게 진한 초록 */
+  --accent:#4F5E2C;
+  --accent-soft:#ECF0DF;
+  --accent-fill:var(--xm-green);
+  --page:var(--xm-board);
+  --paper:#F4EAE6;
+  --line:#EADCD7;
+}
+/* 페이지 전체 바탕: 레드와인 니트 (내용이 짧아도 화면 끝까지) */
+html,body{background:url(xmas/fabric.svg) 0 0 / 9px 9px repeat, var(--xm-red)}
+body{min-height:100vh}
+
+/* 상단 바 아래 지그재그 띠, 푸터 바로 위 나무 줄 */
+.topbar{position:relative}
+.topbar::after{
+  content:"";position:absolute;left:0;right:0;top:calc(100% + 14px);height:13px;pointer-events:none;
+  background:url(xmas/band.svg) center top / 26px 13px repeat-x;
+}
+footer{position:relative;margin-top:96px}
+footer::before{
+  content:"";position:absolute;left:0;right:0;bottom:100%;height:40px;pointer-events:none;
+  background:url(xmas/trees.svg) center bottom / 66px 40px repeat-x;
+}
+
+/* ── 소개 페이지 ── */
+.hero{color:var(--xm-cream)}
+.hero-inner{padding-top:60px}
+.xmas-mark{display:block;width:min(100%, 440px);height:auto;margin:0 0 18px}
+.hero .kicker,.hero .hero-note{color:var(--xm-pink)}
+/* 제목은 니트 코 모양으로만 보이게 (글자 위에 코 무늬 마스크) */
+.hero h1{
+  color:var(--xm-gold);font-weight:800;
+  -webkit-mask:url(xmas/stitch.svg) 0 0 / 4px 4px repeat;
+          mask:url(xmas/stitch.svg) 0 0 / 4px 4px repeat;
+}
+.hero-lead{color:var(--xm-cream)}
+.hero-cta{background:var(--xm-cream);color:var(--xm-red)}
+.hero-cta:hover{filter:brightness(.96)}
+.hero-art{background:var(--xm-board);border-color:rgba(0,0,0,.08);box-shadow:0 18px 40px -20px rgba(0,0,0,.55)}
+.site-main h2{color:var(--xm-cream)}
+.site-main .note{color:var(--xm-pink)}
+.steps li{background:var(--xm-board);border-color:rgba(0,0,0,.08)}
+.step-no{background:var(--xm-red);color:var(--xm-cream)}
+.cat-table{background:var(--xm-board)}
+.cat-table th{background:#F4EAE6}
+.sister{background:var(--xm-board);border-color:rgba(0,0,0,.08)}
+.sister:hover{border-color:rgba(0,0,0,.16);box-shadow:0 8px 24px -12px rgba(0,0,0,.45)}
+
+/* ── 시뮬레이터 ──
+   빨간 니트 판 위에, 글을 읽고 고르는 곳은 크림·흰 판으로 올려요 */
+.setup{padding-top:48px}
+.setup-card,.archive{background:var(--xm-board);border-radius:16px;padding:24px 22px}
+.archive{margin-top:20px}
+.sim{padding-top:40px}
+.sim-head{border-radius:16px;padding:0 16px 10px;border-bottom:0}
+.scene{width:calc(100% + 32px);max-width:none;margin:0 -16px;border-radius:16px 16px 0 0}
+.sim-body{padding-top:16px}
+.feed-empty{background:var(--xm-board);border-style:solid;border-color:transparent}
+.report{padding-top:48px}
+.r-wrap{background:var(--xm-board);border-radius:16px;padding:24px 24px 28px}
+.r-summary{background:#fff}
+
+@media (max-width:860px){
+  .tabs{border-radius:0 0 12px 12px;padding:8px 8px;border-bottom:0}
+}
+@media (max-width:640px){
+  /* 폰에서는 위쪽 판(그림·지금 시기·단추)과 탭을 화면 끝까지 넓혀요 */
+  .sim{padding-top:36px}
+  .sim-head,.tabs{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding-left:16px;padding-right:16px;border-radius:0}
+  .scene{width:100vw;margin:0 0 0 calc(50% - 50vw);border-radius:0}
+  .setup{padding-top:40px}
+  .setup-card,.archive{padding:20px 16px}
+  .report{padding-top:40px;padding-left:10px;padding-right:10px}
+  .r-wrap{padding:18px 14px 22px}
+}
