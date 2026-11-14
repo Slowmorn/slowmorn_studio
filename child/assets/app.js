@@ -1,12 +1,12 @@
 // 미리 키움 — 출산·육아 시뮬레이터
 // 화면 세 개(시작 설정 · 시뮬레이션 · 정리)와 결정 카드를 다뤄요. 상태는 localStorage 에 저장해요.
-import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261115a';
-import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261115a';
-import { mountScene, caption } from './pixel.js?v=20261115a';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261115a';
-import { Clock } from './clock.js?v=20261115a';
-import { renderReport } from './report.js?v=20261115a';
-import { stageLabel, dateText } from './time.js?v=20261115a';
+import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261115c';
+import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261115c';
+import { mountScene, caption } from './pixel.js?v=20261115c';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261115c';
+import { Clock } from './clock.js?v=20261115c';
+import { renderReport } from './report.js?v=20261115c';
+import { stageLabel, dateText } from './time.js?v=20261115c';
 
 const KEY = 'child-sim-v1';
 const ARCHIVE_KEY = 'child-sim-archive-v1';
@@ -145,7 +145,7 @@ function startSim(autoplay){
   const r = document.querySelector(`input[name="simSpeed"][value="${state.speed}"]`);
   if(r) r.checked = true;
   $('#nowWho').textContent = `${state.names.join(' · ')}${state.baby ? ` · ${state.baby}` : ''}${state.twins ? ' · 쌍둥이' : ''}`;
-  if(!sceneMounted){ mountScene($('#scene'), () => ({ t:state ? state.t : 0, twins:!!state?.twins })); sceneMounted = true; }
+  if(!sceneMounted){ mountScene($('#scene'), () => ({ t:state ? state.t : 0, twins:!!state?.twins, seed:state?.id })); sceneMounted = true; }
   buildTrack();
   lastInt = -1;
   feedCount = -1;

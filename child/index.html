@@ -14,7 +14,7 @@
 <meta property="og:locale" content="ko_KR">
 <meta property="og:title" content="미리 키움 · 부부가 같이 해 보는 출산·육아 시뮬레이터">
 <meta property="og:description" content="임신 4주부터 만 3세까지, 할 일과 살 것과 예산과 키우는 방향을 둘이 같이 정해요.">
-<link rel="icon" href="favicon.svg?v=20261115a" type="image/svg+xml">
+<link rel="icon" href="favicon.svg?v=20261115c" type="image/svg+xml">
 <!-- Google Analytics 4 (버짓리스트와 같은 속성. 보고서에서 /child/ 경로로 나눠 봐요) -->
 <script>
   // 내 컴퓨터에서 미리 볼 때(localhost 등)는 GA로 보내지 않아요
@@ -30,9 +30,9 @@
 </script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
-<link rel="stylesheet" href="assets/base.css?v=20261115a">
-<link rel="stylesheet" href="assets/site.css?v=20261115a">
-<link rel="stylesheet" href="assets/xmas.css?v=20261115a">
+<link rel="stylesheet" href="assets/base.css?v=20261115c">
+<link rel="stylesheet" href="assets/site.css?v=20261115c">
+<link rel="stylesheet" href="assets/xmas.css?v=20261115c">
 </head>
 <body>
 <header class="topbar">
@@ -133,11 +133,12 @@
 </script>
 <!-- 소개 그림: 배 속에서 만 3세까지 장면이 차례로 바뀌어요 -->
 <script type="module">
-  import { mountScene, caption } from './assets/pixel.js?v=20261115a';
-  import { stageLabel } from './assets/time.js?v=20261115a';
+  import { mountScene, caption } from './assets/pixel.js?v=20261115c';
+  import { stageLabel } from './assets/time.js?v=20261115c';
   const STOPS = [2, 8, 16, 30, 36, 40, 43, 46, 50, 58, 70];
   let k = 0;
-  const cur = () => ({ t:STOPS[k], twins:false });
+  const seed = Math.random().toString(36).slice(2);   // 들어올 때마다 다른 부부가 나와요
+  const cur = () => ({ t:STOPS[k], twins:false, seed });
   mountScene(document.getElementById('heroScene'), cur);
   const show = () => {
     document.getElementById('heroStage').textContent = stageLabel(STOPS[k]);

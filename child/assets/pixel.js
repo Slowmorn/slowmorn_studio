@@ -1,7 +1,7 @@
 // 도트 그림 — 임신기에는 곰 부부와 그 사이에 크게 보이는 배 속, 출산 뒤에는 만 3세 아기 곰까지, 시기에 맞는 장면을 그려요.
 // 80×40 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
 // 캐릭터는 한 줄씩 글자로 적은 도트 지도(스프라이트)를 찍어요. 테두리까지 지도에 들어 있어요.
-import { BIRTH_T, PREG_START } from './events.js?v=20261115a';
+import { BIRTH_T, PREG_START } from './events.js?v=20261115c';
 
 // 높이는 40칸 그대로, 가로 칸 수는 그림이 놓인 자리의 폭에 맞춰 늘어나요 (최소 80칸). 사람·벽난로·트리는 가운데를 기준으로 놓아요
 export let W = 80;
@@ -91,65 +91,120 @@ export function caption(t, name, twins){
 }
 
 
-// ── 곰 스프라이트 ───────────────────────────────
-// o 테두리 · f 털 · s 털 그늘 · i 귀 안쪽 · z 주둥이 · e 눈 · c 볼 · n 코 · t 옷 · u 옷 그늘 · l 옷 밝은 곳 · r 리본 · k 리본 매듭 · . 빈칸
-// 모서리를 한 칸씩 깎아서 머리·귀·몸·발이 다 동글동글해요
-const ADULT = turn(14, [       // 17×22 어른 (14줄부터 몸)
-  '..ooo.......ooo..',
-  '.ofifo.....ofifo.',
-  '.offfooooooofffo.',
+// ── 사람 스프라이트 ─────────────────────────────
+// o 테두리 · f 피부 · s 피부 그늘 · e 눈 · c 볼 · m 입 · h 머리카락 · H 머리 윤기 · t 옷 · u 옷 그늘 · l 옷 밝은 곳 · g 다리 · G 다리 그늘 · . 빈칸
+// 머리가 크고 몸이 작은 비율, 모서리를 깎은 둥근 머리. 얼굴은 오른쪽을 살짝 봐요 (3/4)
+// 머리 모양은 덮어 그리는 지도(HAIR)로 바꿔요. '.' 은 밑그림 그대로
+const HEAD_ADULT = [           // 17칸 폭, 0~12줄
+  '.................',
+  '.................',
+  '.....ooooooo.....',
+  '...oofffffffoo...',
+  '..offfffffffffo..',
   '.offfffffffffffo.',
-  'offfffffffffffffo',
-  'offfffffffffffffo',
   'offffffefffffeffo',
   'offffffefffffeffo',
-  'offfffcfznnnzfcfo',
-  'offffffzzzzzzzffo',
-  'offffffzzzzzzzffo',
-  'offfffffzzzzzfffo',
-  '.ossssssssssssso.',
+  'offfffcfffffffcfo',
+  'offfffffffmfffffo',
+  '.offfffffffffffo.',
+  '..ossssssssssso..',
   '...ooooooooooo...',
+];
+const BODY_ADULT = [           // 13~20줄
   '....ottttttto....',
   '...ottttttttto...',
   '..oftttttttttfo..',
   '..offtttttttffo..',
   '...ootttttttoo...',
   '....ouuuuuuuo....',
-  '....offfofffo....',
+  '....ogggogggo....',
   '.....ooo.ooo.....',
-]);
-const KID = turn(11, [         // 15×17 걸음마 아기 (11줄부터 몸)
-  '.ooo.......ooo.',
-  'ofifo.....ofifo',
-  '.offoooooooffo.',
+];
+const HAIR = {
+  // 짧은 머리
+  short:{ 1:'.....ooooooo.....', 2:'...oohhHHhhhoo...', 3:'..ohhhhhhHhhhho..', 4:'.ohhhhhhhhhhhhho.', 5:'ohhhhhhhhhhhfhhfo', 6:'ohhhfffefffffeffo', 7:'ohhffffefffffeffo' },
+  // 가르마 (이마가 보이게 넘긴 머리)
+  part:{ 1:'.....ooooooo.....', 2:'...oohhhHHhhoo...', 3:'..ohhhhhhhhHhho..', 4:'.ohhhhhhhhhhhhfo.', 5:'ohhhhhhhhhhfffffo', 6:'ohhhfffefffffeffo', 7:'ohhffffefffffeffo' },
+  // 아주 짧은 머리
+  buzz:{ 3:'...oohhhhhhhoo...', 4:'..ohhhhhHhhhhho..', 5:'.ohhhffffffffffo.' },
+  // 아내 머리 윗부분 (긴 머리·묶은 머리·올림머리가 같이 써요): 둥근 머리 위를 덮고 앞머리는 옆으로 넘겨 이마가 살짝 보여요
+  cap:{ 1:'....ooooooooo....', 2:'..oohhhhHHhhhoo..', 3:'.ohhhhhhhhhHhhho.', 4:'ohhhhhhhhhhhhhhho', 5:'ohhhhhhhhhhhhfffo',
+        6:'ohhhfffefffffeffo', 7:'ohhffffefffffeffo' },
+  // 긴 머리: 얼굴 뒤쪽을 따라 내려와요 (등 뒤로 흘러내리는 부분은 BEHIND.long)
+  long:{ 1:'....ooooooooo....', 2:'..oohhhhHHhhhoo..', 3:'.ohhhhhhhhhHhhho.', 4:'ohhhhhhhhhhhhhhho', 5:'ohhhhhhhhhhhhfffo',
+         6:'ohhhfffefffffeffo', 7:'ohhhfffefffffeffo', 8:'ohhhffcfffffffcfo', 9:'ohhhffffffmfffffo', 10:'.ohhfffffffffffo.', 11:'..ohsssssssssso..' },
+  // 단발: 턱선까지 둥글게
+  bob:{ 1:'....ooooooooo....', 2:'..oohhhhHHhhhoo..', 3:'.ohhhhhhhhhHhhho.', 4:'ohhhhhhhhhhhhhhho', 5:'ohhhhhhhhhhhhhhho',
+        6:'ohhhhffefffffehho', 7:'ohhhhffefffffehho', 8:'ohhhhfcffffffhhho', 9:'ohhhhfffffmffhhho', 10:'.ohhhhfffffffhho.', 11:'..oooosssssssooo.' },
+};
+
+function overlay(base, map){
+  return base.map((row, y) => {
+    const o = map[y];
+    if(!o) return row;
+    return [...row].map((ch, x) => o[x] && o[x] !== '.' ? o[x] : ch).join('');
+  });
+}
+// 머리 뒤쪽·위쪽으로 삐져나오는 머리(묶은 머리, 올림머리, 흘러내린 긴 머리)를 그릴 자리로 왼쪽 3칸, 위쪽 2칸을 비워 둬요
+const PAD_L = 3, PAD_T = 3;
+// 머리 뒤에 깔리는 부분: 빈칸에만 채워서 얼굴·몸 뒤에 있는 것처럼 보여요. [왼쪽 x, 위 y (여백 포함 좌표), 줄들]
+const BEHIND = {
+  long:[0, PAD_T + 5, ['..o...', '.oh...', '.oh...', 'ohh...', 'ohH...', 'ohhh..', 'ohhhh.', 'ohhhhh', 'ohhhh.', '.ohhh.', '..ooo.']],
+  pony:[0, PAD_T + 3, ['..oo', '.ohk', 'ohhh', 'ohH.', 'ohh.', 'ohh.', 'ohh.', '.oh.', '..o.']],
+  bun:[1, 0, ['...oooo...', '.oohhhHoo.', 'ohhhhhhHHo', 'ohhhhhhhHo', 'ohhhhhhhho', 'ohhhhhhhho', '.ohhhhhho.', '..oooooo..']],
+};
+const CAP_OF = { pony:'cap', bun:'cap' };
+function adultRows(style){
+  let rows = turn(13, overlay([...HEAD_ADULT, ...BODY_ADULT], HAIR[CAP_OF[style] || style] || {}));
+  const w = rows[0].length + PAD_L;
+  rows = [...Array(PAD_T).fill(''), ...rows].map(r => '.'.repeat(w - r.length) + r);
+  const b = BEHIND[style];
+  if(b){
+    const [x0, y0, tpl] = b, a = rows.map(r => r.split(''));
+    tpl.forEach((line, dy) => [...line].forEach((ch, dx) => { const y = y0 + dy, x = x0 + dx; if(ch !== '.' && a[y] && a[y][x] === '.') a[y][x] = ch; }));
+    rows = a.map(r => r.join(''));
+  }
+  return rows;
+}
+const ADULT_H = PAD_T + HEAD_ADULT.length + BODY_ADULT.length;   // 23줄
+const ADULT_LEGS = ADULT_H - 2;                          // 숨 쉴 때 이 줄부터 아래(다리)는 제자리
+const EYE_Y = PAD_T + 6;                                 // 눈 줄
+
+const KID_BASE = turn(10, [    // 15×16 걸음마 아이 (10줄부터 몸)
+  '...............',
+  '....ooooooo....',
+  '..oohhhhHhhoo..',
+  '.ohhhhhhhhHhho.',
+  'ohhhffefffffefo',
+  'ohhfffefffffefo',
+  'offffcffmffffco',
   'offfffffffffffo',
-  'offfffefffffefo',
-  'offfffefffffefo',
-  'offffcffnnnffco',
-  'offffffzzzzzffo',
-  'offffffzzzzzffo',
   '.ossssssssssso.',
   '...ooooooooo...',
   '...ottttttto...',
   '..oftttttttfo..',
   '..offtttttffo..',
   '...oouuuuuoo...',
-  '....offoffo....',
+  '....oggoggo....',
   '.....oo.oo.....',
 ]);
-const BABY_HEAD = [            // 13×9 아기 머리
-  '.oo.......oo.',
-  'ofio.....oifo',
-  '.ofooooooofo.',
-  'offfffffffffo',
+const BABY_BASE = [            // 13×9 아기 머리
+  '.............',
+  '...ooooooo...',
+  '..offfffffo..',
+  '.offfffffffo.',
   'offffeffffefo',
-  'offfcfznnnzco',
-  'offfffzzzzzfo',
+  'offfcfmfffcfo',
+  'offfffffffffo',
   '.ossssssssso.',
   '...ooooooo...',
 ];
+// 아기 머리카락: 갓난아기는 한 가닥, 6개월부터 짧게 덮어요
+const babyHeadRows = month => month < 6
+  ? setPx(BABY_BASE, [[6, 0, 'h'], [7, 0, 'o'], [5, 0, 'o']])
+  : overlay(BABY_BASE, { 1:'...ooooooo...', 2:'..ohhhHhhho..', 3:'.ohhhffffffo.' });
 
-// 눈 감기: 눈 두 줄 중 위쪽은 털로, 아래쪽은 가로선으로
+// 눈 감기: 눈 두 줄 중 위쪽은 피부로, 아래쪽은 가로선으로
 function closeEyes(rows, top){
   const r = rows.slice();
   const a = r[top].split(''), b = r[top + 1].split('');
@@ -174,6 +229,7 @@ function turn(from, rows){
     const a = r.split('');
     const i = a.findIndex(ch => ch !== '.');
     if(a[i + 1] === 't') a[i + 1] = 'u';
+    else if(a[i + 1] === 'g') for(let k = i + 1; a[k] === 'g'; k++) a[k] = 'G';
     else for(let k = i + 1; a[k] === 'f'; k++) a[k] = 's';
     return a.join('');
   });
@@ -186,17 +242,41 @@ function setPx(rows, list){
   return r.map(a => a.join(''));
 }
 
-// 색 묶음: 엄마 곰은 꿀색, 아빠 곰은 밤색
-const BASE = { o:C.line, e:C.eye, n:C.eye, c:C.cheek, z:'#F5E1C6', r:'#F27E9B', k:'#E5484D' };
-const PAL = {
-  mom:{ ...BASE, f:'#DDAB78', s:'#C8925F', i:'#F0CBA6', t:'#F5A3B4', u:'#E07C93', l:'#FBC9D3' },
-  dad:{ ...BASE, f:'#A97C58', s:'#8E6445', i:'#D4AE8A', t:'#82B4E6', u:'#5E93CC', l:'#B5D3F2' },
-};
-// 배 속 아기는 곰 털색 대신 분홍
+// ── 등장인물 고르기 ── 시뮬레이션마다(id 로) 피부색·머리 모양·머리색·옷·안경을 무작위로 골라요. 같은 시뮬레이션에서는 늘 같아요
+const BASE = { o:C.line, e:C.eye, c:C.cheek, m:'#B5534F', k:'#E5484D' };   // k 머리끈
+const SKIN = [['#F9DCC6', '#EBC0A2']];   // 피부색은 밝은 한 가지
+const HAIR_C = [['#2E2420', '#4A3A33'], ['#4A3024', '#6B4A38'], ['#6E4630', '#8E6248'], ['#2A2A33', '#474756'], ['#9C6B45', '#BC8A60'], ['#C99A5E', '#E0B97E']];
+const MOM_TOP = [['#F5A3B4', '#E07C93', '#FBC9D3'], ['#F6C26B', '#E0A447', '#FBDDA3'], ['#B7A3E0', '#9580C9', '#D6CBF0'], ['#9FD6B9', '#6EBE96', '#C7EAD7'], ['#F49B7A', '#DE7C5A', '#F9C2AD'], ['#F2EFE6', '#D9D3C4', '#FFFFFF']];
+const DAD_TOP = [['#82B4E6', '#5E93CC', '#B5D3F2'], ['#7FAF7A', '#5F9159', '#B3D3AE'], ['#E8D2A6', '#CDB27F', '#F3E6CB'], ['#9A93A3', '#7D7688', '#C4BFCB'], ['#E58A7E', '#C96C60', '#F2B8AF'], ['#4C5A7A', '#3A4663', '#6C7CA0']];
+const DAD_LEGS = [['#5D6B8A', '#48546E'], ['#4A4A4A', '#363636'], ['#7A6248', '#5F4B37'], ['#C8B48E', '#AE9A74']];
+// 배 속 아기는 분홍
 const FETUS_PAL = { f:'#F6B3BE', s:'#E8919F' };
 // 아기 옷 색 (쌍둥이는 둘째가 민트)
 const CLOTH = [{ t:'#FFB38A', u:'#EF8E60', l:'#FFD0B5' }, { t:'#9FD6B9', u:'#6EBE96', l:'#C7EAD7' }];
-const babyPal = i => ({ ...(i ? PAL.dad : PAL.mom), ...CLOTH[i] });
+
+function rng(seed){
+  let h = 1779033703;
+  for(const ch of String(seed)) h = Math.imul(h ^ ch.charCodeAt(0), 3432918353), h = h << 13 | h >>> 19;
+  return () => { h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+}
+let CAST = null, CAST_SEED = null;
+function castFor(seed = 'miri'){
+  if(CAST && CAST_SEED === seed) return CAST;
+  const r = rng(seed), pick = a => a[Math.floor(r() * a.length)];
+  const mSkin = pick(SKIN), dSkin = pick(SKIN), mHair = pick(HAIR_C), dHair = pick(HAIR_C);
+  const mTop = pick(MOM_TOP), dTop = pick(DAD_TOP), dLegs = pick(DAD_LEGS);
+  const mom = { rows:adultRows(pick(['long', 'bob', 'pony', 'bun'])),
+    pal:{ ...BASE, f:mSkin[0], s:mSkin[1], h:mHair[0], H:mHair[1], t:mTop[0], u:mTop[1], l:mTop[2], g:mSkin[0], G:mSkin[1] } };
+  const dad = { rows:adultRows(pick(['short', 'part', 'buzz'])),
+    pal:{ ...BASE, f:dSkin[0], s:dSkin[1], h:dHair[0], H:dHair[1], t:dTop[0], u:dTop[1], l:dTop[2], g:dLegs[0], G:dLegs[1] } };
+  const kids = [0, 1].map(i => {
+    const sk = r() < .5 ? mSkin : dSkin, hc = r() < .5 ? mHair : dHair;
+    return { ...BASE, f:sk[0], s:sk[1], h:hc[0], H:hc[1], ...CLOTH[i], g:'#7E9CD6', G:'#6482BF' };
+  });
+  CAST = { mom, dad, kids }; CAST_SEED = seed;
+  return CAST;
+}
+const babyPal = i => CAST.kids[i];
 
 function stamp(L1, rows, x, y, pal, split = -1, bob = 0){
   // split 줄부터 아래(다리)는 제자리, 위는 bob 만큼 내려와요 (숨쉬기)
@@ -217,13 +297,14 @@ function layers(){
   if(!L.char || L.char.c.width !== W){ L.char = new Layer(); L.tmp = new Layer(); }
   return L;
 }
-const norm = opts => ({ twins:!!(opts && typeof opts === 'object' ? opts.twins : opts) });
+const norm = opts => opts && typeof opts === 'object' ? { twins:!!opts.twins, seed:opts.seed } : { twins:!!opts };
 
 // main: 60×40 Layer, t: 시간 축, opts: { twins } (twins 불리언만 줘도 돼요), now: ms (움직임용)
 export function drawScene(main, t, opts, now){
   const o = norm(opts);
   const i = Math.floor(t + 1e-6);
   W = main.c.width;
+  castFor(o.seed ?? 'miri');
   main.clear();
   if(i < BIRTH_T) couple(main, i + PREG_START, o, now);
   else room(main, i - BIRTH_T, o, now);
@@ -243,7 +324,7 @@ function couple(m, week, { twins }, now){
   const g = Math.min(1, Math.max(0, (week - 4) / 36));
   const GY = 38;                                  // 발 아래 줄
   const mid = Math.floor(W / 2);
-  const wx = mid - 28, hx = mid + 12, sy = GY - ADULT.length; // 스프라이트 왼쪽 위 (양옆에 벽난로와 트리)
+  const wx = mid - 28, hx = mid + 12, sy = GY - ADULT_H; // 스프라이트 왼쪽 위 (양옆에 벽난로와 트리)
   const cx = mid, cy = 16, BR = 10, ir = BR - 2;
   const { char, tmp } = layers();
   m.rect(wx + 3, GY - 1, 11, 1, C.floorD); m.rect(hx + 3, GY - 1, 11, 1, C.floorD);
@@ -286,24 +367,24 @@ function couple(m, week, { twins }, now){
 
   // ── 엄마 곰: 리본, 주수가 차면 배가 볼록
   const bw = anim ? Math.floor(now / 1100) % 2 : 0;
-  let mom = setPx(ADULT, [[11, 2, 'r'], [12, 2, 'k'], [13, 2, 'r'], [11, 3, 'r'], [13, 3, 'r']]);
-  if(blinkAt(now, 0)) mom = closeEyes(mom, 6);
+  let mom = CAST.mom.rows;
+  if(blinkAt(now, 0)) mom = closeEyes(mom, EYE_Y);
   char.clear();
-  stamp(char, mom, wx, sy, PAL.mom, 20, bw);
+  stamp(char, mom, wx - PAD_L, sy, CAST.mom.pal, ADULT_LEGS, bw);
   if(week >= 14){
     // 볼록한 배: 배 속은 가운데 창에서 보여 주니, 몸에는 아랫배만 한 칸 살짝 (14주쯤부터 같은 크기)
-    const y1 = sy + 18 + bw, y2 = sy + 19 + bw;
-    char.rect(wx + 12, y1, 2, 1, PAL.mom.t); char.px(wx + 14, y1, C.line);
-    char.px(wx + 12, y2, PAL.mom.u); char.px(wx + 13, y2, C.line);
+    const y1 = sy + PAD_T + 17 + bw, y2 = sy + PAD_T + 18 + bw;
+    char.rect(wx + 12, y1, 2, 1, CAST.mom.pal.t); char.px(wx + 14, y1, C.line);
+    char.px(wx + 12, y2, CAST.mom.pal.u); char.px(wx + 13, y2, C.line);
   }
   m.x.drawImage(char.c, 0, 0);
 
   // ── 아빠 곰: 숨 쉬고 눈 깜빡이기만 해요
   const bh = anim ? Math.floor((now + 550) / 1100) % 2 : 0;
-  let dad = mirror(ADULT);                                     // 창이 있는 왼쪽을 봐요
-  if(blinkAt(now, 1800)) dad = closeEyes(dad, 6);
+  let dad = mirror(CAST.dad.rows);                             // 창이 있는 왼쪽을 봐요
+  if(blinkAt(now, 1800)) dad = closeEyes(dad, EYE_Y);
   char.clear();
-  stamp(char, dad, hx, sy, PAL.dad, 20, bh);
+  stamp(char, dad, hx, sy, CAST.dad.pal, ADULT_LEGS, bh);
   m.x.drawImage(char.c, 0, 0);
 
   // 창 위로 하트가 떠올라요
@@ -345,9 +426,6 @@ function babyInWomb(L1, cordL, cx, cy, week, now, k, seed, inside, pal){
     const x = bx + hr * .2 + s * (hr * 1.6), y = by - (s * hr * 1.6) + Math.sin(s * 9 + now / 500);
     if(!inside || inside(x, y)) cordL.px(x, y, C.cord);
   }
-  if(hr >= 2.5){                                                // 동그란 곰 귀
-    for(const ex of [hx - hr * .65, hx + hr * .55]) L1.disc(ex, hy - hr * .75, Math.max(1, hr * .32), pal.f);
-  }
   L1.ell(bx, by, hr * .75, hr * .85, pal.f);                           // 몸
   L1.ell(bx + hr * .35 + kick, by + hr * .75, hr * .55, hr * .32, pal.s);        // 다리
   L1.disc(hx, hy, hr, pal.f);                                          // 머리
@@ -370,18 +448,18 @@ function room(m, month, { twins }, now){
 }
 // 출산 뒤에도 엄마·아빠 곰이 아기 양옆에 서서 아기를 바라봐요
 function parents(m, now){
-  const mid = Math.floor(W / 2), GY = 38, sy = GY - ADULT.length;
+  const mid = Math.floor(W / 2), GY = 38, sy = GY - ADULT_H;
   const mx = mid - 46, dx = mid + 30;
   m.rect(mx + 3, GY - 1, 11, 1, X.floorD); m.rect(dx + 3, GY - 1, 11, 1, X.floorD);
   const bm = now > 0 ? Math.floor(now / 1100) % 2 : 0, bd = now > 0 ? Math.floor((now + 550) / 1100) % 2 : 0;
-  let mom = setPx(ADULT, [[11, 2, 'r'], [12, 2, 'k'], [13, 2, 'r'], [11, 3, 'r'], [13, 3, 'r']]);
-  if(blinkAt(now, 0)) mom = closeEyes(mom, 6);
-  let dad = mirror(ADULT);
-  if(blinkAt(now, 1800)) dad = closeEyes(dad, 6);
+  let mom = CAST.mom.rows;
+  if(blinkAt(now, 0)) mom = closeEyes(mom, EYE_Y);
+  let dad = mirror(CAST.dad.rows);
+  if(blinkAt(now, 1800)) dad = closeEyes(dad, EYE_Y);
   const { tmp } = layers();
   tmp.clear();
-  stamp(tmp, mom, mx, sy, PAL.mom, 20, bm);
-  stamp(tmp, dad, dx, sy, PAL.dad, 20, bd);
+  stamp(tmp, mom, mx - PAD_L, sy, CAST.mom.pal, ADULT_LEGS, bm);
+  stamp(tmp, dad, dx, sy, CAST.dad.pal, ADULT_LEGS, bd);
   m.x.drawImage(tmp.c, 0, 0);
 }
 // ── 크리스마스 거실 ── 왼쪽 벽난로(불이 일렁여요), 위에 꼬마전구 가랜드, 오른쪽 트리와 선물
@@ -509,7 +587,7 @@ function babies(m, char, month, twins, xs, now){
     xs.forEach((x, i) => {
       const p = babyPal(i);
       char.ell(x, 25, 5, 2, p.t);
-      stamp(char, closeEyes1(i ? mirror(BABY_HEAD) : BABY_HEAD, 4), x - 6, 16, p);
+      stamp(char, closeEyes1(i ? mirror(babyHeadRows(month)) : babyHeadRows(month), 4), x - 6, 16, p);
     });
     tmp2(char, t => { t.rect(bx, 26, bw, 6, C.bas); for(let x = bx + 2; x < bx + bw - 1; x += 3) t.rect(x, 28, 1, 3, C.basS); });
     xs.forEach(x => zzz(m, x + 5, 13, now));
@@ -519,7 +597,7 @@ function babies(m, char, month, twins, xs, now){
     xs.forEach((x, i) => {
       const p = babyPal(i), kick = Math.floor(now / 400 + i) % 2;
       tmp2(char, t => { t.ell(x + 4, 31, 6, 2, p.t); t.rect(x + 9, 28 - kick, 2, 2, p.f); });
-      let h = mirror(BABY_HEAD); if(blinkAt(now, i * 1300)) h = closeEyes1(h, 4);
+      let h = mirror(babyHeadRows(month)); if(blinkAt(now, i * 1300)) h = closeEyes1(h, 4);
       stamp(char, h, x - 8, 23, p);
     });
   } else if(month < 9){
@@ -530,7 +608,7 @@ function babies(m, char, month, twins, xs, now){
         t.ell(x, 31, 4, 4, p.t);
         t.rect(x - 6, 29 - wave, 2, 2, p.f); t.rect(x + 5, 29 - (1 - wave), 2, 2, p.f);
       });
-      let h = i ? mirror(BABY_HEAD) : BABY_HEAD; if(blinkAt(now, i * 1300)) h = closeEyes1(h, 4);
+      let h = i ? mirror(babyHeadRows(month)) : babyHeadRows(month); if(blinkAt(now, i * 1300)) h = closeEyes1(h, 4);
       stamp(char, h, x - 6, 20, p);
     });
   } else if(month < 12){
@@ -542,7 +620,7 @@ function babies(m, char, month, twins, xs, now){
         t.rect(x - 1 + st, 33, 2, 3, p.f); t.rect(x + 2 - st, 33, 2, 3, p.f);
         t.rect(x + 7 - st, 33, 2, 3, p.f); t.rect(x + 9 + st, 33, 2, 3, p.f);
       });
-      let h = mirror(BABY_HEAD); if(blinkAt(now, i * 1300)) h = closeEyes1(h, 4);
+      let h = mirror(babyHeadRows(month)); if(blinkAt(now, i * 1300)) h = closeEyes1(h, 4);
       stamp(char, h, x - 9, 23, p);
     });
   } else {
@@ -551,7 +629,7 @@ function babies(m, char, month, twins, xs, now){
     xs.forEach((x, i) => {
       const p = babyPal(i);
       const ph = Math.floor(now / (month >= 18 ? 260 : 420) + i) % 2;
-      const base = KID, sprite = i ? mirror(base) : base, w = sprite[0].length;   // 만 3세도 엄마·아빠보다 작게
+      const base = KID_BASE, sprite = i ? mirror(base) : base, w = sprite[0].length;   // 만 3세도 엄마·아빠보다 작게
       const sx = x - Math.floor(w / 2) + (month < 18 ? (ph ? 1 : 0) : 0), sy = 38 - sprite.length;
       if(big) tmp2(char, t => t.rect(i ? sx + w - 3 : sx - 1, sy + 11, 4, 4, C.bag));   // 가방은 등 쪽에
       let s = sprite; if(blinkAt(now, i * 1300)) s = closeEyes(s, 4);
