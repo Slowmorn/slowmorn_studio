@@ -186,6 +186,10 @@
 .phase-bars i{height:8px;border-radius:4px;background:var(--accent-fill);min-width:2px;transition:width .4s}
 .phase-bars b{font-weight:600;font-variant-numeric:tabular-nums;min-width:62px;text-align:right}
 .modes{margin:12px 0 0;font-size:13px}
+.money-ahead{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.money-ahead summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--muted)}
+.money-ahead summary:hover{color:var(--ink)}
+.money-ahead .note{margin-top:8px}
 .modes span{color:var(--good)}
 
 .log{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}

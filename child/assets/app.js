@@ -1,12 +1,12 @@
 // 미리 키움 — 출산·육아 시뮬레이터
 // 화면 세 개(시작 설정 · 시뮬레이션 · 정리)와 결정 카드를 다뤄요. 상태는 localStorage 에 저장해요.
-import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261114a';
-import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261114a';
-import { mountScene, caption } from './pixel.js?v=20261114a';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261114a';
-import { Clock } from './clock.js?v=20261114a';
-import { renderReport } from './report.js?v=20261114a';
-import { stageLabel, dateText } from './time.js?v=20261114a';
+import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261115a';
+import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261115a';
+import { mountScene, caption } from './pixel.js?v=20261115a';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261115a';
+import { Clock } from './clock.js?v=20261115a';
+import { renderReport } from './report.js?v=20261115a';
+import { stageLabel, dateText } from './time.js?v=20261115a';
 
 const KEY = 'child-sim-v1';
 const ARCHIVE_KEY = 'child-sim-archive-v1';
@@ -286,25 +286,33 @@ function renderSide(){ renderSideBudget(); renderLog(); renderMarks(); }
 function renderSideBudget(){
   const tt = totals(state, state.t);
   const undecided = DECISIONS.filter(ev => !state.decisions[ev.id] || state.decisions[ev.id].status === 'hold').length;
-  const max = Math.max(1, ...PHASES.map(p => tt.phases[p.id].cost));
+  const max = Math.max(1, ...PHASES.map(p => tt.phasesNow[p.id].cost));
+  // 위쪽은 0원에서 시작해서 시간이 흐르며 쌓이는 '지금까지', 아래쪽은 지금까지 정한 대로 가면 만 3세까지 얼마인지
   $('#budgetPanel').innerHTML = `
     <h2>예산</h2>
     <div class="money-now">
       <span>지금까지 쓴 돈</span>
       <b>${won(tt.costNow)}</b>
-      <small>받은 지원금 ${won(tt.supportNow)}</small>
+      <small>고른 것의 값은 고른 순간 더해지고, 매달 드는 돈은 그달마다 더해져요</small>
     </div>
     <dl class="money-total">
-      <div><dt>만 3세까지 예상 지출</dt><dd>${won(tt.cost)}</dd></div>
-      <div><dt>받을 지원금</dt><dd class="good">−${won(tt.support)}</dd></div>
-      <div class="sum"><dt>실제 부담</dt><dd>${tt.net >= 0 ? won(tt.net) : `<span class="good">지원금이 ${won(-tt.net)} 더 많아요</span>`}</dd></div>
+      <div><dt>지금까지 받은 지원금</dt><dd class="good">−${won(tt.supportNow)}</dd></div>
+      <div class="sum"><dt>지금까지 실제 부담</dt><dd>${tt.netNow >= 0 ? won(tt.netNow) : `<span class="good">지원금이 ${won(-tt.netNow)} 더 많아요</span>`}</dd></div>
     </dl>
     <ul class="phase-bars">${PHASES.map(p => {
-      const c = tt.phases[p.id].cost;
+      const c = tt.phasesNow[p.id].cost;
       return `<li><span>${p.label}</span><i style="width:${(c / max * 100).toFixed(1)}%"></i><b>${won(c)}</b></li>`;
     }).join('')}</ul>
     <p class="modes">육아용품 ${gearText()}</p>
-    <p class="note">${BASE_NOTE}${state.twins ? ', 쌍둥이는 1.8배' : ''}가 들어 있어요.${undecided ? ` 아직 정하지 않았거나 보류한 ${undecided}개는 빠져 있어요.` : ''}</p>
+    <details class="money-ahead">
+      <summary>지금까지 정한 대로라면, 만 3세까지</summary>
+      <dl class="money-total">
+        <div><dt>예상 지출</dt><dd>${won(tt.cost)}</dd></div>
+        <div><dt>받을 지원금</dt><dd class="good">−${won(tt.support)}</dd></div>
+        <div class="sum"><dt>실제 부담</dt><dd>${tt.net >= 0 ? won(tt.net) : `<span class="good">지원금이 ${won(-tt.net)} 더 많아요</span>`}</dd></div>
+      </dl>
+      <p class="note">${BASE_NOTE}${state.twins ? ', 쌍둥이는 1.8배' : ''}와 부모급여·아동수당이 들어 있어요.${undecided ? ` 아직 정하지 않았거나 보류한 ${undecided}개는 빠져 있어요.` : ''}</p>
+    </details>
   `;
 }
 

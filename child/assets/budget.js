@@ -1,5 +1,5 @@
 // 예산 계산 — 고른 선택지로 지출·지원 장부(ledger)를 만들고 합계를 내요.
-import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js?v=20261114a';
+import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js?v=20261115a';
 
 // 매달 들어오는 지원금 (생후 개월 기준, 끝 포함)
 //   부모급여: 0세 월 100만, 1세 월 50만. 어린이집을 다니면 1세 부모급여는 보육료 바우처로 나가서 현금은 0원으로 봐요.
@@ -50,7 +50,10 @@ export function optionOf(ev, choiceId){
   return ev.options?.find(o => o.id === choiceId) || null;
 }
 
-// 장부 한 줄: { t, amount, kind:'cost'|'support', label, eventId, mode }
+// 장부 한 줄: { t, amount, kind:'cost'|'support', label, eventId, mode, bookT? }
+//   t 는 실제로 돈이 나가는 때, bookT 는 '지금까지' 에 더하기 시작하는 때예요.
+//   결정의 일회성 비용은 나중에 내더라도 고른 순간 지출로 잡아요 (고르면 바로 예산이 늘어나 보이게).
+//   매달 나가는 돈과 지원금은 그달이 될 때마다 더해져요.
 export function ledger(state){
   const rows = [];
   for(const ev of EVENTS){
@@ -59,18 +62,21 @@ export function ledger(state){
   }
   for(const ev of DECISIONS){
     const rec = state.decisions[ev.id];
-    const opt = rec && eff(ev, optionOf(ev, rec.choice), state.twins);
+    if(!rec || rec.status === 'hold') continue;              // 보류한 결정은 예산에서 빼요
+    const opt = eff(ev, optionOf(ev, rec.choice), state.twins);
     if(!opt) continue;
     const payT = ev.payAt ? atToT(ev.payAt) : ev.t;
+    const decidedT = rec.t ?? ev.t;
+    const book = t => Math.min(t, decidedT);
     if(opt.once && ev.payPlan){
       // 오래 걸쳐 사는 것은 나눠서: 마지막 몫에 반올림 차이를 몰아요
       let left = opt.once;
       ev.payPlan.forEach(([at, ratio], k) => {
         const amount = k === ev.payPlan.length - 1 ? left : Math.round(opt.once * ratio);
         left -= amount;
-        rows.push({ t:atToT(at), amount, kind:'cost', label:`${ev.title} · ${opt.label}`, eventId:ev.id, mode:opt.mode });
+        rows.push({ t:atToT(at), bookT:book(atToT(at)), amount, kind:'cost', label:`${ev.title} · ${opt.label}`, eventId:ev.id, mode:opt.mode });
       });
-    } else if(opt.once) rows.push({ t:payT, amount:opt.once, kind:'cost', label:`${ev.title} · ${opt.label}`, eventId:ev.id, mode:opt.mode });
+    } else if(opt.once) rows.push({ t:payT, bookT:book(payT), amount:opt.once, kind:'cost', label:`${ev.title} · ${opt.label}`, eventId:ev.id, mode:opt.mode });
     if(opt.monthly && opt.pre){
       // 임신 중에도 매달 나가는 돈 (태아보험처럼 가입한 달부터): 결정 시점에서 출산까지 고르게 나눠요
       const step = (BIRTH_T - ev.t) / opt.pre;
@@ -96,13 +102,15 @@ export function ledger(state){
 
 export function totals(state, upToT = END_T){
   const rows = ledger(state);
-  const out = { cost:0, support:0, costNow:0, supportNow:0, phases:{} };
-  for(const p of PHASES) out.phases[p.id] = { cost:0, support:0 };
+  const out = { cost:0, support:0, costNow:0, supportNow:0, phases:{}, phasesNow:{} };
+  for(const p of PHASES){ out.phases[p.id] = { cost:0, support:0 }; out.phasesNow[p.id] = { cost:0, support:0 }; }
   for(const r of rows){
     const ph = phaseOf(r.t).id;
     out[r.kind] += r.amount;
     out.phases[ph][r.kind] += r.amount;
-    if(r.t <= upToT) out[r.kind + 'Now'] += r.amount;
+    const bt = r.bookT ?? r.t;
+    // '지금까지' 는 지출로 잡은 때의 시기에 넣어요 (임신 중에 고른 분만비는 임신기 막대에)
+    if(bt <= upToT + 1e-6){ out[r.kind + 'Now'] += r.amount; out.phasesNow[phaseOf(bt).id][r.kind] += r.amount; }
   }
   out.net = out.cost - out.support;
   out.netNow = out.costNow - out.supportNow;
@@ -150,7 +158,7 @@ export function won(n, unit = true){
   } else {
     s = n.toLocaleString('ko-KR');
   }
-  return sign + s + (unit ? ' 원' : '');
+  return sign + s + (unit ? (n >= 10000 ? ' 원' : '원') : '');   // 0원, 5,000원 · 5만 원
 }
 
 export function afterMonthly(state){
