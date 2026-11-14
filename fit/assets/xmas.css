@@ -1,0 +1,88 @@
+/* 크리스마스 시즌 꾸밈 — 버짓리스트(budget/assets/xmas.css)와 같은 빨간 니트 테마.
+   site.css / app.css 다음에 읽습니다.
+   시즌이 끝나면 이 파일을 읽는 <link> 한 줄만 지우면 원래 화면으로 돌아가요.
+   (merry.svg 워드마크와 캐릭터 모자는 site.css 에서 기본으로 숨겨 둡니다) */
+:root{
+  --xm-red:#7A2228;     /* 니트 바탕 */
+  --xm-cream:#F6E4E1;   /* 지그재그 띠, 빨간 판 위 글자 */
+  --xm-pink:#E9B9B3;    /* 빨간 판 위 옅은 글자 */
+  --xm-gold:#E9A93C;    /* 타이틀 */
+  --xm-board:#FBF4F2;   /* 빨간 판 위의 크림색 판 */
+}
+
+/* ── 소개 페이지 ──
+   상단 바 아래부터 푸터 위까지 빨간 니트 판. 위에는 지그재그 띠, 푸터 바로 위에는 나무 줄 */
+html{background:var(--sheet)}
+body:has(.fit-hero){background:url(xmas/fabric.svg) 0 0 / 9px 9px repeat, var(--xm-red)}
+.hero{position:relative;color:var(--xm-cream)}
+.hero::before{
+  content:"";position:absolute;left:0;right:0;top:14px;height:13px;pointer-events:none;
+  background:url(xmas/band.svg) center top / 26px 13px repeat-x;
+}
+.fit-hero{padding-top:56px}
+body:has(.fit-hero) footer{position:relative;margin-top:96px}
+body:has(.fit-hero) footer::before{
+  content:"";position:absolute;left:0;right:0;bottom:100%;height:40px;pointer-events:none;
+  background:url(xmas/trees.svg) center bottom / 66px 40px repeat-x;
+}
+
+/* MERRY CHRISTMAS 워드마크 */
+.xmas-mark{display:block;width:min(100%, 480px);height:auto;margin:0 0 18px}
+
+.hero .hero-kicker,.hero .hero-note{color:var(--xm-pink)}
+/* 제목은 니트 코 모양으로만 보이게 (글자 위에 코 무늬 마스크) */
+.hero h1{
+  color:var(--xm-gold);font-weight:800;
+  -webkit-mask:url(xmas/stitch.svg) 0 0 / 4px 4px repeat;
+          mask:url(xmas/stitch.svg) 0 0 / 4px 4px repeat;
+}
+.hero .hero-lead{color:var(--xm-cream)}
+.hero-cta{background:var(--xm-cream);color:var(--xm-red)}
+.hero-cta:hover{filter:brightness(.96)}
+.hero-fit{color:var(--xm-pink)}
+.hero-fit b{color:var(--xm-cream)}
+
+/* 아래 안내: 제목은 크림색 글자, 카드와 목록은 크림색 판 */
+.fit-main h2{color:var(--xm-cream)}
+.fit-main .note{color:var(--xm-pink)}
+.steps li{background:var(--xm-board);border-color:rgba(0,0,0,.08)}
+.step-no{background:var(--xm-red);color:var(--xm-cream)}
+.brands{background:var(--xm-board);border:0;border-radius:var(--radius-lg);padding:4px 16px}
+.brands li:last-child{border-bottom:0}
+.sister{background:var(--xm-board);border-color:rgba(0,0,0,.08)}
+.sister:hover{border-color:rgba(0,0,0,.16);box-shadow:0 8px 24px -12px rgba(0,0,0,.45)}
+.m-hat{display:inline}
+
+/* ── 수납장 재기 화면 (app) ──
+   같은 빨간 니트 판. 상단 바 아래에 지그재그 띠, 맨 아래에 나무 줄.
+   카드·3D·목록은 크림·흰 판으로 둬서 보고 고르기 편하게 합니다. */
+body:has(.app){background:url(xmas/fabric.svg) 0 0 / 9px 9px repeat, var(--xm-red)}
+body:has(.app) .topbar{position:relative}
+body:has(.app) .topbar::after{
+  content:"";position:absolute;left:0;right:0;top:calc(100% + 14px);height:13px;pointer-events:none;
+  background:url(xmas/band.svg) center top / 26px 13px repeat-x;
+}
+.wrap.app{padding-top:44px}
+body:has(.app) footer{position:relative;margin-top:96px}
+body:has(.app) footer::before{
+  content:"";position:absolute;left:0;right:0;bottom:100%;height:40px;pointer-events:none;
+  background:url(xmas/trees.svg) center bottom / 66px 40px repeat-x;
+}
+
+/* 요약 카드·추천은 크림색 판, 3D 는 흰 판 그대로 */
+.app .plan-card{background:var(--xm-board);border-color:rgba(0,0,0,.08)}
+.app .plan-card::after{display:none}
+.app .rec{background:var(--xm-board);border-color:rgba(0,0,0,.08)}
+.app .stage-wrap{border-color:rgba(0,0,0,.08)}
+/* 수납함 목록과 후보 수납함은 바탕 위에 바로 있던 것을 크림색 판에 올려요 */
+.app .catalog,.app .side{
+  background:var(--xm-board);border-radius:var(--radius-lg);padding:14px 16px 16px;
+}
+.app .catalog{margin-top:0}
+@media (max-width:640px){
+  .wrap.app{padding-top:40px}
+  /* 폰에서는 목록 줄이 좁아지지 않게 판 안쪽 여백을 줄여요 */
+  .wrap.app{padding-left:10px;padding-right:10px}
+  .app .catalog,.app .side{padding:12px 10px}
+  .app .list-filter .chips{margin:0 -10px;padding:0 10px}
+}

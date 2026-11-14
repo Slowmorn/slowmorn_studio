@@ -75,6 +75,8 @@ body{--wrap:1080px;--shell:1080px}   /* 상단 바·푸터도 본문과 같은 �
 @keyframes m-shadow{0%,100%{transform:scaleX(1);opacity:1}50%{transform:scaleX(.82);opacity:.6}}
 @keyframes m-blink{0%,44%,50%,92%,100%{transform:scaleY(1)}47%,95%{transform:scaleY(.08)}}
 @media (prefers-reduced-motion:reduce){.m-shadow,.m-body,.m-eyes{animation:none}}
+/* 시즌 꾸밈(xmas.css)에서만 보여요 */
+.m-hat,.xmas-mark{display:none}
 .sister-body{display:flex;flex-direction:column;gap:3px;min-width:0}
 .sister-kicker{color:var(--muted);font-size:12.5px;font-weight:600}
 .sister-body b{font-size:18px;letter-spacing:-0.01em}
