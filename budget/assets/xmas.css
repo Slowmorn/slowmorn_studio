@@ -47,3 +47,55 @@ footer::before{
 .hero .hero-lead{color:var(--xm-cream)}
 .m-shadow{fill:rgba(0,0,0,.22)}
 .m-hat{display:inline}
+
+/* ── 체크리스트 화면 (planner) ──
+   홈과 같은 빨간 니트 판. 상단 바 아래에 지그재그 띠, 맨 아래에 나무 줄.
+   카테고리 카드와 요약 카드는 크림·흰 판으로 둬서 글을 읽고 적기 편하게 합니다. */
+body:has(#planner){
+  background:url(xmas/fabric.svg) 0 0 / 9px 9px repeat, var(--xm-red);
+  padding-bottom:0;
+}
+body:has(#planner) .topbar{position:relative}
+body:has(#planner) .topbar::after{
+  content:"";position:absolute;left:0;right:0;top:calc(100% + 14px);height:13px;pointer-events:none;
+  background:url(xmas/band.svg) center top / 26px 13px repeat-x;
+}
+#planner{padding-top:44px}
+body:has(#planner)::after{
+  content:"";display:block;height:40px;margin-top:72px;
+  background:url(xmas/trees.svg) center bottom / 66px 40px repeat-x;
+}
+
+/* 빨간 판 위의 글자와 단추 */
+#planner .back-desk,#planner .file-bar-sep,#planner .file-switch-btn,#planner .color-btn,
+#planner .opt-toggle{color:var(--xm-cream)}
+#planner .file-switch-btn .chev{color:#E9B9B3}
+#planner .back-desk:hover,#planner .file-switch-btn:hover,#planner .file-switch[open] .file-switch-btn,
+#planner .color-btn:hover,#planner .color-menu[open] .color-btn{background:rgba(255,255,255,.1);color:var(--xm-cream)}
+#planner .opt-toggle:hover{color:#fff}
+#planner .save-note,#planner .foot-actions button{color:#E9B9B3}
+#planner .save-note a{color:var(--xm-cream)}
+#planner .foot-actions button:hover{color:var(--xm-cream)}
+#planner .add-cat{border-color:rgba(246,228,225,.45);color:var(--xm-cream)}
+#planner .add-cat:hover{border-color:var(--xm-cream);color:#fff}
+#cats .empty{border-color:rgba(246,228,225,.45);color:var(--xm-cream)}
+
+/* 요약 카드는 크림색 판 */
+#planner .plan-card{background:#FBF4F2;border-color:rgba(0,0,0,.08)}
+
+/* 템플릿 설명을 건네는 캐릭터와 말풍선은 시즌 동안 숨겨요 */
+#planner .hello{display:none !important}
+
+/* 이모지를 안 고른 카테고리의 웃는 얼굴 자리에 니트 리스 */
+.cat-emoji:not(.has){background:url(xmas/wreath.svg) center / 27px 30px no-repeat}
+.cat-emoji:not(.has):hover{background:url(xmas/wreath.svg) center / 27px 30px no-repeat, var(--accent-soft)}
+.cat-emoji:not(.has) svg{visibility:hidden}
+
+/* 엑셀로 내보내기와 카테고리 칩: 바탕은 그대로, 테두리만 색 있는 점선 (색상 단추처럼) */
+#planner .export{border:1.5px dashed #8DB35E;padding:5.5px 12.5px}
+.cat-nav-item,.cat-nav-item:hover{border:1.5px dashed #C9363E}
+.cat-nav-item:has(.cat-nav-go[aria-current="true"]){border-color:#C9363E}
+
+/* 점 여섯 개 손잡이(항목·카테고리 칩)는 와인색 */
+.item-grip,.item-grip:hover,.cat-nav-grip{color:var(--xm-red)}
+.item-grip,.cat-nav-grip{opacity:.8}
