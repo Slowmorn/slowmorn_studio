@@ -1,12 +1,12 @@
 // 미리 키움 — 출산·육아 시뮬레이터
 // 화면 세 개(시작 설정 · 시뮬레이션 · 정리)와 결정 카드를 다뤄요. 상태는 localStorage 에 저장해요.
-import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261112a';
-import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261112a';
-import { mountScene, caption } from './pixel.js?v=20261112a';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261112a';
-import { Clock } from './clock.js?v=20261112a';
-import { renderReport } from './report.js?v=20261112a';
-import { stageLabel, dateText } from './time.js?v=20261112a';
+import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261114a';
+import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261114a';
+import { mountScene, caption } from './pixel.js?v=20261114a';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261114a';
+import { Clock } from './clock.js?v=20261114a';
+import { renderReport } from './report.js?v=20261114a';
+import { stageLabel, dateText } from './time.js?v=20261114a';
 
 const KEY = 'child-sim-v1';
 const ARCHIVE_KEY = 'child-sim-archive-v1';

@@ -1,9 +1,9 @@
 // 정리 화면 — 우리 부부의 육아 계획서. PDF로 저장하면 요약과 함께 타임라인이 처음(임신 4주)부터 차례로 담겨요.
-import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, evTitle, byId } from './events.js?v=20261112a';
-import { sceneImage } from './pixel.js?v=20261112a';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261112a';
-import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261112a';
-import { stageLabel, dateText } from './time.js?v=20261112a';
+import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, evTitle, byId } from './events.js?v=20261114a';
+import { sceneImage } from './pixel.js?v=20261114a';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261114a';
+import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261114a';
+import { stageLabel, dateText } from './time.js?v=20261114a';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const statusText = s => s === 'hold' ? '보류' : '합의';
@@ -31,7 +31,7 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
   root.innerHTML = `
   <div class="r-wrap">
     <header class="r-head">
-      <img class="r-scene" alt="" src="${sceneImage(Math.min(state.t, END_T - 1), state.twins)}">
+      <img class="r-scene" alt="" src="${sceneImage(Math.min(state.t, END_T - 1), { twins:state.twins })}">
       <p class="kicker">${esc(state.names.join(' · '))}${state.baby ? ` · ${esc(state.baby)}` : ''}${state.twins ? ' · 쌍둥이' : ''}의 육아 계획</p>
       <h1>${state.finished ? '만 3세까지 같이 살아 봤어요' : `${esc(stageLabel(state.t))}까지 살아 봤어요`}</h1>
       <p class="lead">${new Date(state.createdAt).toLocaleDateString('ko-KR')}에 시작 · 결정 ${DECISIONS.length - undecided.length}/${DECISIONS.length}개${holds.length ? ` · 보류 ${holds.length}개` : ''}</p>
