@@ -1,9 +1,14 @@
 // 도트 그림 — 임신기에는 곰 부부와 그 사이에 크게 보이는 배 속, 출산 뒤에는 만 3세 아기 곰까지, 시기에 맞는 장면을 그려요.
-// 60×40 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
+// 80×40 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
 // 캐릭터는 한 줄씩 글자로 적은 도트 지도(스프라이트)를 찍어요. 테두리까지 지도에 들어 있어요.
 import { BIRTH_T, PREG_START } from './events.js?v=20261114a';
 
-export const W = 60, H = 40;
+// 높이는 40칸 그대로, 가로 칸 수는 그림이 놓인 자리의 폭에 맞춰 늘어나요 (최소 80칸). 사람·벽난로·트리는 가운데를 기준으로 놓아요
+export let W = 80;
+export const H = 40;
+export const MIN_W = 80;
+// 크리스마스 시즌: 벽난로·트리·선물이 있는 거실을 배경으로 써요. 시즌이 끝나면 false 로
+const XMAS = true;
 
 const C = {
   line:'#3E3343', eye:'#2E2530', cheek:'#F29A9A',
@@ -207,7 +212,7 @@ const blinkAt = (now, off) => now > 0 && (now + off) % 3700 < 160;
 // ── 장면 ────────────────────────────────────
 const L = { char:null, tmp:null };
 function layers(){
-  if(!L.char){ L.char = new Layer(); L.tmp = new Layer(); }
+  if(!L.char || L.char.c.width !== W){ L.char = new Layer(); L.tmp = new Layer(); }
   return L;
 }
 const norm = opts => ({ twins:!!(opts && typeof opts === 'object' ? opts.twins : opts) });
@@ -216,6 +221,7 @@ const norm = opts => ({ twins:!!(opts && typeof opts === 'object' ? opts.twins :
 export function drawScene(main, t, opts, now){
   const o = norm(opts);
   const i = Math.floor(t + 1e-6);
+  W = main.c.width;
   main.clear();
   if(i < BIRTH_T) couple(main, i + PREG_START, o, now);
   else room(main, i - BIRTH_T, o, now);
@@ -224,15 +230,19 @@ export function drawScene(main, t, opts, now){
 // 임신기: 왼쪽 엄마 곰, 오른쪽 아빠 곰, 가운데에 배 속을 크게 보여 주는 동그란 창
 function couple(m, week, { twins }, now){
   const anim = now > 0;
-  m.rect(0, 0, W, 33, C.bgP);
-  for(let y = 2; y < 33; y += 4) for(let x = (y / 4 % 2) * 2 + 1; x < W; x += 4) m.px(x, y, C.bgPd);
-  m.rect(0, 33, W, 7, C.floor);
-  m.rect(0, 36, W, 1, C.floorD);
+  if(XMAS) xmasRoom(m, now);
+  else {
+    m.rect(0, 0, W, 33, C.bgP);
+    for(let y = 2; y < 33; y += 4) for(let x = (y / 4 % 2) * 2 + 1; x < W; x += 4) m.px(x, y, C.bgPd);
+    m.rect(0, 33, W, 7, C.floor);
+    m.rect(0, 36, W, 1, C.floorD);
+  }
 
   const g = Math.min(1, Math.max(0, (week - 4) / 36));
   const GY = 38;                                  // 발 아래 줄
-  const wx = 0, hx = 43, sy = GY - ADULT.length;  // 스프라이트 왼쪽 위
-  const cx = 30, cy = 17, BR = 10, ir = BR - 2;
+  const mid = Math.floor(W / 2);
+  const wx = mid - 28, hx = mid + 12, sy = GY - ADULT.length; // 스프라이트 왼쪽 위 (양옆에 벽난로와 트리)
+  const cx = mid, cy = 16, BR = 10, ir = BR - 2;
   const { char, tmp } = layers();
   m.rect(wx + 3, GY - 1, 11, 1, C.floorD); m.rect(hx + 3, GY - 1, 11, 1, C.floorD);
 
@@ -347,6 +357,109 @@ function babyInWomb(L1, cordL, cx, cy, week, now, k, seed, inside, pal){
 
 // 아기방
 function room(m, month, { twins }, now){
+  if(XMAS) xmasRoom(m, now);
+  else roomPlain(m, month, now);
+  const { char } = layers();
+  char.clear();
+  const n = twins ? 2 : 1, mid = Math.floor(W / 2);
+  const xs = n === 2 ? (month >= 3 && month < 12 && (month < 6 || month >= 9) ? [mid - 14, mid + 13] : [mid - 10, mid + 10]) : [mid];
+  babies(m, char, month, twins, xs, now);
+}
+// ── 크리스마스 거실 ── 왼쪽 벽난로(불이 일렁여요), 위에 꼬마전구 가랜드, 오른쪽 트리와 선물
+const X = {
+  wall:'#F4E4D8', wallDot:'#EAD2C4', wain:'#E8CDBE', wainL:'#DDBBA9',
+  floor:'#C99A6E', floorD:'#B5845A', floorL:'#D4A87D',
+  brick:'#B4513F', mortar:'#94402F', mantel:'#7A5240', mantelL:'#93684F', hearth:'#3A2626', log:'#6B4532',
+  fire:'#E8742E', fireL:'#F7C74A',
+  leaf:'#4F7A3A', leafD:'#3D5A26', leafL:'#6B9A4A', trunk:'#7A5240',
+  red:'#C9363E', gold:'#E9A93C', blue:'#5E93CC', cream:'#F6E4E1', green:'#5E8A3F',
+};
+function xmasRoom(m, now){
+  const FY = 31, anim = now > 0, tick = anim ? Math.floor(now / 520) : 0;
+  // 벽: 따뜻한 크림색 + 점무늬, 아래쪽 징두리 판
+  m.rect(0, 0, W, FY, X.wall);
+  for(let y = 4; y < FY - 7; y += 5) for(let x = (y / 5 % 2) * 3 + 1; x < W; x += 6) m.px(x, y, X.wallDot);
+  m.rect(0, FY - 7, W, 7, X.wain); m.rect(0, FY - 7, W, 1, X.wainL);
+  for(let x = 3; x < W; x += 8) m.rect(x, FY - 5, 1, 5, X.wainL);
+  // 바닥: 나무 마루
+  m.rect(0, FY, W, H - FY, X.floor);
+  m.rect(0, FY, W, 1, X.floorD);
+  for(const [y, o] of [[FY + 3, 0], [FY + 6, 5]]){ m.rect(0, y, W, 1, X.floorD); for(let x = o; x < W; x += 11) m.px(x, y - 1, X.floorD); }
+  // 위쪽 가랜드 + 꼬마전구 (번갈아 반짝)
+  const lights = [X.red, X.gold, X.blue, X.cream];
+  for(let x = 0; x < W; x++){
+    const k = x % 10, sag = Math.floor((k < 5 ? k : 10 - k) / 2);
+    m.px(x, 1 + sag, X.leaf); m.px(x, 2 + sag, X.leafD);
+    if(k === 5){
+      const n = Math.floor(x / 10), on = (n + tick) % 2 === 0;
+      m.px(x, 4 + sag, on ? lights[n % 4] : X.wainL);
+    }
+  }
+  const mid = Math.floor(W / 2), F = Math.max(0, mid - 68), T = mid + 32;  // 벽난로 왼쪽 끝(부부보다 조금 멀리), 트리 가운데
+  // 넓은 화면에서는 양옆 벽에 눈 내리는 창문을 더 달아요
+  const wins = [];
+  for(let x = F - 20; x >= 2; x -= 28) wins.push(x);
+  for(let x = T + 14; x + 14 <= W - 2; x += 28) wins.push(x);
+  for(const x of wins) snowWindow(m, x, 8, now);
+  // 벽난로
+  m.rect(F + 1, 14, 15, FY - 14, X.brick);
+  for(let y = 16; y < FY; y += 3){ m.rect(F + 1, y, 15, 1, X.mortar); for(let x = (y % 2 ? 3 : 6); x < 16; x += 6) m.px(F + x, y - 1, X.mortar); }
+  m.rect(F, 12, 17, 2, X.mantel); m.rect(F, 12, 17, 1, X.mantelL);
+  m.rect(F + 4, 19, 9, FY - 19, X.hearth); m.px(F + 4, 19, X.brick); m.px(F + 12, 19, X.brick);
+  m.rect(F + 5, FY - 2, 7, 2, X.log); m.px(F + 6, FY - 2, X.mantelL); m.px(F + 10, FY - 1, X.mantelL);
+  const ft = anim ? Math.floor(now / 140) : 0;                 // 불꽃: 칸마다 높이가 바뀌어요
+  for(let x = 5; x <= 11; x++){
+    const h = 3 + ((x * 7 + ft * 3) % 4) - (x === 5 || x === 11 ? 2 : 0);
+    if(h <= 0) continue;
+    m.rect(F + x, FY - 2 - h, 1, h, X.fire);
+    if(h > 2 && x > 5 && x < 11) m.rect(F + x, FY - 2 - h + 2, 1, h - 2, X.fireL);
+  }
+  // 벽난로 위 양말 두 짝
+  for(const [x, c] of [[F + 3, X.red], [F + 11, X.green]]){
+    m.rect(x, 14, 3, 1, X.cream); m.rect(x, 15, 3, 3, c); m.rect(x, 18, 4, 2, c); m.px(x + 3, 19, X.cream);
+  }
+  // 트리
+  const tx = T;
+  const tiers = [[6, 12, 1, 4], [11, 19, 2, 6], [18, 28, 3, 7]];
+  for(const [y0, y1, w0, w1] of tiers) for(let y = y0; y <= y1; y++){
+    const hw = Math.round(w0 + (w1 - w0) * (y - y0) / (y1 - y0));
+    m.rect(tx - hw, y, hw * 2 + 1, 1, X.leaf);
+    m.px(tx + hw, y, X.leafD); m.px(tx - hw, y, X.leafL);
+    if(y === y1) m.rect(tx - hw, y, hw * 2 + 1, 1, X.leafD);
+  }
+  m.rect(tx - 1, 29, 3, 2, X.trunk);
+  const tw = anim && Math.floor(now / 400) % 2;                // 별이 반짝
+  m.px(tx, 3, X.gold); m.rect(tx - 1, 4, 3, 1, X.gold); m.px(tx, 5, X.gold);
+  if(tw){ m.px(tx - 2, 4, X.gold); m.px(tx + 2, 4, X.gold); m.px(tx, 2, X.gold); }
+  const balls = [[-1, 10, X.red], [2, 13, X.gold], [-3, 16, X.blue], [3, 18, X.red], [0, 21, X.gold], [-4, 24, X.red], [4, 25, X.blue], [-1, 27, X.cream]];
+  balls.forEach(([x, y, c], k) => m.px(tx + x, y, (k + tick) % 3 === 0 && anim ? X.cream : c));
+  // 선물
+  const gifts = [[-8, 27, 6, 4, X.red, X.gold], [-2, 28, 5, 3, X.green, X.red], [3, 26, 5, 5, X.cream, X.red]];
+  for(const [dx, y, w, h, c, rb] of gifts){
+    const x = tx + dx;
+    m.rect(x - 1, y - 1, w + 2, h + 1, C.line);
+    m.rect(x, y, w, h, c);
+    m.rect(x + Math.floor(w / 2), y, 1, h, rb); m.rect(x, y + 1, w, 1, rb);
+    m.px(x + Math.floor(w / 2) - 1, y - 2, rb); m.px(x + Math.floor(w / 2) + 1, y - 2, rb);
+  }
+}
+// 눈 내리는 창문 (14×12)
+function snowWindow(m, x, y, now){
+  m.rect(x - 1, y - 1, 16, 14, X.mantel);
+  m.rect(x, y, 14, 12, '#2E3E66');
+  m.rect(x, y + 9, 14, 3, '#E8EEF6');                           // 쌓인 눈
+  m.rect(x + 6, y, 2, 12, X.mantel); m.rect(x, y + 5, 14, 1, X.mantel);
+  const ph = now > 0 ? Math.floor(now / 300) : 0;
+  for(let k = 0; k < 7; k++){
+    const sx = x + (k * 5 + 1) % 14, sy = y + (k * 3 + ph) % 9;
+    if(sx === x + 6 || sx === x + 7 || sy === y + 5) continue;
+    m.px(sx, sy, '#FFFFFF');
+  }
+  m.rect(x - 2, y + 12, 18, 1, X.mantelL);                      // 창턱
+}
+
+// 예전 아기방 배경 (시즌이 아닐 때)
+function roomPlain(m, month, now){
   m.rect(0, 0, W, 28, C.wall);
   for(let x = 0; x < W; x += 6) m.rect(x, 0, 3, 28, C.wallD);
   m.rect(0, 28, W, 12, C.floor);
@@ -365,13 +478,12 @@ function room(m, month, { twins }, now){
   } else {
     star(m, 46, 5); star(m, 54, 10); star(m, 38, 11);
   }
-  const { char } = layers();
-  char.clear();
-  const n = twins ? 2 : 1;
-  const xs = n === 2 ? (month >= 3 && month < 12 && (month < 6 || month >= 9) ? [16, 43] : [20, 40]) : [30];
+}
+// 시기별 아기 모습
+function babies(m, char, month, twins, xs, now){
   if(month < 3){
     // 바구니 침대: 고개만 쏙, 새근새근
-    const bw = twins ? 34 : 20, bx = 30 - bw / 2;
+    const bw = twins ? 34 : 20, bx = Math.floor(W / 2) - bw / 2;
     m.rect(bx + 1, 32, 1, 5, C.basS); m.rect(bx + bw - 2, 32, 1, 5, C.basS);
     char.rect(bx, 24, bw, 8, C.bas);
     char.outline(C.line);
@@ -384,7 +496,7 @@ function room(m, month, { twins }, now){
     xs.forEach(x => zzz(m, x + 5, 13, now));
   } else if(month < 6){
     // 엎드려 고개 들기
-    m.ell(30, 34, twins ? 26 : 16, 3, C.matS); m.ell(30, 33, twins ? 25 : 15, 2, C.mat);
+    m.ell(Math.floor(W / 2), 34, twins ? 26 : 16, 3, C.matS); m.ell(Math.floor(W / 2), 33, twins ? 25 : 15, 2, C.mat);
     xs.forEach((x, i) => {
       const p = babyPal(i), kick = Math.floor(now / 400 + i) % 2;
       tmp2(char, t => { t.ell(x + 4, 31, 6, 2, p.t); t.rect(x + 9, 28 - kick, 2, 2, p.f); });
@@ -448,15 +560,21 @@ function zzz(m, x, y, now){
 // ── 캔버스에 붙이기 ──────────────────────────────
 // canvas 하나에 장면을 계속 그려 주는 작은 플레이어. get() 이 { t, twins } 를 돌려줘요
 export function mountScene(canvas, get){
-  const main = new Layer();
-  canvas.width = W; canvas.height = H;
+  let main = null;
   const ctx = canvas.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let raf = 0, last = 0;
+  // 그림이 놓인 자리의 가로세로 비율로 가로 칸 수를 정해요 (높이 40칸은 그대로)
+  const fitW = () => {
+    const { width:cw, height:ch } = canvas.getBoundingClientRect();
+    return cw > 0 && ch > 0 ? Math.max(MIN_W, Math.round(H * cw / ch)) : MIN_W;
+  };
   function paint(now){
+    const w = fitW();
+    if(!main || main.c.width !== w){ main = new Layer(w, H); canvas.width = w; canvas.height = H; }
     const s = get();
     drawScene(main, s.t, s, reduce ? 0 : now);
-    ctx.clearRect(0, 0, W, H);
+    ctx.clearRect(0, 0, w, H);
     ctx.drawImage(main.c, 0, 0);
   }
   function frame(now){
@@ -472,7 +590,7 @@ export function mountScene(canvas, get){
 
 // 한 장만 그려서 이미지 주소로 (정리 화면용)
 export function sceneImage(t, opts){
-  const main = new Layer();
+  const main = new Layer(MIN_W, H);
   drawScene(main, t, opts, 0);
   return main.c.toDataURL();
 }
