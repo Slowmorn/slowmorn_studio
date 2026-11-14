@@ -1,12 +1,12 @@
 // 도트 그림 — 임신기에는 곰 부부와 그 사이에 크게 보이는 배 속, 출산 뒤에는 만 3세 아기 곰까지, 시기에 맞는 장면을 그려요.
 // 80×40 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
 // 캐릭터는 한 줄씩 글자로 적은 도트 지도(스프라이트)를 찍어요. 테두리까지 지도에 들어 있어요.
-import { BIRTH_T, PREG_START } from './events.js?v=20261114a';
+import { BIRTH_T, PREG_START } from './events.js?v=20261115a';
 
 // 높이는 40칸 그대로, 가로 칸 수는 그림이 놓인 자리의 폭에 맞춰 늘어나요 (최소 80칸). 사람·벽난로·트리는 가운데를 기준으로 놓아요
 export let W = 80;
 export const H = 40;
-export const MIN_W = 80;
+export const MIN_W = 140;   // 부부와 아기, 벽난로, 트리가 다 들어가는 가장 좁은 폭
 // 크리스마스 시즌: 벽난로·트리·선물이 있는 거실을 배경으로 써요. 시즌이 끝나면 false 로
 const XMAS = true;
 
@@ -192,6 +192,8 @@ const PAL = {
   mom:{ ...BASE, f:'#DDAB78', s:'#C8925F', i:'#F0CBA6', t:'#F5A3B4', u:'#E07C93', l:'#FBC9D3' },
   dad:{ ...BASE, f:'#A97C58', s:'#8E6445', i:'#D4AE8A', t:'#82B4E6', u:'#5E93CC', l:'#B5D3F2' },
 };
+// 배 속 아기는 곰 털색 대신 분홍
+const FETUS_PAL = { f:'#F6B3BE', s:'#E8919F' };
 // 아기 옷 색 (쌍둥이는 둘째가 민트)
 const CLOTH = [{ t:'#FFB38A', u:'#EF8E60', l:'#FFD0B5' }, { t:'#9FD6B9', u:'#6EBE96', l:'#C7EAD7' }];
 const babyPal = i => ({ ...(i ? PAL.dad : PAL.mom), ...CLOTH[i] });
@@ -269,8 +271,8 @@ function couple(m, week, { twins }, now){
   }
   const twinK = fitK(week, ir * .62);
   const fetuses = twins
-    ? [[cx - ir * .36, cy + 1, now, twinK, 0, PAL.mom], [cx + ir * .36, cy - 1, now + 700, twinK, 1, PAL.dad]]
-    : [[cx, cy, now, fitK(week, ir), 0, PAL.mom]];
+    ? [[cx - ir * .36, cy + 1, now, twinK, 0, FETUS_PAL], [cx + ir * .36, cy - 1, now + 700, twinK, 1, FETUS_PAL]]
+    : [[cx, cy, now, fitK(week, ir), 0, FETUS_PAL]];
   for(const [fx, fy, fnow, k, seed, pal] of fetuses){
     tmp.clear();
     babyInWomb(tmp, m, fx, fy, week, fnow, k, seed, inside, pal);
@@ -363,7 +365,24 @@ function room(m, month, { twins }, now){
   char.clear();
   const n = twins ? 2 : 1, mid = Math.floor(W / 2);
   const xs = n === 2 ? (month >= 3 && month < 12 && (month < 6 || month >= 9) ? [mid - 14, mid + 13] : [mid - 10, mid + 10]) : [mid];
+  parents(m, now);
   babies(m, char, month, twins, xs, now);
+}
+// 출산 뒤에도 엄마·아빠 곰이 아기 양옆에 서서 아기를 바라봐요
+function parents(m, now){
+  const mid = Math.floor(W / 2), GY = 38, sy = GY - ADULT.length;
+  const mx = mid - 46, dx = mid + 30;
+  m.rect(mx + 3, GY - 1, 11, 1, X.floorD); m.rect(dx + 3, GY - 1, 11, 1, X.floorD);
+  const bm = now > 0 ? Math.floor(now / 1100) % 2 : 0, bd = now > 0 ? Math.floor((now + 550) / 1100) % 2 : 0;
+  let mom = setPx(ADULT, [[11, 2, 'r'], [12, 2, 'k'], [13, 2, 'r'], [11, 3, 'r'], [13, 3, 'r']]);
+  if(blinkAt(now, 0)) mom = closeEyes(mom, 6);
+  let dad = mirror(ADULT);
+  if(blinkAt(now, 1800)) dad = closeEyes(dad, 6);
+  const { tmp } = layers();
+  tmp.clear();
+  stamp(tmp, mom, mx, sy, PAL.mom, 20, bm);
+  stamp(tmp, dad, dx, sy, PAL.dad, 20, bd);
+  m.x.drawImage(tmp.c, 0, 0);
 }
 // ── 크리스마스 거실 ── 왼쪽 벽난로(불이 일렁여요), 위에 꼬마전구 가랜드, 오른쪽 트리와 선물
 const X = {
@@ -395,7 +414,7 @@ function xmasRoom(m, now){
       m.px(x, 4 + sag, on ? lights[n % 4] : X.wainL);
     }
   }
-  const mid = Math.floor(W / 2), F = Math.max(0, mid - 68), T = mid + 32;  // 벽난로 왼쪽 끝(부부보다 조금 멀리), 트리 가운데
+  const mid = Math.floor(W / 2), F = Math.max(0, mid - 68), T = Math.min(W - 8, mid + 60);  // 벽난로 왼쪽 끝, 트리 가운데 (출산 뒤 아기 양옆에 선 엄마·아빠 자리를 비워 둬요)
   // 넓은 화면에서는 양옆 벽에 눈 내리는 창문을 더 달아요
   const wins = [];
   for(let x = F - 20; x >= 2; x -= 28) wins.push(x);
@@ -532,10 +551,10 @@ function babies(m, char, month, twins, xs, now){
     xs.forEach((x, i) => {
       const p = babyPal(i);
       const ph = Math.floor(now / (month >= 18 ? 260 : 420) + i) % 2;
-      const base = big ? ADULT : KID, sprite = i ? mirror(base) : base, w = sprite[0].length;
+      const base = KID, sprite = i ? mirror(base) : base, w = sprite[0].length;   // 만 3세도 엄마·아빠보다 작게
       const sx = x - Math.floor(w / 2) + (month < 18 ? (ph ? 1 : 0) : 0), sy = 38 - sprite.length;
-      if(big) tmp2(char, t => t.rect(i ? sx + w - 4 : sx, sy + 15, 4, 5, C.bag));   // 가방은 등 쪽에
-      let s = sprite; if(blinkAt(now, i * 1300)) s = closeEyes(s, big ? 6 : 4);
+      if(big) tmp2(char, t => t.rect(i ? sx + w - 3 : sx - 1, sy + 11, 4, 4, C.bag));   // 가방은 등 쪽에
+      let s = sprite; if(blinkAt(now, i * 1300)) s = closeEyes(s, 4);
       stamp(char, s, sx, sy, p, sprite.length - 2, now > 0 ? ph : 0);
     });
   }

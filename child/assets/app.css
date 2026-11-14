@@ -425,13 +425,13 @@ html:has(dialog[open]){overflow:hidden}
   /* 저장본에는 요약과 타임라인만 담아요 */
   .r-wrap > .r-sec:not(.r-summary):not(.r-timeline){display:none}
   .print-only{display:block}
-  .r-scene{width:120px}
+  .r-scene{width:100%}
   body{font-size:12.5px;background:#fff}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 
 /* 정리 화면: 지금 아이 모습과 초음파 앨범 */
-.r-scene{display:block;width:180px;max-width:100%;height:auto;image-rendering:pixelated;border-radius:12px;margin-bottom:14px;background:var(--paper)}
+.r-scene{display:block;width:420px;max-width:100%;height:auto;image-rendering:pixelated;border-radius:12px;margin-bottom:14px;background:var(--paper)}
 .r-album{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px}
 .r-album figure{margin:0;display:flex;flex-direction:column;gap:4px}
 .r-album img{width:100%;height:auto;border-radius:8px;image-rendering:pixelated;background:#000}

@@ -47,7 +47,7 @@ footer::before{
 .hero-lead{color:var(--xm-cream)}
 .hero-cta{background:var(--xm-cream);color:var(--xm-red)}
 .hero-cta:hover{filter:brightness(.96)}
-.hero-art{background:var(--xm-board);border-color:rgba(0,0,0,.08);box-shadow:0 18px 40px -20px rgba(0,0,0,.55)}
+.hero-art{color:var(--ink);background:var(--xm-board);border-color:rgba(0,0,0,.08);box-shadow:0 18px 40px -20px rgba(0,0,0,.55)}
 .site-main h2{color:var(--xm-cream)}
 .site-main .note{color:var(--xm-pink)}
 .steps li{background:var(--xm-board);border-color:rgba(0,0,0,.08)}
