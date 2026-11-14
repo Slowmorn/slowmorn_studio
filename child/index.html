@@ -16,12 +16,17 @@
 <meta property="og:description" content="임신 4주부터 만 3세까지, 할 일과 살 것과 예산과 키우는 방향을 둘이 같이 정해요.">
 <link rel="icon" href="favicon.svg?v=20261112a" type="image/svg+xml">
 <!-- Google Analytics 4 (버짓리스트와 같은 속성. 보고서에서 /child/ 경로로 나눠 봐요) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-ZB0D0NTBJ8"></script>
 <script>
+  // 내 컴퓨터에서 미리 볼 때(localhost 등)는 GA로 보내지 않아요
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-ZB0D0NTBJ8');
+  if(!/^(localhost|127\.0\.0\.1|\[::1\]|.*\.local|.*\.localhost|.*\.test)$/.test(location.hostname) && location.protocol !== 'file:'){
+    const s = document.createElement('script');
+    s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=G-ZB0D0NTBJ8';
+    document.head.appendChild(s);
+    gtag('js', new Date());
+    gtag('config', 'G-ZB0D0NTBJ8');
+  }
 </script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
