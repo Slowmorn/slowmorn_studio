@@ -1,5 +1,5 @@
 // 시점 표기: t → "임신 23주" / "생후 7개월" / "첫돌", 출산 예정일이 있으면 실제 날짜
-import { PREG_START, BIRTH_T, END_T, TWIN_BIRTH_T } from './events.js?v=20261117a';
+import { PREG_START, BIRTH_T, END_T, TWIN_BIRTH_T } from './events.js?v=20261117b';
 
 export function stageLabel(t){
   const i = Math.floor(t + 1e-6);

@@ -1,9 +1,9 @@
 // 정리 화면 — 우리 부부의 육아 계획서. PDF로 저장하면 요약과 함께 타임라인이 처음(임신 4주)부터 차례로 담겨요.
-import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, BIRTH_T, atToT, evTitle, byId } from './events.js?v=20261117a';
-import { mountScene } from './pixel.js?v=20261117a';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261117a';
-import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261117a';
-import { stageLabel, dateText } from './time.js?v=20261117a';
+import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, BIRTH_T, atToT, evTitle, byId } from './events.js?v=20261117b';
+import { mountScene } from './pixel.js?v=20261117b';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261117b';
+import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261117b';
+import { stageLabel, dateText } from './time.js?v=20261117b';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const statusText = s => s === 'hold' ? '보류' : '합의';
@@ -159,7 +159,7 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
 
     ${timelineHtml(state, when)}
 
-    <p class="note r-foot">금액과 제도는 2026년 기준 참고용 추정치예요. 지역·병원·브랜드에 따라 달라요. · 미리 키움 slowmorn.com/child</p>
+    <p class="note r-foot">금액과 제도는 2026년 기준 참고용 추정치예요. 지역·병원·브랜드에 따라 달라요. · 패밀리리허설 slowmorn.com/child</p>
   </div>`;
 
   stopScene?.();
@@ -168,7 +168,7 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
   // 인쇄 창에서 'PDF로 저장'을 고르면 돼요. 파일 이름은 문서 제목을 따라가요.
   root.querySelector('[data-r="print"]').onclick = () => {
     const title = document.title;
-    document.title = `미리 키움 · ${state.names.join(' · ')}의 육아 타임라인`;
+    document.title = `패밀리리허설 · ${state.names.join(' · ')}의 육아 타임라인`;
     const restore = () => { document.title = title; window.removeEventListener('afterprint', restore); };
     window.addEventListener('afterprint', restore);
     window.print();
