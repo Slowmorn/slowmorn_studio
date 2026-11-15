@@ -1,9 +1,9 @@
 // 정리 화면 — 우리 부부의 육아 계획서. PDF로 저장하면 요약과 함께 타임라인이 처음(임신 4주)부터 차례로 담겨요.
-import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, BIRTH_T, atToT, evTitle, byId } from './events.js?v=20261116v';
-import { mountScene } from './pixel.js?v=20261116v';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261116v';
-import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261116v';
-import { stageLabel, dateText } from './time.js?v=20261116v';
+import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, BIRTH_T, atToT, evTitle, byId } from './events.js?v=20261116w';
+import { mountScene } from './pixel.js?v=20261116w';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261116w';
+import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261116w';
+import { stageLabel, dateText } from './time.js?v=20261116w';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const statusText = s => s === 'hold' ? '보류' : '합의';
