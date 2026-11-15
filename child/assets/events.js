@@ -169,7 +169,7 @@ export const EVENTS = [
   { at:'w24', type:'buy', id:'gear', title:'육아용품 예산 정하기',
     body:'유모차, 카시트, 아기 침대, 젖병, 옷, 아기띠, 장난감까지. 만 3세까지 살 것을 하나하나 고르기보다 먼저 전체 예산을 정해요.',
     twinNote:'쌍둥이는 카시트·옷처럼 하나씩 더 필요한 게 많아요. 유모차는 쌍둥이용이 따로 있어요.',
-    link:{ href:'https://slowmorn.com/budget/planner/?tpl=baby', label:'버짓리스트 출산·육아 준비물 체크리스트 열기 (110개)' },
+    link:{ href:'https://slowmorn.com/budget/planner/?tpl=baby', label:'출산육아 준비물 체크리스트 보기' },
     payPlan:[['w30', .55], ['m4', .2], ['m14', .25]], noPrice:true,
     options:[
       { id:'b300', label:'300만 원 · 알뜰하게', twinLabel:'500만 원 · 알뜰하게', once:3000000, twinOnce:5000000, mode:'used',

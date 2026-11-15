@@ -1,7 +1,7 @@
 // 도트 그림 — 임신기에는 곰 부부와 그 사이에 크게 보이는 배 속, 출산 뒤에는 만 3세 아기 곰까지, 시기에 맞는 장면을 그려요.
 // 80×40 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
 // 캐릭터는 한 줄씩 글자로 적은 도트 지도(스프라이트)를 찍어요. 테두리까지 지도에 들어 있어요.
-import { BIRTH_T, PREG_START } from './events.js?v=20261117c';
+import { BIRTH_T, PREG_START } from './events.js?v=20261117n';
 
 // 높이는 40칸 그대로, 가로 칸 수는 그림이 놓인 자리의 폭에 맞춰 늘어나요 (최소 80칸). 사람·벽난로·트리는 가운데를 기준으로 놓아요
 export let W = 80;
@@ -11,6 +11,7 @@ const TOP = 9;
 export const MIN_W = 140;   // 부부와 아기, 벽난로, 트리가 다 들어가는 가장 좁은 폭
 // 크리스마스 시즌: 벽난로·트리·선물이 있는 거실을 배경으로 써요. 시즌이 끝나면 false 로
 const XMAS = true;
+let xmasOn = XMAS;            // 그림마다 opts.xmas 로 끄고 켤 수 있어요 (예: 시즌과 상관없는 공유 이미지)
 
 const C = {
   line:'#3E3343', eye:'#2E2530', cheek:'#F29A9A',
@@ -65,10 +66,10 @@ class Layer {
 
 // ── 시기별 크기와 한 줄 설명 ───────────────────────
 const FETUS = [ // 주, 비유, 크기
-  // 19주까지는 다리를 웅크리고 있어서 머리~엉덩이 길이로, 20주부터는 머리~발끝 키로 재요 (그래서 20주에 숫자가 크게 뛰어요)
-  [4, '양귀비씨', '약 0.2cm'], [6, '렌틸콩', '약 0.6cm'], [8, '라즈베리', '머리~엉덩이 약 1.6cm'], [10, '딸기', '머리~엉덩이 약 3cm'],
-  [12, '라임', '머리~엉덩이 약 5cm'], [14, '레몬', '머리~엉덩이 약 9cm'], [16, '아보카도', '머리~엉덩이 약 12cm'], [18, '고구마', '머리~엉덩이 약 14cm'],
-  [20, '바나나', '머리~엉덩이 약 16cm · 발끝까지 약 25cm'], [22, '파파야', '키 약 28cm'], [24, '옥수수', '키 약 30cm · 600g'], [26, '양상추', '키 약 35cm · 800g'],
+  // 19주까지는 다리를 웅크리고 있어서 앉은키(머리~엉덩이)로, 20주부터는 키(머리~발끝)로 재요 (그래서 20주에 숫자가 크게 뛰어요)
+  [4, '양귀비씨', '약 0.2cm'], [6, '렌틸콩', '약 0.6cm'], [8, '라즈베리', '앉은키 약 1.6cm'], [10, '딸기', '앉은키 약 3cm'],
+  [12, '라임', '앉은키 약 5cm'], [14, '레몬', '앉은키 약 9cm'], [16, '아보카도', '앉은키 약 12cm'], [18, '고구마', '앉은키 약 14cm'],
+  [20, '바나나', '앉은키 약 16cm · 키 약 25cm'], [22, '파파야', '키 약 28cm'], [24, '옥수수', '키 약 30cm · 600g'], [26, '양상추', '키 약 35cm · 800g'],
   [28, '가지', '키 약 37cm · 1kg'], [30, '양배추', '키 약 40cm · 1.3kg'], [32, '단호박', '키 약 42cm · 1.7kg'], [34, '멜론', '키 약 45cm · 2.1kg'],
   [36, '파인애플', '키 약 47cm · 2.6kg'], [38, '작은 수박', '키 약 49cm · 3kg'], [40, '수박', '키 약 50cm · 3.3kg'],
 ];
@@ -340,7 +341,7 @@ function layers(){
   if(!L.char || L.char.c.width !== W){ L.char = new Layer(); L.tmp = new Layer(); }
   return L;
 }
-const norm = opts => opts && typeof opts === 'object' ? { twins:!!opts.twins, seed:opts.seed } : { twins:!!opts };
+const norm = opts => opts && typeof opts === 'object' ? { twins:!!opts.twins, seed:opts.seed, xmas:opts.xmas } : { twins:!!opts };
 
 // main: 60×40 Layer, t: 시간 축, opts: { twins } (twins 불리언만 줘도 돼요), now: ms (움직임용)
 export function drawScene(main, t, opts, now){
@@ -348,6 +349,7 @@ export function drawScene(main, t, opts, now){
   const i = Math.floor(t + 1e-6);
   W = main.c.width;
   castFor(o.seed ?? 'miri');
+  xmasOn = o.xmas ?? XMAS;
   main.clear();
   main.x.setTransform(1, 0, 0, 1, 0, TOP);     // 아래 40칸에 그려요. 위쪽 TOP 칸은 배경이 위로 이어져요
   if(i < BIRTH_T) couple(main, i + PREG_START, o, now);
@@ -358,7 +360,7 @@ export function drawScene(main, t, opts, now){
 // 임신기: 왼쪽 엄마 곰, 오른쪽 아빠 곰, 가운데에 배 속을 크게 보여 주는 동그란 창
 function couple(m, week, { twins }, now){
   const anim = now > 0;
-  if(XMAS) xmasRoom(m, now);
+  if(xmasOn) xmasRoom(m, now);
   else {
     m.rect(0, -TOP, W, 33 + TOP, C.bgP);
     for(let y = 2; y < 33; y += 4) for(let x = (y / 4 % 2) * 2 + 1; x < W; x += 4) m.px(x, y, C.bgPd);
@@ -482,7 +484,7 @@ function babyInWomb(L1, cordL, cx, cy, week, now, k, seed, inside, pal){
 
 // 아기방
 function room(m, month, { twins }, now){
-  if(XMAS) xmasRoom(m, now);
+  if(xmasOn) xmasRoom(m, now);
   else roomPlain(m, month, now);
   const { char } = layers();
   char.clear();
