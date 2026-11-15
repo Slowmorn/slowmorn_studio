@@ -66,8 +66,8 @@
 :root{--scene-h:160px;--scene-gap:8px}   /* 도트 그림 높이와 그 아래 틈 (붙는 머리 계산에 같이 써요) */
 .sim{max-width:var(--wrap);margin:0 auto;padding:0 20px}
 .sim-head{
-  /* 도트 그림은 가로폭을 다 쓰고 높이는 그대로예요. 내리면 그림만 위로 올라가고, 지금 시기·단추·막대는 위에 붙어 있어요 */
-  position:sticky;top:calc(env(safe-area-inset-top, 0px) - var(--scene-h) - var(--scene-gap));z-index:5;background:var(--page);
+  /* 도트 그림은 가로폭을 다 쓰고 높이는 그대로예요. 내려도 그림·지금 시기·단추·막대가 함께 위에 떠 있어요 */
+  position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--page);
   padding:0 0 10px;border-bottom:1px solid var(--line);
   display:grid;grid-template-columns:minmax(0,1fr) auto;
   grid-template-areas:"scene scene" "now ctrl" "track track" "next next";
@@ -120,7 +120,7 @@
 
 .tabs{display:none}
 .sim-body{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;padding-top:20px;align-items:start}
-.side{position:sticky;top:calc(var(--head-h, 360px) - var(--scene-h) - var(--scene-gap) + 16px);display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - var(--head-h, 360px) + var(--scene-h) + var(--scene-gap) - 24px);overflow:auto;padding-bottom:12px}
+.side{position:sticky;top:calc(var(--head-h, 360px) + 16px);display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - var(--head-h, 360px) - 24px);overflow:auto;padding-bottom:12px}
 
 /* 타임라인 카드 */
 .feed{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -210,7 +210,7 @@
   overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
   background:var(--sheet);color:var(--ink);box-shadow:0 20px 60px -10px rgba(0,0,0,.35);
 }
-.decide::backdrop{background:rgba(30,26,22,.45)}
+.decide::backdrop{background:transparent}   /* 화면을 어둡게 하지 않아요 */
 /* 시트가 열려 있는 동안 뒤 화면은 스크롤되지 않게 */
 html:has(dialog[open]){overflow:hidden}
 .decide[open]{animation:dlg-in .25s ease-out}
@@ -284,7 +284,7 @@ html:has(dialog[open]){overflow:hidden}
 .toast.on{opacity:1;transform:translate(-50%, 0)}
 
 /* ── 3. 정리 ─────────────────────────── */
-.report{max-width:860px;margin:0 auto;padding:36px 20px 0}
+.report{max-width:var(--wrap);margin:0 auto;padding:36px 20px 0}
 .r-head h1{margin:0 0 6px;font-size:clamp(24px,4vw,32px);letter-spacing:-0.025em;line-height:1.3}
 .r-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .r-sec{margin-top:36px}
@@ -341,7 +341,7 @@ html:has(dialog[open]){overflow:hidden}
   .sim-body{grid-template-columns:minmax(0,1fr)}
   .side{position:static;max-height:none;overflow:visible}
   .tabs{
-    display:flex;gap:4px;position:sticky;top:calc(var(--head-h, 330px) - var(--scene-h) - var(--scene-gap));z-index:4;background:var(--page);
+    display:flex;gap:4px;position:sticky;top:var(--head-h, 330px);z-index:4;background:var(--page);
     padding:8px 0;border-bottom:1px solid var(--line);
   }
   .tabs button{flex:1;border:0;background:none;border-radius:8px;padding:7px 4px;font-weight:600;font-size:14px;color:var(--muted)}
@@ -360,7 +360,7 @@ html:has(dialog[open]){overflow:hidden}
 @media (max-width:640px){
   .setup{padding:24px 16px 0}
   .sim{padding:0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px))}
-  /* 폰에서는 도트 그림이 화면 가로폭을 다 써요. 내리면 그림만 위로 올라가고, 지금 시기·단추·막대는 위에 붙어 있어요 */
+  /* 폰에서는 도트 그림이 화면 가로폭을 다 써요 */
   :root{--scene-h:88px;--scene-gap:6px}
   .sim-head{column-gap:12px}
   .scene{width:100vw;max-width:none;margin-left:calc(50% - 50vw);border-radius:0}
@@ -425,13 +425,13 @@ html:has(dialog[open]){overflow:hidden}
   /* 저장본에는 요약과 타임라인만 담아요 */
   .r-wrap > .r-sec:not(.r-summary):not(.r-timeline){display:none}
   .print-only{display:block}
-  .r-scene{width:100%}
+  .r-scene{width:100%;height:110px}
   body{font-size:12.5px;background:#fff}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 
 /* 정리 화면: 지금 아이 모습과 초음파 앨범 */
-.r-scene{display:block;width:420px;max-width:100%;height:auto;image-rendering:pixelated;border-radius:12px;margin-bottom:14px;background:var(--paper)}
+.r-scene{display:block;width:100%;max-width:100%;height:var(--scene-h);image-rendering:pixelated;border-radius:12px;margin-bottom:14px;background:var(--paper)}   /* 시뮬레이션 화면과 같은 높이, 가로는 꽉 차게 */
 .r-album{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px}
 .r-album figure{margin:0;display:flex;flex-direction:column;gap:4px}
 .r-album img{width:100%;height:auto;border-radius:8px;image-rendering:pixelated;background:#000}
@@ -458,3 +458,19 @@ html:has(dialog[open]){overflow:hidden}
 .checklist input:checked + span b{color:var(--muted);text-decoration:line-through}
 .r-principles .r-picks{margin:4px 0 0;padding-left:18px;display:flex;flex-direction:column;gap:3px;font-size:15px;font-weight:600}
 .r-principles .r-picks li{border:0;border-radius:0;padding:0;display:list-item;list-style:disc}
+
+/* 아기가 태어난 순간 */
+.birth-fx{position:fixed;inset:0;z-index:60;display:grid;place-items:center;background:rgba(24,12,18,.74);animation:fx-in .45s ease-out;overflow:hidden;cursor:pointer}
+.birth-fx.out{animation:fx-out .6s ease-in forwards}
+.birth-card{position:relative;text-align:center;color:#fff;padding:0 24px;animation:fx-pop .7s cubic-bezier(.2,1.5,.4,1) both}
+.birth-card h2{margin:6px 0 8px;font-size:clamp(30px,7vw,48px);letter-spacing:-0.03em;color:#FFD9A0;text-shadow:0 4px 24px rgba(255,180,120,.45)}
+.birth-when{margin:0;font-size:14px;color:rgba(255,255,255,.75);font-weight:600}
+.birth-hi{margin:0;font-size:17px;color:#FFE9EF}
+.birth-fx i{position:absolute;bottom:-20px;width:var(--s);height:var(--s);animation:fx-rise 2.8s ease-out var(--d) both}
+.birth-fx i.sp{background:#FFE7A8;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%)}
+.birth-fx i.ht{background:#FF9EB5;clip-path:path('M5 9 C1 6 0 3 2.5 1.5 C4 .6 5 1.6 5 2.6 C5 1.6 6 .6 7.5 1.5 C10 3 9 6 5 9Z');width:10px;height:10px;transform:scale(calc(var(--s) / 10px))}
+@keyframes fx-in{from{opacity:0}to{opacity:1}}
+@keyframes fx-out{to{opacity:0}}
+@keyframes fx-pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes fx-rise{from{transform:translateY(0) rotate(0);opacity:0}15%{opacity:1}to{transform:translateY(-105vh) rotate(160deg);opacity:0}}
+@media (prefers-reduced-motion: reduce){ .birth-fx,.birth-card,.birth-fx i{animation:none} .birth-fx i{display:none} }

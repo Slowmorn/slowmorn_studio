@@ -1,13 +1,15 @@
 // 정리 화면 — 우리 부부의 육아 계획서. PDF로 저장하면 요약과 함께 타임라인이 처음(임신 4주)부터 차례로 담겨요.
-import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, evTitle, byId } from './events.js?v=20261115c';
-import { sceneImage } from './pixel.js?v=20261115c';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261115c';
-import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261115c';
-import { stageLabel, dateText } from './time.js?v=20261115c';
+import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, evTitle, byId } from './events.js?v=20261116k';
+import { mountScene } from './pixel.js?v=20261116k';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261116k';
+import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261116k';
+import { stageLabel, dateText } from './time.js?v=20261116k';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const statusText = s => s === 'hold' ? '보류' : '합의';
 
+// 정리 화면 위쪽 그림: 시뮬레이션 화면과 같은 가로폭·높이로 움직여요
+let stopScene = null;
 export function renderReport(root, state, { readonly, onOpen, onPromise, onBack, toast }){
   const tt = totals(state);
   const after = afterMonthly(state);
@@ -31,7 +33,7 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
   root.innerHTML = `
   <div class="r-wrap">
     <header class="r-head">
-      <img class="r-scene" alt="" src="${sceneImage(Math.min(state.t, END_T - 1), { twins:state.twins, seed:state.id })}">
+      <canvas class="r-scene" role="img" aria-label="지금 우리 가족 모습 도트 그림"></canvas>
       <p class="kicker">${esc(state.names.join(' · '))}${state.baby ? ` · ${esc(state.baby)}` : ''}${state.twins ? ' · 쌍둥이' : ''}의 육아 계획</p>
       <h1>${state.finished ? '만 3세까지 같이 살아 봤어요' : `${esc(stageLabel(state.t))}까지 살아 봤어요`}</h1>
       <p class="lead">${new Date(state.createdAt).toLocaleDateString('ko-KR')}에 시작 · 결정 ${DECISIONS.length - undecided.length}/${DECISIONS.length}개${holds.length ? ` · 보류 ${holds.length}개` : ''}</p>
@@ -125,8 +127,8 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
       <h2>시기별 예산</h2>
       <table class="r-table">
         <thead><tr><th>구간</th><th class="num">지출</th><th class="num">지원금</th><th class="num">실제 부담</th></tr></thead>
-        <tbody>${PHASES.map(p => { const x = tt.phases[p.id]; return `<tr><td>${p.label}</td><td class="num">${won(x.cost)}</td><td class="num good">−${won(x.support)}</td><td class="num"><b>${won(x.cost - x.support)}</b></td></tr>`; }).join('')}
-          <tr class="sum"><td>합계</td><td class="num">${won(tt.cost)}</td><td class="num good">−${won(tt.support)}</td><td class="num"><b>${won(tt.net)}</b></td></tr>
+        <tbody>${PHASES.map(p => { const x = tt.phases[p.id]; return `<tr><td>${p.label}</td><td class="num">${won(x.cost)}</td><td class="num good">${won(x.support)}</td><td class="num"><b>${won(x.cost - x.support)}</b></td></tr>`; }).join('')}
+          <tr class="sum"><td>합계</td><td class="num">${won(tt.cost)}</td><td class="num good">${won(tt.support)}</td><td class="num"><b>${won(tt.net)}</b></td></tr>
         </tbody>
       </table>
       <p class="note">지원금: 국민행복카드 100만 원, 첫만남이용권 200만 원, 부모급여(0세 월 100만 원 · 1세 월 50만 원, 어린이집 이용 시 보육료로 대신 지급), 아동수당 월 10만 원을 넣었어요. 지출에는 ${BASE_NOTE}가 들어 있어요.${state.twins ? ` 쌍둥이라 지원금은 아이마다, 생활비는 ${BASE_TWIN}배로 잡았어요.` : ''}</p>
@@ -158,6 +160,9 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
 
     <p class="note r-foot">금액과 제도는 2026년 기준 참고용 추정치예요. 지역·병원·브랜드에 따라 달라요. · 미리 키움 slowmorn.com/child</p>
   </div>`;
+
+  stopScene?.();
+  stopScene = mountScene(root.querySelector('.r-scene'), () => ({ t:Math.min(state.t, END_T - 1), twins:state.twins, seed:state.id }));
 
   // 인쇄 창에서 'PDF로 저장'을 고르면 돼요. 파일 이름은 문서 제목을 따라가요.
   root.querySelector('[data-r="print"]').onclick = () => {

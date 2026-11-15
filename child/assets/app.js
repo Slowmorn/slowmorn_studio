@@ -1,12 +1,12 @@
 // 미리 키움 — 출산·육아 시뮬레이터
 // 화면 세 개(시작 설정 · 시뮬레이션 · 정리)와 결정 카드를 다뤄요. 상태는 localStorage 에 저장해요.
-import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261115c';
-import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261115c';
-import { mountScene, caption } from './pixel.js?v=20261115c';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261115c';
-import { Clock } from './clock.js?v=20261115c';
-import { renderReport } from './report.js?v=20261115c';
-import { stageLabel, dateText } from './time.js?v=20261115c';
+import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261116k';
+import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261116k';
+import { mountScene, caption } from './pixel.js?v=20261116k';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261116k';
+import { Clock } from './clock.js?v=20261116k';
+import { renderReport } from './report.js?v=20261116k';
+import { stageLabel, dateText } from './time.js?v=20261116k';
 
 const KEY = 'child-sim-v1';
 const ARCHIVE_KEY = 'child-sim-archive-v1';
@@ -133,6 +133,14 @@ const clock = new Clock({
   setT:t => { state.t = t; onTime(); },
   birthT:() => state?.twins ? TWIN_BIRTH_T : BIRTH_T,
   nextStop:(from, to) => STOPS.find(ev => ev.t <= to && isOpenStop(ev)) || null,
+  nextEvent:to => { const ev = EVENTS[shownCount()]; return ev && ev.t <= to + 1e-9 ? ev : null; },
+  reveal:ev => {
+    state.shown = EVENTS.indexOf(ev) + 1;
+    onTime();
+    if(STOPS.includes(ev) && isOpenStop(ev)) return 'stop';
+    if(ev.type === 'milestone' && Math.abs(ev.t - BIRTH_T) < 1e-6){ celebrate(ev); return 3600; }
+    return Math.round(1400 / Math.sqrt(clock.speed));   // 카드 하나를 읽을 틈 (빠르게 돌리면 조금 짧게)
+  },
   onStop:ev => openStop(ev, { fromClock:true }),
   onEnd:() => { state.finished = true; save(true); toast('만 36개월이 되었어요. 둘의 계획을 정리해 볼게요.'); setTimeout(() => openReport(state), 900); },
   onState:running => { document.body.classList.toggle('is-running', running); $('#btnPlay').setAttribute('aria-label', running ? '일시정지' : '재생'); },
@@ -169,6 +177,30 @@ function renderMarks(){
   }).join('');
 }
 
+// 지금까지 타임라인에 띄운 이벤트 수 (같은 주에 여러 개면 하나씩 늘어나요)
+const shownCount = () => state.shown ?? EVENTS.filter(ev => ev.t <= state.t + 1e-6).length;
+const visibleEvents = () => EVENTS.slice(0, shownCount()).filter(ev => ev.t <= state.t + 1e-6);
+
+// 아기가 태어나는 순간: 화면이 잠깐 어두워지고 축하 효과가 떠요
+function celebrate(ev){
+  document.querySelector('.birth-fx')?.remove();
+  const el = document.createElement('div');
+  el.className = 'birth-fx';
+  el.setAttribute('role', 'status');
+  const bits = Array.from({ length:18 }, (_, k) => {
+    const x = (k * 37 + 11) % 100, d = (k % 6) * .12, s = 10 + (k * 7) % 14;
+    return `<i class="${k % 3 ? 'sp' : 'ht'}" style="left:${x}%;--d:${d}s;--s:${s}px"></i>`;
+  }).join('');
+  el.innerHTML = `${bits}<div class="birth-card">
+    <p class="birth-when">${esc(stageLabel(ev.t))}${state.due ? ' · ' + esc(dateText(state.due, ev.t, state.twins)) : ''}</p>
+    <h2>${esc(evTitle(ev, state.twins))}</h2>
+    <p class="birth-hi">${state.baby ? `${esc(state.baby)}, 반가워요` : '반가워요, 우리 아기'}</p></div>`;
+  document.body.append(el);
+  const close = () => { el.classList.add('out'); setTimeout(() => el.remove(), 600); };
+  el.addEventListener('click', close);
+  setTimeout(close, 3000);
+}
+
 let lastInt = -1;
 let feedCount = -1;
 let sceneMounted = false;
@@ -187,18 +219,18 @@ function onTime(force = false){
     renderSideBudget();
     save();
   }
-  const n = EVENTS.filter(ev => ev.t <= t + 1e-6).length;
+  const n = visibleEvents().length;
   if(n !== feedCount){ renderFeed(n > feedCount && feedCount >= 0 ? feedCount : n); feedCount = n; }
 }
 
 // 타임라인: 지나온 일을 최신이 위로 오게 쌓아요
 function renderFeed(newFrom){
-  const seen = EVENTS.filter(ev => ev.t <= state.t + 1e-6);
+  const seen = visibleEvents();
   if(!seen.length){
     $('#feed').innerHTML = `<div class="feed-empty"><b>곧 시작해요</b><span>재생 단추를 누르면 임신 4주부터 시간이 흘러가요.</span></div>`;
     return;
   }
-  $('#feed').innerHTML = seen.map((ev, idx) => card(ev, idx >= newFrom)).reverse().join('');
+  $('#feed').innerHTML = seen.map((ev, idx) => card(ev, idx >= newFrom).replace('<article ', `<article data-ev="${ev.id || ''}" `)).reverse().join('');
 }
 
 function card(ev, isNew){
@@ -235,7 +267,7 @@ function card(ev, isNew){
     return `<article class="${cls}${done ? ' is-done' : ''}">
       <p class="card-when">${when} · 할 일</p>
       <label class="todo"><input type="checkbox" data-todo="${ev.id}" ${done ? 'checked' : ''}><h3>${title}</h3></label>
-      ${para}${img}${chips ? `<div class="chips">${chips}</div>` : ''}
+      ${para}${img}${linkHtml(ev)}${chips ? `<div class="chips">${chips}</div>` : ''}
     </article>`;
   }
   // 결정 카드
@@ -296,7 +328,7 @@ function renderSideBudget(){
       <small>고른 것의 값은 고른 순간 더해지고, 매달 드는 돈은 그달마다 더해져요</small>
     </div>
     <dl class="money-total">
-      <div><dt>지금까지 받은 지원금</dt><dd class="good">−${won(tt.supportNow)}</dd></div>
+      <div><dt>지금까지 받은 지원금</dt><dd class="good">${won(tt.supportNow)}</dd></div>
       <div class="sum"><dt>지금까지 실제 부담</dt><dd>${tt.netNow >= 0 ? won(tt.netNow) : `<span class="good">지원금이 ${won(-tt.netNow)} 더 많아요</span>`}</dd></div>
     </dl>
     <ul class="phase-bars">${PHASES.map(p => {
@@ -308,7 +340,7 @@ function renderSideBudget(){
       <summary>지금까지 정한 대로라면, 만 3세까지</summary>
       <dl class="money-total">
         <div><dt>예상 지출</dt><dd>${won(tt.cost)}</dd></div>
-        <div><dt>받을 지원금</dt><dd class="good">−${won(tt.support)}</dd></div>
+        <div><dt>받을 지원금</dt><dd class="good">${won(tt.support)}</dd></div>
         <div class="sum"><dt>실제 부담</dt><dd>${tt.net >= 0 ? won(tt.net) : `<span class="good">지원금이 ${won(-tt.net)} 더 많아요</span>`}</dd></div>
       </dl>
       <p class="note">${BASE_NOTE}${state.twins ? ', 쌍둥이는 1.8배' : ''}와 부모급여·아동수당이 들어 있어요.${undecided ? ` 아직 정하지 않았거나 보류한 ${undecided}개는 빠져 있어요.` : ''}</p>
@@ -344,15 +376,14 @@ function renderLog(){
 // ── 결정 카드 ─────────────────────────────────
 const dlg = $('#decide');
 let dlgCtx = null;
-function openDecision(ev, { fromClock = false } = {}){
-  if(!ev) return;
-  dlgCtx = { ev, fromClock };
+// 결정 카드 내용 (타임라인 카드 안에 펼치거나, 정리 화면에서는 창으로 띄워요)
+function decideHtml(ev, fromClock){
   const rec = state.decisions[ev.id];
   const cur = rec?.choice || '';
   const multi = ev.type === 'care';
   const isOn = id => multi ? Array.isArray(cur) && cur.includes(id) : id === cur;
   const hasCost = !ev.noPrice && ev.options.some(o => o.once || o.monthly || o.after);
-  dlg.innerHTML = `
+  return `
     <form method="dialog" class="decide-inner">
       ${fromClock ? `<p class="pause-note">시간이 잠시 멈췄어요. 둘이 이야기해 보고 정해요.</p>` : ''}
       <p class="card-when">${stageLabel(ev.t)}${state.due ? ' · ' + dateText(state.due, ev.t, state.twins) : ''} · ${typeLabel(ev)}</p>
@@ -385,18 +416,12 @@ function openDecision(ev, { fromClock = false } = {}){
       </div>
       <button type="button" class="dlg-close" data-act="close" aria-label="닫기">×</button>
     </form>`;
-  dlg.showModal();
-  dlg.scrollTop = 0;   // 같은 시트를 다시 쓰니까, 새 카드는 늘 맨 위부터 보여요
-  const first = dlg.querySelector('input[name="choice"]:checked') || dlg.querySelector('input[name="choice"]');
-  first?.focus({ preventScroll:true });
 }
-
-// 아빠 할 일 체크리스트: 시간이 멈추고 크게 띄워요. 체크하고 '확인했어요'를 누르면 다시 흘러가요
-function openChecklist(ev, { fromClock = false } = {}){
-  dlgCtx = { ev, fromClock, list:true };
+// 아빠 할 일 체크리스트 내용
+function checklistHtml(ev, fromClock){
   const tw = state.twins;
   const amount = ev.support && (tw && ev.support.twinAmount ? ev.support.twinAmount : ev.support.amount);
-  dlg.innerHTML = `
+  return `
     <form method="dialog" class="decide-inner">
       ${fromClock ? `<p class="pause-note">시간이 잠시 멈췄어요. ${esc(state.names[1] || '남편')} 님이 챙길 일이에요.</p>` : ''}
       <p class="card-when">${stageLabel(ev.t)}${state.due ? ' · ' + dateText(state.due, ev.t, state.twins) : ''} · 아빠 할 일</p>
@@ -412,9 +437,18 @@ function openChecklist(ev, { fromClock = false } = {}){
       </div>
       <button type="button" class="dlg-close" data-act="close" aria-label="닫기">×</button>
     </form>`;
-  dlg.showModal();
-  dlg.scrollTop = 0;   // 같은 시트를 다시 쓰니까, 새 카드는 늘 맨 위부터 보여요
 }
+// 결정과 아빠 할 일은 팝업 창으로 띄워요 (뒤 화면은 어두워지지 않아요)
+function openPanel(ev, fromClock, list){
+  dlgCtx = { ev, fromClock, list };
+  dlg.innerHTML = list ? checklistHtml(ev, fromClock) : decideHtml(ev, fromClock);
+  dlg.showModal();
+  dlg.scrollTop = 0;   // 같은 창을 다시 쓰니까, 새 카드는 늘 맨 위부터 보여요
+  const first = dlg.querySelector('input[name="choice"]:checked') || dlg.querySelector('input[name="choice"]');
+  first?.focus({ preventScroll:true });
+}
+function openDecision(ev, { fromClock = false } = {}){ if(ev) openPanel(ev, fromClock, false); }
+function openChecklist(ev, { fromClock = false } = {}){ openPanel(ev, fromClock, true); }
 dlg.addEventListener('change', e => {
   const id = e.target.dataset.todo;
   if(!id) return;
@@ -422,36 +456,37 @@ dlg.addEventListener('change', e => {
   save();
 });
 
-dlg.addEventListener('click', e => {
-  if(e.target === dlg){ closeDecision(); return; }   // 바깥 누르면 닫기
-  const act = e.target.closest('[data-act]')?.dataset.act;
-  if(!act) return;
+function closeDecision(){ dlgCtx = null; if(dlg.open) dlg.close(); }
+function onAct(act){
+  if(!dlgCtx) return;
   if(act === 'close'){ closeDecision(); if(screen === 'sim'){ feedCount = -1; onTime(true); } return; }
+  const { ev, fromClock } = dlgCtx;
   if(act === 'seen'){
-    const { ev, fromClock } = dlgCtx;
     (state.seen ||= {})[ev.id] = true;
     save(true);
-    dlg.close(); dlgCtx = null;
-    if(screen === 'sim'){ feedCount = -1; onTime(true); }
+    closeDecision();
     if(fromClock && !state.finished && screen === 'sim') setTimeout(() => clock.play(), 350);
     return;
   }
   const fd = new FormData(dlg.querySelector('form'));
-  const choice = dlgCtx.ev.type === 'care' ? fd.getAll('choice') : (fd.get('choice') || '');
+  const choice = ev.type === 'care' ? fd.getAll('choice') : (fd.get('choice') || '');
   const memo = String(fd.get('memo') || '').trim();
   if(act === 'agree' && !choice.length){
     toast('하나를 골라 주세요. 아직 의견이 다르면 "나중에 다시 이야기하기"를 눌러요.');
     return;
   }
-  record(dlgCtx.ev, { choice, memo, status:act });
-  const resume = dlgCtx.fromClock;
-  dlg.close();
-  dlgCtx = null;
+  closeDecision();
+  record(ev, { choice, memo, status:act });
+  if(screen === 'sim'){ feedCount = -1; onTime(true); }
   toast(act === 'hold' ? '보류로 남겨 뒀어요. 정리 화면에서 다시 볼 수 있어요.' : '기록했어요.');
-  if(resume && !state.finished && screen === 'sim') setTimeout(() => clock.play(), 350);
+  if(fromClock && !state.finished && screen === 'sim') setTimeout(() => clock.play(), 350);
+}
+dlg.addEventListener('click', e => {
+  if(e.target === dlg){ closeDecision(); return; }   // 바깥 누르면 닫기
+  const act = e.target.closest('[data-act]')?.dataset.act;
+  if(act) onAct(act);
 });
 dlg.addEventListener('cancel', () => { dlgCtx = null; });
-function closeDecision(){ dlg.close(); dlgCtx = null; }
 
 function record(ev, { choice, memo, status }){
   const prev = state.decisions[ev.id];
@@ -480,7 +515,9 @@ $('#btnNext').addEventListener('click', () => {
   const next = STOPS.find(isOpenStop);
   if(!next){ toast('정할 건 다 정했어요.'); return; }
   clock.pause();
-  if(next.t > state.t){ state.t = next.t; onTime(true); }
+  if(next.t > state.t) state.t = next.t;
+  state.shown = Math.max(shownCount(), EVENTS.indexOf(next) + 1);
+  onTime(true);
   openStop(next, { fromClock:true });
 });
 $('#btnReport').addEventListener('click', () => { clock.pause(); openReport(state); });
