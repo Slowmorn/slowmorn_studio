@@ -1,11 +1,13 @@
 // 도트 그림 — 임신기에는 곰 부부와 그 사이에 크게 보이는 배 속, 출산 뒤에는 만 3세 아기 곰까지, 시기에 맞는 장면을 그려요.
 // 80×40 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
 // 캐릭터는 한 줄씩 글자로 적은 도트 지도(스프라이트)를 찍어요. 테두리까지 지도에 들어 있어요.
-import { BIRTH_T, PREG_START } from './events.js?v=20261116w';
+import { BIRTH_T, PREG_START } from './events.js?v=20261117a';
 
 // 높이는 40칸 그대로, 가로 칸 수는 그림이 놓인 자리의 폭에 맞춰 늘어나요 (최소 80칸). 사람·벽난로·트리는 가운데를 기준으로 놓아요
 export let W = 80;
-export const H = 40;
+export const H = 52;
+// 장면은 40칸 높이로 그리고, 위에 벽을 TOP 칸 더 붙여요. 남는 아래 3칸은 마룻바닥 한 줄이 더 깔려요 (캐릭터 크기는 그대로)
+const TOP = 9;
 export const MIN_W = 140;   // 부부와 아기, 벽난로, 트리가 다 들어가는 가장 좁은 폭
 // 크리스마스 시즌: 벽난로·트리·선물이 있는 거실을 배경으로 써요. 시즌이 끝나면 false 로
 const XMAS = true;
@@ -346,8 +348,10 @@ export function drawScene(main, t, opts, now){
   W = main.c.width;
   castFor(o.seed ?? 'miri');
   main.clear();
+  main.x.setTransform(1, 0, 0, 1, 0, TOP);     // 아래 40칸에 그려요. 위쪽 TOP 칸은 배경이 위로 이어져요
   if(i < BIRTH_T) couple(main, i + PREG_START, o, now);
   else room(main, i - BIRTH_T, o, now);
+  main.x.setTransform(1, 0, 0, 1, 0, 0);
 }
 
 // 임신기: 왼쪽 엄마 곰, 오른쪽 아빠 곰, 가운데에 배 속을 크게 보여 주는 동그란 창
@@ -355,7 +359,7 @@ function couple(m, week, { twins }, now){
   const anim = now > 0;
   if(XMAS) xmasRoom(m, now);
   else {
-    m.rect(0, 0, W, 33, C.bgP);
+    m.rect(0, -TOP, W, 33 + TOP, C.bgP);
     for(let y = 2; y < 33; y += 4) for(let x = (y / 4 % 2) * 2 + 1; x < W; x += 4) m.px(x, y, C.bgPd);
     m.rect(0, 33, W, 7, C.floor);
     m.rect(0, 36, W, 1, C.floorD);
@@ -514,22 +518,23 @@ const X = {
 function xmasRoom(m, now){
   const FY = 31, anim = now > 0, tick = anim ? Math.floor(now / 520) : 0;
   // 벽: 따뜻한 크림색 + 점무늬, 아래쪽 징두리 판
-  m.rect(0, 0, W, FY, X.wall);
-  for(let y = 4; y < FY - 7; y += 5) for(let x = (y / 5 % 2) * 3 + 1; x < W; x += 6) m.px(x, y, X.wallDot);
+  m.rect(0, -TOP, W, FY + TOP, X.wall);
+  m.rect(0, -TOP, W, 1, X.wainL);                                  // 천장 몰딩
+  for(let y = 4 - TOP; y < FY - 7; y += 5) for(let x = (y / 5 % 2) * 3 + 1; x < W; x += 6) m.px(x, y, X.wallDot);
   m.rect(0, FY - 7, W, 7, X.wain); m.rect(0, FY - 7, W, 1, X.wainL);
   for(let x = 3; x < W; x += 8) m.rect(x, FY - 5, 1, 5, X.wainL);
   // 바닥: 나무 마루
   m.rect(0, FY, W, H - FY, X.floor);
   m.rect(0, FY, W, 1, X.floorD);
-  for(const [y, o] of [[FY + 3, 0], [FY + 6, 5]]){ m.rect(0, y, W, 1, X.floorD); for(let x = o; x < W; x += 11) m.px(x, y - 1, X.floorD); }
+  for(const [y, o] of [[FY + 3, 0], [FY + 6, 5], [FY + 9, 2]]){ m.rect(0, y, W, 1, X.floorD); for(let x = o; x < W; x += 11) m.px(x, y - 1, X.floorD); }
   // 위쪽 가랜드 + 꼬마전구 (번갈아 반짝)
   const lights = [X.red, X.gold, X.blue, X.cream];
   for(let x = 0; x < W; x++){
     const k = x % 10, sag = Math.floor((k < 5 ? k : 10 - k) / 2);
-    m.px(x, 1 + sag, X.leaf); m.px(x, 2 + sag, X.leafD);
+    m.px(x, 1 + sag - TOP, X.leaf); m.px(x, 2 + sag - TOP, X.leafD);
     if(k === 5){
       const n = Math.floor(x / 10), on = (n + tick) % 2 === 0;
-      m.px(x, 4 + sag, on ? lights[n % 4] : X.wainL);
+      m.px(x, 4 + sag - TOP, on ? lights[n % 4] : X.wainL);
     }
   }
   const mid = Math.floor(W / 2), F = Math.max(0, mid - 68), T = Math.min(W - 8, mid + 60);  // 벽난로 왼쪽 끝, 트리 가운데 (출산 뒤 아기 양옆에 선 엄마·아빠 자리를 비워 둬요)
@@ -597,7 +602,7 @@ function snowWindow(m, x, y, now){
 
 // 예전 아기방 배경 (시즌이 아닐 때)
 function roomPlain(m, month, now){
-  m.rect(0, 0, W, 28, C.wall);
+  m.rect(0, -TOP, W, 28 + TOP, C.wall);
   for(let x = 0; x < W; x += 6) m.rect(x, 0, 3, 28, C.wallD);
   m.rect(0, 28, W, 12, C.floor);
   for(let y = 31; y < H; y += 4) m.rect(0, y, W, 1, C.floorD);

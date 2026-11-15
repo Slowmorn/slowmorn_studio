@@ -63,11 +63,11 @@
 .archive button span{color:var(--muted);font-size:13px}
 
 /* ── 2. 시뮬레이션 ─────────────────────── */
-:root{--scene-h:160px;--scene-gap:8px}   /* 도트 그림 높이와 그 아래 틈 (붙는 머리 계산에 같이 써요) */
+:root{--scene-h:208px;--scene-gap:8px}   /* 도트 그림 높이와 그 아래 틈 (붙는 머리 계산에 같이 써요) */
 .sim{max-width:var(--wrap);margin:0 auto;padding:0 20px}
 .sim-head{
-  /* 도트 그림은 가로폭을 다 쓰고 높이는 그대로예요. 내려도 그림·지금 시기·단추·막대가 함께 위에 떠 있어요 */
-  position:sticky;top:env(safe-area-inset-top, 0px);z-index:5;background:var(--page);
+  /* 도트 그림은 가로폭을 다 쓰고 높이는 그대로예요. 내리면 그림만 위로 올라가고, 지금 시기·단추·막대는 위에 붙어 있어요 */
+  position:sticky;top:calc(env(safe-area-inset-top, 0px) - var(--scene-h) - var(--scene-gap));z-index:5;background:var(--page);
   padding:0 0 10px;border-bottom:1px solid var(--line);
   display:grid;grid-template-columns:minmax(0,1fr) auto;
   grid-template-areas:"scene scene" "now ctrl" "track track" "next next";
@@ -122,7 +122,7 @@
 
 .tabs{display:none}
 .sim-body{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;padding-top:20px;align-items:start}
-.side{position:sticky;top:calc(var(--head-h, 360px) + 16px);display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - var(--head-h, 360px) - 24px);overflow:auto;padding-bottom:12px}
+.side{position:sticky;top:calc(var(--head-h, 360px) - var(--scene-h) - var(--scene-gap) + 16px);display:flex;flex-direction:column;gap:16px;max-height:calc(100vh - var(--head-h, 360px) + var(--scene-h) + var(--scene-gap) - 24px);overflow:auto;padding-bottom:12px}
 
 /* 타임라인 카드 */
 .feed{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -341,7 +341,7 @@ html:has(dialog[open]){overflow:hidden}
   .sim-body{grid-template-columns:minmax(0,1fr)}
   .side{position:static;max-height:none;overflow:visible}
   .tabs{
-    display:flex;gap:4px;position:sticky;top:var(--head-h, 330px);z-index:4;background:var(--page);
+    display:flex;gap:4px;position:sticky;top:calc(var(--head-h, 330px) - var(--scene-h) - var(--scene-gap));z-index:4;background:var(--page);
     padding:8px 0;border-bottom:1px solid var(--line);
   }
   .tabs button{flex:1;border:0;background:none;border-radius:8px;padding:7px 4px;font-weight:600;font-size:14px;color:var(--muted)}
@@ -353,7 +353,7 @@ html:has(dialog[open]){overflow:hidden}
   .r-summary{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:860px){
-  :root{--scene-h:120px}
+  :root{--scene-h:156px}
   .sim-head{grid-template-columns:minmax(0,1fr);grid-template-areas:"scene" "now" "ctrl" "track" "next";align-items:center;column-gap:14px}
   .controls{justify-content:flex-start}
 }
@@ -361,7 +361,7 @@ html:has(dialog[open]){overflow:hidden}
   .setup{padding:24px 16px 0}
   .sim{padding:0 max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px))}
   /* 폰에서는 도트 그림이 화면 가로폭을 다 써요 */
-  :root{--scene-h:88px;--scene-gap:6px}
+  :root{--scene-h:114px;--scene-gap:6px}
   .sim-head{column-gap:12px}
   .scene{width:100vw;max-width:none;margin-left:calc(50% - 50vw);border-radius:0}
   .now-who{font-size:12px}
@@ -426,7 +426,7 @@ html:has(dialog[open]){overflow:hidden}
   /* 저장본에는 요약과 타임라인만 담아요 */
   .r-wrap > .r-sec:not(.r-summary):not(.r-timeline){display:none}
   .print-only{display:block}
-  .r-scene{width:100%;height:110px}
+  .r-scene{width:100%;height:143px}
   body{font-size:12.5px;background:#fff}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
