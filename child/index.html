@@ -19,7 +19,7 @@
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://slowmorn.com/child/og.png?v=2">
-<link rel="icon" href="favicon.svg?v=20261117n" type="image/svg+xml">
+<link rel="icon" href="favicon.svg?v=20261117p" type="image/svg+xml">
 <!-- Google Analytics 4 (버짓리스트와 같은 속성. 보고서에서 /child/ 경로로 나눠 봐요) -->
 <script>
   // 내 컴퓨터에서 미리 볼 때(localhost 등)는 GA로 보내지 않아요
@@ -35,9 +35,9 @@
 </script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
-<link rel="stylesheet" href="assets/base.css?v=20261117n">
-<link rel="stylesheet" href="assets/site.css?v=20261117n">
-<link rel="stylesheet" href="assets/xmas.css?v=20261117n">
+<link rel="stylesheet" href="assets/base.css?v=20261117p">
+<link rel="stylesheet" href="assets/site.css?v=20261117p">
+<link rel="stylesheet" href="assets/xmas.css?v=20261117p">
 </head>
 <body>
 <header class="topbar">
@@ -158,8 +158,8 @@
 </script>
 <!-- 시작 폼: 새 기록을 만들고 시뮬레이터로 넘어가요. 진행 중인 기록이 있으면 이어서 하기를 보여 줘요 -->
 <script type="module">
-  import { KEY, ARCHIVE_KEY, load, store, newState, archive } from './assets/start.js?v=20261117n';
-  import { stageLabel } from './assets/time.js?v=20261117n';
+  import { KEY, ARCHIVE_KEY, load, store, newState, archive } from './assets/start.js?v=20261117p';
+  import { stageLabel } from './assets/time.js?v=20261117p';
   const $ = s => document.querySelector(s);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
   const who = s => `${s.names.join(' · ')}${s.baby ? ` · ${s.baby}` : ''}${s.twins ? ' · 쌍둥이' : ''}`;
@@ -176,7 +176,7 @@
     e.preventDefault();
     if(cur && cur.v === 5) archive(cur);
     store(KEY, newState(Object.fromEntries(new FormData(e.target))));
-    location.href = 'app/';
+    location.href = 'app/?start=1';   // 새로 시작하면 시뮬레이터에서 바로 시간이 흘러요
   });
   const list = load(ARCHIVE_KEY) || [];
   if(list.length){
@@ -189,8 +189,8 @@
 </script>
 <!-- 소개 그림: 배 속에서 만 3세까지 장면이 차례로 바뀌어요 -->
 <script type="module">
-  import { mountScene, caption } from './assets/pixel.js?v=20261117n';
-  import { stageLabel } from './assets/time.js?v=20261117n';
+  import { mountScene, caption } from './assets/pixel.js?v=20261117p';
+  import { stageLabel } from './assets/time.js?v=20261117p';
   const STOPS = [2, 8, 16, 30, 36, 40, 43, 46, 50, 58, 70];
   let k = 0;
   const seed = Math.random().toString(36).slice(2);   // 들어올 때마다 다른 부부가 나와요

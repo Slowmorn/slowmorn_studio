@@ -1,5 +1,5 @@
 // 시간 흐름 엔진 — requestAnimationFrame 으로 t 를 밀어 주고, 결정할 일이 오면 멈춰요.
-import { BIRTH_T, END_T } from './events.js?v=20261117n';
+import { BIRTH_T, END_T } from './events.js?v=20261117p';
 
 // 1배속 기준: 임신기 1주 = 5초, 출산 후 1개월 = 6초 → 결정 시간 빼고 약 6분 30초
 export const SEC_PER_WEEK = 5;
