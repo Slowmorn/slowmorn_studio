@@ -1,9 +1,9 @@
 // 정리 화면 — 우리 부부의 육아 계획서. PDF로 저장하면 요약과 함께 타임라인이 처음(임신 4주)부터 차례로 담겨요.
-import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, evTitle, byId } from './events.js?v=20261116k';
-import { mountScene } from './pixel.js?v=20261116k';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261116k';
-import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261116k';
-import { stageLabel, dateText } from './time.js?v=20261116k';
+import { EVENTS, DECISIONS, PHASES, MODE_LABEL, TYPE_LABEL, END_T, BIRTH_T, atToT, evTitle, byId } from './events.js?v=20261116m';
+import { mountScene } from './pixel.js?v=20261116m';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261116m';
+import { totals, optionOf, optionTotal, priceText, won, afterMonthly, BASE_COSTS, BASE_TWIN, BASE_NOTE, eff, spanText, monthCount } from './budget.js?v=20261116m';
+import { stageLabel, dateText } from './time.js?v=20261116m';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const statusText = s => s === 'hold' ? '보류' : '합의';
@@ -116,7 +116,8 @@ export function renderReport(root, state, { readonly, onOpen, onPromise, onBack,
       <h2>매달 나가는 돈</h2>
       <table class="r-table">
         <thead><tr><th>항목</th><th>선택</th><th>기간</th><th class="num">한 달</th><th class="num">합계</th></tr></thead>
-        <tbody>${BASE_COSTS.map(b => `<tr><td>${esc(b.label)}</td><td class="note">${esc(b.note)}</td>
+        <tbody>${EVENTS.filter(ev => ev.monthly).map(ev => { const n = Math.ceil(((ev.until ? atToT(ev.until) : BIRTH_T) - ev.t) / 4);
+          return `<tr><td>${esc(ev.title)}</td><td class="note">꼭 먹어요</td><td>${stageLabel(ev.t)}부터 ${n}개월</td><td class="num">${won(ev.monthly)}</td><td class="num">${won(ev.monthly * n)}</td></tr>`; }).join('')}${BASE_COSTS.map(b => `<tr><td>${esc(b.label)}</td><td class="note">${esc(b.note)}</td>
           <td>생후 ${b.span[0]}~${b.span[1]}개월</td><td class="num">${won(b.monthly * (state.twins ? BASE_TWIN : 1))}</td><td class="num">${won(b.monthly * (state.twins ? BASE_TWIN : 1) * (b.span[1] - b.span[0] + 1))}</td></tr>`).join('')}${monthlyRows.map(({ ev, opt }) => `<tr><td>${esc(evTitle(ev, state.twins))}</td><td>${esc(opt.label)}</td>
           <td>${spanText(opt)}</td><td class="num">${won(opt.monthly)}</td><td class="num">${won(opt.monthly * monthCount(opt))}</td></tr>`).join('')}
         </tbody>

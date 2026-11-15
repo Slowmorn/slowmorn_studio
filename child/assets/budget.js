@@ -1,5 +1,5 @@
 // 예산 계산 — 고른 선택지로 지출·지원 장부(ledger)를 만들고 합계를 내요.
-import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js?v=20261116k';
+import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js?v=20261116m';
 
 // 매달 들어오는 지원금 (생후 개월 기준, 끝 포함)
 //   부모급여: 0세 월 100만, 1세 월 50만. 어린이집을 다니면 1세 부모급여는 보육료 바우처로 나가서 현금은 0원으로 봐요.
@@ -38,7 +38,7 @@ export const BASE_COSTS = [
   { label:'기본 육아 생활비 (1세)', note:'기저귀, 먹거리·간식, 병원·약값', monthly:410000, span:[12,23] },
   { label:'기본 육아 생활비 (2세)', note:'먹거리·간식, 위생용품, 병원·약값', monthly:350000, span:[24,35] },
 ];
-export const BASE_NOTE = '기본 육아 생활비(기저귀 포함, 0세 월 33만 · 1세 월 41만 · 2세 월 35만 원)';
+export const BASE_NOTE = '임신 중 영양제(초기 월 3만 · 16주부터 월 10만 원)와 기본 육아 생활비(기저귀 포함, 0세 월 33만 · 1세 월 41만 · 2세 월 35만 원)';
 
 export function optionOf(ev, choiceId){
   // 여러 개 고르는 결정(남편 차례)은 고른 것들을 한 줄로 묶어서 돌려줘요
@@ -58,6 +58,11 @@ export function ledger(state){
   const rows = [];
   for(const ev of EVENTS){
     if(ev.cost) rows.push({ t:ev.t, amount:ev.cost, kind:'cost', label:ev.title, eventId:ev.id });
+    // 임신 중 매달 드는 돈 (영양제처럼 고르지 않아도 드는 것): 그 주부터 4주마다, until 또는 출산까지
+    if(ev.monthly){
+      const end = ev.until ? atToT(ev.until) : BIRTH_T;
+      for(let t = ev.t; t < end - 1e-6; t += 4) rows.push({ t, amount:ev.monthly, kind:'cost', label:ev.title, eventId:ev.id, monthly:true, base:true });
+    }
     if(ev.support) rows.push({ t:ev.t, amount:state.twins && ev.support.twinAmount ? ev.support.twinAmount : ev.support.amount, kind:'support', label:ev.support.label, eventId:ev.id });
   }
   for(const ev of DECISIONS){
