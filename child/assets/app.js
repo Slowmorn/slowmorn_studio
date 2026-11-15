@@ -1,12 +1,12 @@
 // 미리 키움 — 출산·육아 시뮬레이터
 // 화면 세 개(시작 설정 · 시뮬레이션 · 정리)와 결정 카드를 다뤄요. 상태는 localStorage 에 저장해요.
-import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261116m';
-import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261116m';
-import { mountScene, caption } from './pixel.js?v=20261116m';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261116m';
-import { Clock } from './clock.js?v=20261116m';
-import { renderReport } from './report.js?v=20261116m';
-import { stageLabel, dateText } from './time.js?v=20261116m';
+import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261116v';
+import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261116v';
+import { mountScene, caption, momNote } from './pixel.js?v=20261116v';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261116v';
+import { Clock } from './clock.js?v=20261116v';
+import { renderReport } from './report.js?v=20261116v';
+import { stageLabel, dateText } from './time.js?v=20261116v';
 
 const KEY = 'child-sim-v1';
 const ARCHIVE_KEY = 'child-sim-archive-v1';
@@ -139,7 +139,9 @@ const clock = new Clock({
     onTime();
     if(STOPS.includes(ev) && isOpenStop(ev)) return 'stop';
     if(ev.type === 'milestone' && Math.abs(ev.t - BIRTH_T) < 1e-6){ celebrate(ev); return 3600; }
-    return Math.round(1400 / Math.sqrt(clock.speed));   // 카드 하나를 읽을 틈 (빠르게 돌리면 조금 짧게)
+    // 카드 하나를 읽을 틈: 글이 길수록 오래 머물러요 (1배속 2~8초, 빠르게 돌리면 그만큼 짧게)
+    const len = (evTitle(ev, state.twins) + evBody(ev, state.twins)).length;
+    return Math.round(Math.min(8000, 2000 + len * 30) / Math.sqrt(clock.speed));
   },
   onStop:ev => openStop(ev, { fromClock:true }),
   onEnd:() => { state.finished = true; save(true); toast('만 36개월이 되었어요. 둘의 계획을 정리해 볼게요.'); setTimeout(() => openReport(state), 900); },
@@ -214,6 +216,8 @@ function onTime(force = false){
     $('#nowLabel').textContent = stageLabel(t);
     $('#nowDate').textContent = state.due ? dateText(state.due, t, state.twins) : '';
     $('#nowCaption').textContent = caption(t, state.baby, state.twins);
+    const mom = momNote(t, state.twins);
+    $('#nowMom').textContent = mom ? `엄마 · ${mom}` : '';
     const next = DECISIONS.find(ev => !state.decisions[ev.id] && ev.t >= t - 1e-6);
     $('#upNext').innerHTML = next ? `다음 · <b>${esc(evTitle(next, state.twins))}</b> <span>${stageLabel(next.t)}</span>` : (t >= END_T ? '' : '정할 건 다 정했어요. 끝까지 흘러가 볼까요?');
     renderSideBudget();
@@ -239,8 +243,8 @@ function card(ev, isNew){
   const cls = `card card-${ev.type}${isNew ? ' is-new' : ''}`;
   const title = esc(evTitle(ev, tw));
   const body = evBody(ev, tw);
-  // 긴 설명은 두 줄만 보이고, 누르면 펼쳐져요
-  const para = `<p class="body${body.length > 54 ? ' clamp' : ''}">${esc(body)}</p>`;
+  // 설명은 접지 않고 다 보여 줘요
+  const para = `<p class="body">${esc(body)}</p>`;
   if(ev.type === 'milestone'){
     return `<article class="${cls}"><p class="card-when">${when}</p><h3>${title}</h3><p class="body">${esc(body)}</p></article>`;
   }
@@ -268,7 +272,7 @@ function card(ev, isNew){
     return `<article class="${cls}${done ? ' is-done' : ''}">
       <p class="card-when">${when} · 할 일</p>
       <label class="todo"><input type="checkbox" data-todo="${ev.id}" ${done ? 'checked' : ''}><h3>${title}</h3></label>
-      ${para}${img}${linkHtml(ev)}${chips ? `<div class="chips">${chips}</div>` : ''}
+      ${para}${ev.list ? `<ul class="tips">${ev.list.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : ''}${img}${linkHtml(ev)}${chips ? `<div class="chips">${chips}</div>` : ''}
     </article>`;
   }
   // 결정 카드
@@ -292,10 +296,6 @@ function card(ev, isNew){
   </article>`;
 }
 
-$('#feed').addEventListener('click', e => {
-  const p = e.target.closest('p.clamp');
-  if(p) p.classList.toggle('open');
-});
 $('#feed').addEventListener('change', e => {
   const id = e.target.dataset.todo;
   if(!id) return;
