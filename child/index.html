@@ -14,7 +14,12 @@
 <meta property="og:locale" content="ko_KR">
 <meta property="og:title" content="패밀리리허설 · 부부가 같이 해 보는 출산·육아 시뮬레이터">
 <meta property="og:description" content="임신 4주부터 만 3세까지, 할 일과 살 것과 예산과 키우는 방향을 둘이 같이 정해요.">
-<link rel="icon" href="favicon.svg?v=20261117c" type="image/svg+xml">
+<meta property="og:image" content="https://slowmorn.com/child/og.png?v=2">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://slowmorn.com/child/og.png?v=2">
+<link rel="icon" href="favicon.svg?v=20261117n" type="image/svg+xml">
 <!-- Google Analytics 4 (버짓리스트와 같은 속성. 보고서에서 /child/ 경로로 나눠 봐요) -->
 <script>
   // 내 컴퓨터에서 미리 볼 때(localhost 등)는 GA로 보내지 않아요
@@ -30,16 +35,16 @@
 </script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://cdn.jsdelivr.net/npm/pretendard@1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" rel="stylesheet">
-<link rel="stylesheet" href="assets/base.css?v=20261117c">
-<link rel="stylesheet" href="assets/site.css?v=20261117c">
-<link rel="stylesheet" href="assets/xmas.css?v=20261117c">
+<link rel="stylesheet" href="assets/base.css?v=20261117n">
+<link rel="stylesheet" href="assets/site.css?v=20261117n">
+<link rel="stylesheet" href="assets/xmas.css?v=20261117n">
 </head>
 <body>
 <header class="topbar">
   <div class="topbar-inner">
     <a class="brand" href="./" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4444 3C18.4081 3 20 4.46525 20 6.27273C20 7.50495 19.2601 8.57808 18.167 9.13636C19.2601 9.69465 20 10.7678 20 12C20 13.2322 19.2601 14.3053 18.167 14.8636C18.167 16 18.167 16.7678 18.167 18C18.167 19.8075 18.4081 21 16.4444 21H13C8.02943 21 4 16.9706 4 12C4 7.02944 8.02944 3 13 3H16.4444Z" fill="currentColor"/></svg><span class="brand-name">패밀리리허설</span></a>
     <span class="spacer"></span>
-    <a class="top-cta" href="app/">시작하기</a>
+    <a class="top-cta" href="#start">시작하기</a>
   </div>
 </header>
 
@@ -48,30 +53,50 @@
     <div class="hero-text">
       <img class="xmas-mark" src="assets/xmas/merry.svg" alt="Merry Christmas" width="1220" height="70">
       <p class="kicker">패밀리리허설 · 부부가 같이 해 보는 출산·육아 시뮬레이터</p>
-      <h1>아기가 오기 전에,<br>둘이 먼저 살아 봐요</h1>
+      <h1>아기가 오기 전에,<br>둘이 먼저 맞춰 봐요</h1>
       <p class="hero-lead">
-        임신 4주부터 만 3세까지 시간이 저절로 흘러가요. 주차마다 할 일이 쌓이고, 육아용품 예산은 얼마로 할지,
-        입덧이 심할 때 남편은 무엇을 할지, 영상은 언제부터 보여 줄지 정할 때가 오면 시간이 멈춰요.
-        둘이 이야기해서 고르면 그 선택과 이유, 그리고 예산이 기록으로 남아요.
+        할 일, 살 것, 쓸 돈, 키우는 방향. 혼자 알아보던 걸 이제 둘이 같이 정해요.
+        임신 4주부터 만 3세까지 시간이 저절로 흐르다가, 산후조리원이나 육아용품 예산, 입덧이 심할 때 남편이 할 일처럼
+        정할 때가 오면 멈춰요. 둘이 이야기해서 고른 선택과 이유가 우리 둘의 계획서로 남아요.
       </p>
-      <a class="hero-cta" href="app/">같이 시작하기</a>
-      <p class="hero-note">가입 없이 바로 써요 · 쌍둥이도 돼요 · 기록은 이 브라우저에만 저장돼요</p>
+      <p class="hero-note">아빠도 같이 정해요 · 가입 없이 바로 써요 · 쌍둥이도 돼요 · 기록은 이 브라우저에만 저장돼요</p>
     </div>
     <!-- 진행 막대 미리보기 -->
-    <div class="hero-art" aria-hidden="true">
-      <canvas class="hero-scene" id="heroScene" width="80" height="40"></canvas>
-      <div class="mini-now"><span id="heroStage">임신 24주</span><b id="heroCap">육아용품 예산을 정할 때예요</b></div>
-      <div class="mini-opts">
-        <div><b>알뜰하게</b><span>300만 원</span></div>
-        <div class="on"><b>큰 것만 새것</b><span>500만 원</span></div>
-        <div><b>넉넉하게 새것</b><span>1,000만 원</span></div>
+    <!-- 소개 그림, 그 아래 시작 칸: 아기 수와 태명만 넣고 바로 시작해요 -->
+    <div class="hero-side" id="start">
+      <div class="hero-art" aria-hidden="true">
+        <canvas class="hero-scene" id="heroScene" width="80" height="40"></canvas>
+        <div class="mini-now"><span id="heroStage">임신 24주</span><b id="heroCap">육아용품 예산을 정할 때예요</b></div>
       </div>
-      <p class="mini-memo">“유모차·카시트만 새것, 나머진 당근으로” <span>합의</span></p>
+      <form id="startForm" class="hero-start">
+        <div class="start-row">
+        <div class="field" role="group" aria-labelledby="twinsLabel">
+          <span id="twinsLabel">아기는</span>
+          <div class="seg" role="radiogroup" aria-labelledby="twinsLabel">
+            <label><input type="radio" name="twins" value="no" checked><span>한 명</span></label>
+            <label><input type="radio" name="twins" value="yes"><span>쌍둥이</span></label>
+          </div>
+        </div>
+        <label class="field"><span>태명 <em>(선택)</em></span><input name="baby" maxlength="16" placeholder="예: 콩콩이, 콩이와 팥이" autocomplete="off"></label>
+        </div>
+        <button class="btn-start" type="submit">시작하기</button>
+        <p class="note" id="startNote" hidden></p>
+      </form>
     </div>
   </div>
 </section>
 
 <main class="site-main">
+  <!-- 지난 시뮬레이션: 누르면 그때의 정리 화면을 읽기 전용으로 열어요 -->
+  <section class="start-archive" id="startArchive" aria-labelledby="archiveTitle" hidden>
+    <h2 id="archiveTitle">지난 시뮬레이션</h2>
+    <div class="start-resume" id="startResume" hidden>
+      <div><b id="resumeWho"></b><span id="resumeWhere"></span></div>
+      <a class="btn-resume" href="app/">이어서 하기</a>
+    </div>
+    <ul id="startArchiveList" hidden></ul>
+  </section>
+
   <section aria-labelledby="howTitle">
     <h2 id="howTitle">이렇게 흘러가요</h2>
     <ol class="steps">
@@ -131,10 +156,41 @@
   "publisher": { "@type": "Organization", "name": "Slowmorn", "url": "https://slowmorn.com/" }
 }
 </script>
+<!-- 시작 폼: 새 기록을 만들고 시뮬레이터로 넘어가요. 진행 중인 기록이 있으면 이어서 하기를 보여 줘요 -->
+<script type="module">
+  import { KEY, ARCHIVE_KEY, load, store, newState, archive } from './assets/start.js?v=20261117n';
+  import { stageLabel } from './assets/time.js?v=20261117n';
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  const who = s => `${s.names.join(' · ')}${s.baby ? ` · ${s.baby}` : ''}${s.twins ? ' · 쌍둥이' : ''}`;
+  const cur = load(KEY);
+  if(cur && cur.v === 5){
+    $('#startResume').hidden = false;
+    $('#startArchive').hidden = false;
+    $('#resumeWho').textContent = who(cur);
+    $('#resumeWhere').textContent = cur.finished ? '끝까지 봤어요' : `${stageLabel(cur.t)}까지 했어요`;
+    $('#startNote').hidden = false;
+    $('#startNote').textContent = '하던 기록은 아래 지난 시뮬레이션 맨 위에서 이어서 할 수 있어요. 새로 시작하면 거기에 보관돼요';
+  }
+  $('#startForm').addEventListener('submit', e => {
+    e.preventDefault();
+    if(cur && cur.v === 5) archive(cur);
+    store(KEY, newState(Object.fromEntries(new FormData(e.target))));
+    location.href = 'app/';
+  });
+  const list = load(ARCHIVE_KEY) || [];
+  if(list.length){
+    $('#startArchive').hidden = false;
+    $('#startArchiveList').hidden = false;
+    $('#startArchiveList').innerHTML = list.map((a, i) => `<li><a href="app/?archive=${i}">
+      <b>${esc(who(a.state))}</b>
+      <span>${new Date(a.savedAt).toLocaleDateString('ko-KR')} · 결정 ${Object.keys(a.state.decisions).length}개 · ${a.state.finished ? '끝까지 봤어요' : esc(stageLabel(a.state.t)) + '에서 멈춤'}</span></a></li>`).join('');
+  }
+</script>
 <!-- 소개 그림: 배 속에서 만 3세까지 장면이 차례로 바뀌어요 -->
 <script type="module">
-  import { mountScene, caption } from './assets/pixel.js?v=20261117c';
-  import { stageLabel } from './assets/time.js?v=20261117c';
+  import { mountScene, caption } from './assets/pixel.js?v=20261117n';
+  import { stageLabel } from './assets/time.js?v=20261117n';
   const STOPS = [2, 8, 16, 30, 36, 40, 43, 46, 50, 58, 70];
   let k = 0;
   const seed = Math.random().toString(36).slice(2);   // 들어올 때마다 다른 부부가 나와요

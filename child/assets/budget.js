@@ -1,5 +1,5 @@
 // 예산 계산 — 고른 선택지로 지출·지원 장부(ledger)를 만들고 합계를 내요.
-import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js?v=20261117c';
+import { EVENTS, DECISIONS, BIRTH_T, END_T, PHASES, phaseOf, atToT } from './events.js?v=20261117n';
 
 // 매달 들어오는 지원금 (생후 개월 기준, 끝 포함)
 //   부모급여: 0세 월 100만, 1세 월 50만. 어린이집을 다니면 1세 부모급여는 보육료 바우처로 나가서 현금은 0원으로 봐요.

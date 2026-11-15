@@ -1,15 +1,14 @@
 // 패밀리리허설 — 출산·육아 시뮬레이터
-// 화면 세 개(시작 설정 · 시뮬레이션 · 정리)와 결정 카드를 다뤄요. 상태는 localStorage 에 저장해요.
-import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261117c';
-import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261117c';
-import { mountScene, caption, momNote } from './pixel.js?v=20261117c';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261117c';
-import { Clock } from './clock.js?v=20261117c';
-import { renderReport } from './report.js?v=20261117c';
-import { stageLabel, dateText } from './time.js?v=20261117c';
+// 시뮬레이션 · 정리 화면과 결정 카드를 다뤄요. 시작 정보는 소개 페이지의 폼에서 받아요(start.js). 상태는 localStorage 에 저장해요.
+import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261117n';
+import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261117n';
+import { mountScene, caption, momNote } from './pixel.js?v=20261117n';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261117n';
+import { Clock } from './clock.js?v=20261117n';
+import { renderReport } from './report.js?v=20261117n';
+import { stageLabel, dateText } from './time.js?v=20261117n';
+import { KEY, ARCHIVE_KEY, load, store, remove, newState, archive } from './start.js?v=20261117n';
 
-const KEY = 'child-sim-v1';
-const ARCHIVE_KEY = 'child-sim-archive-v1';
 const $ = sel => document.querySelector(sel);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 
@@ -23,9 +22,6 @@ const isOpenStop = ev => ev.items ? !state.seen?.[ev.id] : !state.decisions[ev.i
 const openStop = (ev, opts) => ev.items ? openChecklist(ev, opts) : openDecision(ev, opts);
 
 // ── 저장 ─────────────────────────────────────
-function load(key){ try { return JSON.parse(localStorage.getItem(key)); } catch(e){ return null; } }
-function store(key, val){ try { localStorage.setItem(key, JSON.stringify(val)); } catch(e){} }
-
 let state = load(KEY);
 let saveTimer = 0;
 function save(now = false){
@@ -34,40 +30,14 @@ function save(now = false){
   else saveTimer = setTimeout(() => store(KEY, state), 800);
 }
 
-function newState(form){
-  return {
-    v:5,
-    id:Date.now().toString(36),
-    createdAt:new Date().toISOString(),
-    names:[form.nameA || '아내', form.nameB || '남편'],
-    baby:form.baby || '',
-    twins:form.twins === 'yes',
-    due:form.due || '',
-    speed:1,
-    t:0,
-    decisions:{},   // { [eventId]: { choice, memo, status:'agree'|'hold', ts, t, history:[...] } }
-    todos:{},       // { [eventId]: true } · 체크리스트 항목은 { 'eventId:항목': true }
-    seen:{},        // { [eventId]: true } 확인한 아빠 할 일 체크리스트
-    promise:'',
-    finished:false,
-  };
-}
-
-function archiveCurrent(){
-  if(!state) return;
-  const touched = Object.keys(state.decisions).length > 0;
-  if(!touched){ return; }
-  const list = load(ARCHIVE_KEY) || [];
-  list.unshift({ savedAt:new Date().toISOString(), state });
-  store(ARCHIVE_KEY, list.slice(0, 5));
-}
-
 // ── 화면 전환 ─────────────────────────────────
-const screens = { setup:$('#setup'), sim:$('#sim'), report:$('#report') };
+const screens = { setup:$('#setup'), sim:$('#sim'), report:$('#report') };   // setup 은 따로 쓰는 미리보기에만 있어요
+// 시작 화면으로: 보통은 소개 페이지의 시작 폼, 시작 화면이 들어 있는 페이지면 그 화면
+const goStart = () => screens.setup ? openSetup() : location.assign('../#start');
 let screen = '';
 function show(name){
   screen = name;
-  for(const [k, el] of Object.entries(screens)) el.hidden = k !== name;
+  for(const [k, el] of Object.entries(screens)) if(el) el.hidden = k !== name;
   $('#btnRestart').hidden = name === 'setup';
   $('#btnRestart').textContent = '처음부터 다시';
   $('#btnReport').hidden = name !== 'sim';
@@ -90,13 +60,13 @@ function openSetup(){
     </button></li>`;
   }).join('');
 }
-$('#archiveList').addEventListener('click', e => {
+$('#archiveList')?.addEventListener('click', e => {
   const b = e.target.closest('[data-archive]');
   if(!b) return;
   const a = (load(ARCHIVE_KEY) || [])[Number(b.dataset.archive)];
   if(a) openReport(a.state, true);
 });
-$('#setupForm').addEventListener('submit', e => {
+$('#setupForm')?.addEventListener('submit', e => {
   e.preventDefault();
   const f = Object.fromEntries(new FormData(e.target));
   state = newState(f);
@@ -116,15 +86,15 @@ function ask(title, body, yes = '확인'){
 }
 
 $('#btnRestart').addEventListener('click', async () => {
-  if(screen === 'report' && reportReadonly){ openSetup(); return; }
+  if(screen === 'report' && reportReadonly){ goStart(); return; }
   clock.pause();
-  const ok = await ask('처음부터 다시 할까요?', '지금까지의 기록은 "지난 시뮬레이션"에 보관돼요. 시작 화면에서 언제든 다시 열어 볼 수 있어요.', '처음부터 다시');
+  const ok = await ask('처음부터 다시 할까요?', '지금까지의 기록은 "지난 시뮬레이션"에 보관돼요. 소개 페이지의 시작 칸 아래에서 언제든 다시 열어 볼 수 있어요.', '처음부터 다시');
   if(!ok) return;
-  archiveCurrent();
+  archive(state);
   state = null;
-  try { localStorage.removeItem(KEY); } catch(e){}
-  $('#setupForm').reset();
-  openSetup();
+  remove(KEY);
+  $('#setupForm')?.reset();
+  goStart();
 });
 
 // ── 시뮬레이션 ────────────────────────────────
@@ -151,6 +121,7 @@ const clock = new Clock({
 function startSim(autoplay){
   show('sim');
   if(state.twins && state.t >= TWIN_BIRTH_T && state.t < BIRTH_T) state.t = BIRTH_T;   // 쌍둥이는 37주에 태어나요
+  if(!(state.speed <= 4)) state.speed = 4;   // 8배속은 없앴어요 (예전 기록은 4배속으로)
   clock.speed = state.speed;
   const r = document.querySelector(`input[name="simSpeed"][value="${state.speed}"]`);
   if(r) r.checked = true;
@@ -547,7 +518,7 @@ function openReport(s, readonly = false){
     readonly,
     onOpen:id => openDecision(byId[id], {}),
     onPromise:text => { state.promise = text; save(); },
-    onBack:() => { $('#btnRestart').textContent = '처음부터 다시'; readonly ? openSetup() : startSim(false); },
+    onBack:() => { $('#btnRestart').textContent = '처음부터 다시'; readonly ? goStart() : startSim(false); },
     toast,
   });
 }
@@ -566,9 +537,14 @@ function toast(msg){
 new ResizeObserver(([e]) => document.documentElement.style.setProperty('--head-h', Math.round(e.target.getBoundingClientRect().height) + 'px')).observe($('.sim-head'));
 
 // ── 시작 ─────────────────────────────────────
-if(state && state.v === 5){
+// ?archive=번호 : 소개 페이지의 '지난 시뮬레이션'에서 눌러 들어온 경우 → 읽기 전용 정리 화면
+const fromArchive = new URLSearchParams(location.search).get('archive');
+const archived = fromArchive !== null ? (load(ARCHIVE_KEY) || [])[Number(fromArchive)] : null;
+if(archived){
+  openReport(archived.state, true);
+} else if(state && state.v === 5){
   state.finished ? openReport(state) : startSim(false);
 } else {
   state = null;
-  openSetup();
+  goStart();
 }

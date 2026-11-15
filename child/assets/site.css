@@ -4,15 +4,10 @@
 
 .hero-inner{
   max-width:var(--wrap);margin:0 auto;padding:48px 20px 36px;
-  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:center;gap:28px 48px;
+  display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);align-items:start;gap:28px 48px;   /* 두 열의 윗줄을 맞춰요 */
 }
 .hero h1{font-size:clamp(28px,4vw,44px);line-height:1.22;letter-spacing:-0.03em;margin:0 0 14px}
 .hero-lead{color:var(--muted);margin:0;max-width:54ch;line-height:1.8;word-break:keep-all}
-.hero-cta{
-  display:inline-block;margin-top:22px;background:var(--ink);color:var(--sheet);text-decoration:none;
-  font-weight:600;padding:12px 24px;border-radius:8px;
-}
-.hero-cta:hover{filter:brightness(1.18)}
 .hero-note{color:var(--muted);font-size:13px;margin:10px 0 0}
 
 /* 오른쪽 그림: 앱의 결정 카드를 작게 */
@@ -24,12 +19,6 @@
 .mini-now span{font-size:12.5px;color:var(--muted);font-weight:600}
 .mini-now b{font-size:17px;letter-spacing:-0.02em;word-break:keep-all}
 .hero-scene{width:100%;height:auto;aspect-ratio:35 / 13;image-rendering:pixelated;border-radius:12px;background:var(--paper)}
-.mini-opts{display:flex;flex-direction:column;gap:6px;margin-top:4px}
-.mini-opts div{display:flex;justify-content:space-between;border:1px solid var(--line);border-radius:9px;padding:9px 12px;font-size:14px}
-.mini-opts span{color:var(--muted)}
-.mini-opts .on{border-color:var(--accent);background:var(--accent-soft)}
-.mini-memo{margin:0;font-size:13.5px;color:var(--muted)}
-.mini-memo span{font-size:11.5px;font-weight:700;border-radius:4px;padding:1px 6px;background:var(--good-soft);color:var(--good);margin-left:4px}
 
 .site-main{max-width:var(--wrap);margin:0 auto;padding:8px 20px 24px}
 .site-main h2{font-size:19px;letter-spacing:-0.01em;margin:36px 0 12px}
@@ -61,3 +50,38 @@
   .hero-inner{padding:28px 16px 20px}
   .site-main{padding:0 16px 16px}
 }
+
+/* 소개 그림 아래 시작 칸 */
+.hero-side{display:flex;flex-direction:column;gap:22px;min-width:0}
+.hero-start{display:flex;flex-direction:column;gap:14px}
+.start-row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:start}   /* 아기 수와 태명을 한 줄에, 이름표와 칸 높이를 맞춰요 */
+.start-row .seg{flex-wrap:nowrap}
+.start-row .seg span,.start-row input{height:46px;box-sizing:border-box}
+.start-row .seg span{padding:0 14px}
+.hero-start .note{margin:0}
+.start-resume{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--sheet);padding:14px 18px;margin-bottom:10px}
+.start-resume div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.start-resume span{color:var(--muted);font-size:13px}
+.btn-resume{flex:none;background:var(--ink);color:var(--sheet);text-decoration:none;font-weight:600;font-size:14px;padding:9px 16px;border-radius:8px}
+.btn-start{border:0;border-radius:8px;background:var(--ink);color:var(--sheet);font:inherit;font-weight:600;font-size:16px;padding:13px 28px;cursor:pointer}
+.btn-start:hover{filter:brightness(1.18)}
+.start-archive{max-width:620px}
+.start-archive ul{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:var(--radius-lg);background:var(--sheet);padding:4px 18px}
+.start-archive li + li a{border-top:1px solid var(--line)}
+.start-archive li a{display:flex;flex-direction:column;gap:2px;padding:12px 0;color:inherit;text-decoration:none}
+.start-archive li a:hover b{text-decoration:underline}
+.start-archive span{color:var(--muted);font-size:13px}
+/* 입력 칸과 고르기 단추 (시뮬레이터와 같은 모양) */
+.field{display:flex;flex-direction:column;gap:6px;border:0;padding:0;margin:0;min-width:0}
+.field > span,.field legend{font-size:14px;font-weight:600;padding:0}
+.field em{font-style:normal;color:var(--muted);font-weight:400}
+.field small{color:var(--muted);font-size:12.5px}
+.field input:not([type]),.field input[type="date"]{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--sheet);color:var(--ink);width:100%;font:inherit}
+.field input:focus{outline:2px solid var(--accent-fill);outline-offset:0;border-color:transparent}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg span{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px;background:var(--sheet);color:var(--ink)}
+.seg input:checked + span{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
+.seg input:focus-visible + span{outline:2px solid var(--ink);outline-offset:2px}

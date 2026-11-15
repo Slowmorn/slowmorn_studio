@@ -45,8 +45,6 @@ footer::before{
           mask:url(xmas/stitch.svg) 0 0 / 4px 4px repeat;
 }
 .hero-lead{color:var(--xm-cream)}
-.hero-cta{background:var(--xm-cream);color:var(--xm-red)}
-.hero-cta:hover{filter:brightness(.96)}
 .hero-art{color:var(--ink);background:var(--xm-board);border-color:rgba(0,0,0,.08);box-shadow:0 18px 40px -20px rgba(0,0,0,.55)}
 .site-main h2{color:var(--xm-cream)}
 .site-main .note{color:var(--xm-pink)}
@@ -55,6 +53,12 @@ footer::before{
 .cat-table{background:var(--xm-board)}
 .cat-table th{background:#F4EAE6}
 .sister{background:var(--xm-board);border-color:rgba(0,0,0,.08)}
+.start-archive ul,.start-resume{background:var(--xm-board);border-color:rgba(0,0,0,.08)}
+/* 시작 칸은 빨간 니트 판 위에 바로: 글자는 크림색, 단추는 크림 바탕 */
+.hero-start .field > span{color:var(--xm-cream)}
+.hero-start .field em,.hero-start .note{color:var(--xm-pink)}
+.btn-start{background:var(--xm-cream);color:var(--xm-red)}
+.btn-start:hover{filter:brightness(.96)}
 .sister:hover{border-color:rgba(0,0,0,.16);box-shadow:0 8px 24px -12px rgba(0,0,0,.45)}
 
 /* ── 시뮬레이터 ──
