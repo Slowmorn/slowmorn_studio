@@ -39,13 +39,15 @@ function shapes(kind, twins){
     for(const [cx, cy, k] of babies){
       E(cx, cy, 38 * k, 25 * k, 'wall');
       E(cx, cy, 35 * k, 22 * k, 'fluid');
-      E(cx + 7 * k, cy + 4 * k, 12 * k, 9.5 * k, 'body');          // 동글동글 몸
-      E(cx + 17 * k, cy + 11 * k, 4.5 * k, 3.2 * k, 'body');       // 다리
-      E(cx + 4 * k, cy + 12.5 * k, 3.6 * k, 2.4 * k, 'body');      // 팔
-      E(cx - 11 * k, cy - 3 * k, 12 * k, 11 * k, 'bone');          // 큰 머리
-      E(cx - 11 * k, cy - 3 * k, 10.4 * k, 9.4 * k, 'body');
-      E(cx - 22 * k, cy - 1 * k, 2.2 * k, 2.6 * k, 'body');        // 코끝
-      E(cx - 3 * k, cy - 11 * k, 4 * k, 1.3 * k, 'fluid');         // 목덜미 투명대
+      // 젤리곰: 넓은 양수 속에 작게, 머리와 몸이 둘 다 동글동글하고 팔다리는 짧은 콩처럼
+      const f = .75 * k, bx = cx + 2 * k, by = cy + 2 * k;
+      E(bx + 7 * f, by + 6 * f, 8.5 * f, 8 * f, 'body');           // 동그란 몸
+      E(bx + 14 * f, by + 12 * f, 3.4 * f, 3 * f, 'body');         // 짧은 다리
+      E(bx + 2 * f, by + 11 * f, 2.8 * f, 2.6 * f, 'body');        // 짧은 팔
+      E(bx - 5 * f, by - 4 * f, 10.5 * f, 10 * f, 'bone');         // 큰 머리
+      E(bx - 5 * f, by - 4 * f, 9 * f, 8.6 * f, 'body');
+      E(bx - 14.5 * f, by - 2 * f, 1.8 * f, 2 * f, 'body');        // 콧등
+      E(bx + 2 * f, by - 11.5 * f, 3 * f, 1 * f, 'fluid');         // 목덜미 투명대
     }
   }
   return S;
@@ -123,7 +125,7 @@ function sticker(x2, text, x, y){
 }
 
 export function ultrasound(kind, { seed = 'x', twins = false, week = 12, name = '' } = {}){
-  const key = [kind, seed, twins, week, name, 4].join('|');
+  const key = [kind, seed, twins, week, name, 5].join('|');
   if(cache.has(key)) return cache.get(key);
   const r = rng(key);
   const big = document.createElement('canvas');

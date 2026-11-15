@@ -1,7 +1,7 @@
 // 도트 그림 — 임신기에는 곰 부부와 그 사이에 크게 보이는 배 속, 출산 뒤에는 만 3세 아기 곰까지, 시기에 맞는 장면을 그려요.
 // 80×40 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
 // 캐릭터는 한 줄씩 글자로 적은 도트 지도(스프라이트)를 찍어요. 테두리까지 지도에 들어 있어요.
-import { BIRTH_T, PREG_START } from './events.js?v=20261115c';
+import { BIRTH_T, PREG_START } from './events.js?v=20261116k';
 
 // 높이는 40칸 그대로, 가로 칸 수는 그림이 놓인 자리의 폭에 맞춰 늘어나요 (최소 80칸). 사람·벽난로·트리는 가운데를 기준으로 놓아요
 export let W = 80;
@@ -135,7 +135,7 @@ const HAIR = {
          6:'ohhhfffefffffeffo', 7:'ohhhfffefffffeffo', 8:'ohhhffcfffffffcfo', 9:'ohhhffffffmfffffo', 10:'.ohhfffffffffffo.', 11:'..ohsssssssssso..' },
   // 단발: 턱선까지 둥글게
   bob:{ 1:'....ooooooooo....', 2:'..oohhhhHHhhhoo..', 3:'.ohhhhhhhhhHhhho.', 4:'ohhhhhhhhhhhhhhho', 5:'ohhhhhhhhhhhhhhho',
-        6:'ohhhhffefffffehho', 7:'ohhhhffefffffehho', 8:'ohhhhfcffffffhhho', 9:'ohhhhfffffmffhhho', 10:'.ohhhhfffffffhho.', 11:'..oooosssssssooo.' },
+        6:'ohhhhffefffffefho', 7:'ohhhhffefffffefho', 8:'ohhhhfcfffffffcho', 9:'ohhhhfffffmffffho', 10:'.ohhhhfffffffffo.', 11:'..oooosssssssso..' },
 };
 
 function overlay(base, map){
@@ -442,14 +442,14 @@ function room(m, month, { twins }, now){
   const { char } = layers();
   char.clear();
   const n = twins ? 2 : 1, mid = Math.floor(W / 2);
-  const xs = n === 2 ? (month >= 3 && month < 12 && (month < 6 || month >= 9) ? [mid - 14, mid + 13] : [mid - 10, mid + 10]) : [mid];
-  parents(m, now);
+  const xs = n === 2 ? (month >= 3 && month < 12 ? [mid - 15, mid + 10] : [mid - 10, mid + 10]) : [mid];
+  parents(m, now, twins);
   babies(m, char, month, twins, xs, now);
 }
 // 출산 뒤에도 엄마·아빠 곰이 아기 양옆에 서서 아기를 바라봐요
-function parents(m, now){
+function parents(m, now, twins){
   const mid = Math.floor(W / 2), GY = 38, sy = GY - ADULT_H;
-  const mx = mid - 46, dx = mid + 30;
+  const mx = mid - (twins ? 41 : 31), dx = mid + (twins ? 23 : 14);   // 아기 바로 옆에 붙어 서요
   m.rect(mx + 3, GY - 1, 11, 1, X.floorD); m.rect(dx + 3, GY - 1, 11, 1, X.floorD);
   const bm = now > 0 ? Math.floor(now / 1100) % 2 : 0, bd = now > 0 ? Math.floor((now + 550) / 1100) % 2 : 0;
   let mom = CAST.mom.rows;
@@ -601,24 +601,26 @@ function babies(m, char, month, twins, xs, now){
       stamp(char, h, x - 8, 23, p);
     });
   } else if(month < 9){
-    // 혼자 앉아서 손 흔들기
+    // 매트에 혼자 앉아 있기: 동그란 몸에 짧은 팔다리, 두 손을 번갈아 흔들어요
+    m.ell(Math.floor(W / 2), 34, twins ? 26 : 16, 3, C.matS); m.ell(Math.floor(W / 2), 33, twins ? 25 : 15, 2, C.mat);
     xs.forEach((x, i) => {
-      const p = babyPal(i), wave = Math.floor(now / 350 + i) % 2;
+      const p = babyPal(i), wave = now > 0 ? Math.floor(now / 380 + i) % 2 : 0;
       tmp2(char, t => {
-        t.ell(x, 31, 4, 4, p.t);
-        t.rect(x - 6, 29 - wave, 2, 2, p.f); t.rect(x + 5, 29 - (1 - wave), 2, 2, p.f);
+        t.rect(x - 5, 31 - wave, 2, 2, p.f); t.rect(x + 4, 31 - (1 - wave), 2, 2, p.f);   // 팔
+        t.ell(x, 32, 3, 2, p.t);                                            // 작고 동그란 몸
+        t.rect(x - 5, 34, 3, 1, p.f); t.rect(x + 3, 34, 3, 1, p.f);       // 양쪽으로 벌린 다리 (몸 위에 그려서 잘 보여요)
       });
       let h = i ? mirror(babyHeadRows(month)) : babyHeadRows(month); if(blinkAt(now, i * 1300)) h = closeEyes1(h, 4);
-      stamp(char, h, x - 6, 20, p);
+      stamp(char, h, x - 6, 22, p);
     });
   } else if(month < 12){
     // 기어 다니기
     xs.forEach((x, i) => {
       const p = babyPal(i), st = Math.floor(now / 300 + i) % 2;
       tmp2(char, t => {
-        t.ell(x + 4, 31, 6, 3, p.t);
-        t.rect(x - 1 + st, 33, 2, 3, p.f); t.rect(x + 2 - st, 33, 2, 3, p.f);
-        t.rect(x + 7 - st, 33, 2, 3, p.f); t.rect(x + 9 + st, 33, 2, 3, p.f);
+        t.ell(x + 3, 32, 4, 2, p.t);                                   // 몸 (작게)
+        t.rect(x - 1 + st, 33, 2, 2, p.f); t.rect(x + 1 - st, 33, 2, 2, p.f);
+        t.rect(x + 5 - st, 33, 2, 2, p.f); t.rect(x + 7 + st, 33, 2, 2, p.f);
       });
       let h = mirror(babyHeadRows(month)); if(blinkAt(now, i * 1300)) h = closeEyes1(h, 4);
       stamp(char, h, x - 9, 23, p);
