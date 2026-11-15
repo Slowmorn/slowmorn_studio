@@ -85,3 +85,14 @@
 .seg span{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:600;font-size:14px;background:var(--sheet);color:var(--ink)}
 .seg input:checked + span{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
 .seg input:focus-visible + span{outline:2px solid var(--ink);outline-offset:2px}
+
+/* 개인정보 처리방침 같은 글 페이지 */
+.doc-hero{display:block}
+.doc{max-width:var(--wrap);margin:0 auto;padding:8px 20px 24px}
+.doc h2{font-size:17px;letter-spacing:-0.01em;margin:32px 0 10px}
+.doc p{color:var(--muted);margin:0 0 10px;max-width:66ch;line-height:1.75;word-break:keep-all}
+.doc ul{color:var(--muted);margin:6px 0 16px;padding-left:20px;line-height:1.85;max-width:66ch;word-break:keep-all}
+.doc b{color:var(--ink)}
+.doc a{color:var(--accent)}
+.doc .cat-table{max-width:760px;margin-top:14px}
+@media (max-width:640px){ .doc{padding:0 16px 16px} }

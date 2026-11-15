@@ -1,13 +1,13 @@
 // 패밀리리허설 — 출산·육아 시뮬레이터
 // 시뮬레이션 · 정리 화면과 결정 카드를 다뤄요. 시작 정보는 소개 페이지의 폼에서 받아요(start.js). 상태는 localStorage 에 저장해요.
-import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261117p';
-import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261117p';
-import { mountScene, caption, momNote } from './pixel.js?v=20261117p';
-import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261117p';
-import { Clock } from './clock.js?v=20261117p';
-import { renderReport } from './report.js?v=20261117p';
-import { stageLabel, dateText } from './time.js?v=20261117p';
-import { KEY, ARCHIVE_KEY, load, store, remove, newState, archive } from './start.js?v=20261117p';
+import { EVENTS, DECISIONS, BIRTH_T, TWIN_BIRTH_T, END_T, PHASES, TYPE_LABEL, MODE_LABEL, byId, evTitle, evBody } from './events.js?v=20261117q';
+import { totals, optionOf, priceText, optionTotal, won, eff, BASE_NOTE } from './budget.js?v=20261117q';
+import { mountScene, caption, momNote } from './pixel.js?v=20261117q';
+import { ultrasound, ULTRA_LABEL, ULTRA_WEEK } from './ultra.js?v=20261117q';
+import { Clock } from './clock.js?v=20261117q';
+import { renderReport } from './report.js?v=20261117q';
+import { stageLabel, dateText } from './time.js?v=20261117q';
+import { KEY, ARCHIVE_KEY, load, store, remove, newState, archive } from './start.js?v=20261117q';
 
 const $ = sel => document.querySelector(sel);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));

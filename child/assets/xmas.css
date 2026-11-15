@@ -88,3 +88,8 @@ footer::before{
   .report{padding-top:40px;padding-left:10px;padding-right:10px}
   .r-wrap{padding:18px 14px 22px}
 }
+
+/* ── 글 페이지 (개인정보 처리방침) ── 니트 위에 크림 판으로 */
+.hero .doc-hero .kicker{color:var(--xm-pink)}
+.doc{background:var(--xm-board);border-radius:16px;padding:8px 28px 28px;max-width:calc(var(--wrap) - 40px)}
+@media (max-width:640px){ .doc{margin:0 16px;padding:4px 18px 22px} }
