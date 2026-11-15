@@ -1,7 +1,7 @@
 // 도트 그림 — 임신기에는 곰 부부와 그 사이에 크게 보이는 배 속, 출산 뒤에는 만 3세 아기 곰까지, 시기에 맞는 장면을 그려요.
 // 80×40 작은 캔버스에 점을 찍고, 화면에는 image-rendering: pixelated 로 크게 보여 줘요.
 // 캐릭터는 한 줄씩 글자로 적은 도트 지도(스프라이트)를 찍어요. 테두리까지 지도에 들어 있어요.
-import { BIRTH_T, PREG_START } from './events.js?v=20261117n';
+import { BIRTH_T, PREG_START } from './events.js?v=20261117p';
 
 // 높이는 40칸 그대로, 가로 칸 수는 그림이 놓인 자리의 폭에 맞춰 늘어나요 (최소 80칸). 사람·벽난로·트리는 가운데를 기준으로 놓아요
 export let W = 80;
@@ -643,8 +643,8 @@ function babies(m, char, month, twins, xs, now){
     // 엎드려 고개 들기
     m.ell(Math.floor(W / 2), 34, twins ? 26 : 16, 3, C.matS); m.ell(Math.floor(W / 2), 33, twins ? 25 : 15, 2, C.mat);
     xs.forEach((x, i) => {
-      const p = babyPal(i), kick = Math.floor(now / 400 + i) % 2;
-      tmp2(char, t => { t.ell(x + 4, 31, 6, 2, p.t); t.rect(x + 9, 28 - kick, 2, 2, p.f); });
+      const p = babyPal(i);
+      tmp2(char, t => t.ell(x + 4, 31, 6, 2, p.t));
       let h = mirror(babyHeadRows(month)); if(blinkAt(now, i * 1300)) h = closeEyes1(h, 4);
       stamp(char, h, x - 8, 23, p);
     });
